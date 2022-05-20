@@ -8,7 +8,7 @@ function hideControls() {
 }
 
 function startGame() {
-    window.location.href = "main.html";
+    window.location.href = "game.html";
 }
 
 //loss page------------------------------------------

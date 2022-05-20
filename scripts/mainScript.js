@@ -12,7 +12,7 @@ async function move0Sequence() {
 }
 async function move1Sequence() {
     await output("The home of the Will is not a tranquil place.");
-    await output("It is a harbour of desire and dissatisfaction.");
+    await output("It is a harbour of desire and absent satisfaction.");
     await output("Of throttled dreams and far-flung goals.");
 }
 async function fight1WinSequence() {
