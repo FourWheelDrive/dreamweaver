@@ -169,7 +169,8 @@ class Game {
         this.currentRoom = 1;
         this.moveCounter = 0;
         this.dialogueSequenceMoves = [1]; //check if moveCounter = these, then do the sequences.
-        this.encounterSequenceMoves = [];
+        this.encounterSequenceMoves = [0, 1];
+        this.encounterSequences = [];
 
         this.attackMultiplier = 1;
         this.healthMultiplier = 1;

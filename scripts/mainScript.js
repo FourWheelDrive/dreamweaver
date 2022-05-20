@@ -1,7 +1,7 @@
 //Functions
 //Sequences:
 async function openingSequence() {
-    await externalOutput(["That representation of the being-in-itself...", "...is the Will that drives the world."]);
+    await externalOutput(["That which represents the being-in-itself...", "...is the Will that drives the world."]);
 }
 
 //Move sequences
@@ -77,7 +77,7 @@ async function clearRoomSequence() {
 
 //Output functions
 function createOutputBoxes() {
-    var number = 5;
+    var number = Math.floor(window.innerHeight/100);
     var opacity = 1;
     let outputBox = document.getElementById("outputBox");
 

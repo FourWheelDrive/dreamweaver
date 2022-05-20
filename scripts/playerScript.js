@@ -114,8 +114,10 @@ async function keyDownHandler(e) {
     //special case for move triggers.
     if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD" && !game.encounterInProgress && !e.repeat)) {
         game.moveCounter++;
-        if (game.moveCounter == 1) {                                                      //first move trigger.
-            await move1Sequence();
+        switch (game.moveCounter) {
+            case 1:
+                move1Sequence();
+                break;
         }
         if (game.firstEncounterWon && !game.firstEncounterDialogue) {                     //After the first fight.
             game.firstEncounterDialogue = true;

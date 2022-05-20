@@ -16,7 +16,7 @@ body {
     grid-template-areas: "header header"
         "actionMenu outputBar"
         "footer footer";
-    grid-template-columns: 5fr 1fr;
+    grid-template-columns: 5fr 2fr;
     grid-template-rows: 1fr 6fr 1fr;
 
     gap: 2px;
