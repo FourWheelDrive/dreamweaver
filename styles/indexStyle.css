@@ -1,0 +1,82 @@
+body {
+    background-color: #fff8e0;
+}
+
+/*Titlescreen-------------------------------------------------------------*/
+#titleScreen__menu{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    padding: 10%;
+    width: auto;
+    height: auto;
+
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    display: flex;
+    flex-direction: column;
+}
+#titleScreen__menu__title{
+    font-family: monospace;
+    font-size: 20px;
+    line-height: 150%;
+    font-weight: 700;
+
+    margin: 10px;
+    margin-bottom: 5px;
+
+    text-align: center;
+}
+
+/*Control popup-------------------------------------------------------------*/
+#controlsPanel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: auto;
+    height: auto;
+
+    padding: 5px;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    display: none;
+    flex-direction: column;
+}
+
+.controlsPanel__text {
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 110%;
+
+    margin-top: 0px;
+    margin: 10px;
+
+    text-align: left;
+}
+.controlsPanel__button{
+    margin: 5px;
+    height: 40px;
+
+    border-radius: 0px;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    font-family: monospace;
+    font-size: 15px;
+}
+.controlsPanel__button:active{
+    background-color: #d6cbab;
+}
+
+/*Loss screen-------------------------------------------------------------*/
+#lossScreen{
+    display: none;
+}
+
+/*win screen-------------------------------------------------------------*/

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="scripts/globalUtilScript.js"></script>
+    <script type="text/javascript" src="scripts/mapGenerator.js"></script>
+
+    <script type="text/javascript" src="scripts/indexScript.js"></script>
+    <script type="text/javascript" src="scripts/enemiesListScript.js"></script>
+    <script type="text/javascript" src="scripts/playerScript.js"></script>
+    <script type="text/javascript" src="scripts/mainScript.js"></script>
+
+    <link rel="stylesheet" href="styles/mainStyle.css">
+    <link rel="stylesheet" href="styles/encounterStyle.css">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body onload="onLoad()">
+    <div id="mainGameGrid" class="uiGrid">
+        <div id="uiGrid__header">
+            <p id="uiGrid__header__healthDisplay" class="uiGrid__text"> </p>
+            <p id="uiGrid__header__wishesDisplay" class="uiGrid__text"> </p>
+            <p id="uiGrid__header__hoverDisplay" class="uiGrid__text"> </p>
+        </div>
+
+        <div id="outputBox"></div>
+        <div id="gameSpace"></div>
+
+        <div id="uiGrid__footer">
+            <!-- Controls button
+                <button class="uiGrid__footer__controlsButton" onclick="showControls()">Controls</button>
+            -->
+            <p id="uiGrid__header__soloistDisplay" class="uiGrid__text"> </p>
+        </div>
+    </div>
+
+    <!-- control panel
+    <div id="controlsPanel">
+        <p id="controlsPanel__title">Dreamweaver<p>
+        <p class="controlsPanel__text">
+            Movement phase: <br>
+            W, A, S, D......Explore the map <br>
+            <br>
+            Engagement phase: <br>
+            J........................Attack <br>
+            K.........................Parry <br>
+        </p>
+        <button class="uiGrid__footer__controlsButton" onclick="hideControls()">Return to the city.</button>
+    </div>
+-->
+
+    <div id="encounterDialogue">
+        <div id="encounterDialogue__header">
+            <p id="encounterDialogue__header__locationDisplay"></p>
+        </div>
+        <div id="encounterDialogue__menu">
+            <button id="encounterDialogue__menu__attackButton" class="encounterDialogue__menu__button" onclick="buttonPressHandler(event)">
+                <span class="encounterDialogue__menu__button__progress"></span> <!--This is the div whose background makes the timer.-->
+                <span class="encounterDialogue__menu__button__text">Attack</span>
+            </button>
+            <button id="encounterDialogue__menu__parryButton" class="encounterDialogue__menu__button" onclick="buttonPressHandler(event)">
+                <span class="encounterDialogue__menu__button__progress"></span>
+                <span class="encounterDialogue__menu__button__text">Parry</span>
+            </button>
+        </div>
+        <div id="encounterDialogue__displaySpace">
+            <canvas id="encounterDialogue__displaySpace__canvas" width="400" height="50"></canvas>
+        </div>
+        <div id="encounterDialogue__output">
+            <p id="encounterDialogue__output__outputBox">output</p>
+        </div>
+    </div>
+    <div id="encounterVictoryDialogue">
+        <div id="encounterVictoryDialogue__header">
+            <p id="encounterVictoryDialogue__header__locationDisplay"></p>
+        </div>
+        <div id="encounterVictoryDialogue__output">
+            <p id="encounterVictoryDialogue__output__message"></p>
+            <p id="encounterVictoryDialogue__output__loot"></p>
+        </div>
+        <button id="encounterVictoryDialogue__returnButton" onclick="buttonPressHandler(event)"></button>
+    </div>
+
+    <div id="externalOutputBox">
+        <p id="externalOutputBox_output1"></p>
+        <p id="externalOutputBox_output2"></p>
+        <p id="externalOutputBox_output3"></p>
+    </div>
+</body>
+
+</html>

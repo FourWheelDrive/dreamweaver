@@ -1,0 +1,163 @@
+/*ENCOUNTER DIALOGUE POPUP-------------------------------------------------------*/
+#encounterDialogue{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 50%;
+    height: 30%;
+    display: none;
+    grid-template-areas: "header header"
+    "actionMenu canvas"
+    "actionMenu outputBox";
+    grid-template-columns: 1fr 2fr;
+    grid-template-rows: 1fr 3fr 1fr;
+
+    border: 1px solid black;
+    background-color: #fff8e0;
+}
+#encounterDialogue > * {
+    padding: 0px;
+    margin: 0px;
+}
+
+#encounterDialogue__header{
+    grid-area: header;
+}
+#encounterDialogue__menu{
+    width: auto;
+    grid-area: actionMenu;
+
+    display: flexbox;
+    flex-wrap: wrap;
+}
+
+#encounterDialogue__displaySpace{
+    width: auto;
+    grid-area: canvas;
+
+    display: flex;
+    justify-content: center;
+}
+#encounterDialogue__output{
+    grid-area: outputBox;
+    display: flex;
+    justify-content: center;
+}
+
+#encounterDialogue__header__locationDisplay{
+    font-family: monospace;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 90%;
+
+    width: fit-content;
+
+    padding-left: 10px;
+}
+#encounterDialogue__output__outputBox{
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 90%;
+    width: fit-content;
+
+    text-align: center;
+}
+
+.encounterDialogue__menu__button{
+    position: relative; /*For the cooldown timer stuff!*/
+    margin: 5px;
+    margin-right: 0px;
+    height: 40px;
+    aspect-ratio: 2/1;
+
+    border-radius: 0px;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    font-family: monospace;
+    font-size: 15px;
+}
+/*.encounterDialogue__menu__button:active:enabled {
+    background-color: #d6cbab;
+}*/
+.encounterDialogue__menu__button__progress{/*Button cooldown timer!*/
+position: absolute;
+height: 100%;
+width: 0%; /*use JS to change.*/
+top: 0;
+left: 0;
+background:#d6cbab;
+transition: width 1s;
+}
+.encounterDialogue__menu__button__text{
+    position: relative;
+}
+
+/*VICTORY DIALOGUE POPUP-------------------------------------------------------*/
+#encounterVictoryDialogue{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 50%;
+    height: 30%;
+    display: none;
+    grid-template-areas: "header"
+    "output"
+    "button";
+    grid-template-rows: 1fr 3fr 1fr;
+
+    border: 1px solid black;
+    background-color: #fff8e0;
+}
+#encounterVictoryDialogue > *{
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 90%;
+
+    margin: 10px;
+
+    text-align: center;
+
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+#encounterVictoryDialogue__header{
+    grid-area: header;
+}
+#encounterVictoryDialogue__output{
+    grid-area: output;
+    display: flex;
+    flex-direction: column;
+}
+#encounterVictoryDialogue__returnButton{
+    grid-area: button;
+
+    margin: 5px;
+    height: 40px;
+    width: 50%;
+
+    border-radius: 0px;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    font-family: monospace;
+    font-size: 15px;
+}
+#encounterVictoryDialogue__returnButton:active {
+    background-color: #d6cbab;
+}
+#encounterVictoryDialogue__header__locationDisplay{
+    width: fit-content;
+    font-weight: bold;
+    border-bottom: 1px solid black;
+
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+}

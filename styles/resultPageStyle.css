@@ -1,0 +1,11 @@
+/*lose page-----------------------------------------------------------*/
+.losePageText{
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 90%;
+
+    margin: 10px;
+
+    text-align: center;
+}
+/*win page------------------------------------------------------------*/
