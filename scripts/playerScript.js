@@ -5,10 +5,11 @@ function setHoverListener(boardRows) {
         for (var j = 0; j < rowCells.length; j++) { //for each column cell in a row:
             let cell = rowCells[j];
             cell.addEventListener("mouseover", function () { //this updates the display according to cell id.
-                if (cell.classList.contains("gameSpace__specialLocations")) {
+                let tempPosition = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1); //get cell coords
+                if (cell.classList.contains("gameSpace__specialLocations") && !map[tempPosition[0]][tempPosition[1]].obscured) { //if the special location is in vision:
                     let cellPosition = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
                     document.getElementById("uiGrid__header__hoverDisplay").innerHTML = map[cellPosition[0]][cellPosition[1]].name;
-                } else {
+                } else { //else just display coords.
                     document.getElementById("uiGrid__header__hoverDisplay").innerHTML = `${cell.id}`;
                 }
             })
@@ -31,7 +32,7 @@ function drawPlayer(boardRows) {
 //Keydown handlers
 async function keyDownHandler(e) {
     //If keys are pressed for movement AND not in an encounter AND not held down:
-    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.encounterInProgress && !e.repeat) {
+    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.movesLocked && !e.repeat) {
         let boardRows = document.getElementById("gameSpace").children;
         //very cool directions array! Append each element instead of having 4 switch statements.
         //[left] [right] [up] [down]
@@ -64,7 +65,7 @@ async function keyDownHandler(e) {
         nextCellPos = [parseInt(currentCellPos[0]) + newDirection[0], parseInt(currentCellPos[1]) + newDirection[1]];
         let newCell, newCellEntity;
 
-        if (nextCellPos[0] <= globalWidth && nextCellPos[1] <= globalHeight) { //check for out of bounds. //Not working.
+        if ((nextCellPos[0] <= globalWidth && nextCellPos[1] <= globalHeight) && (nextCellPos[0] >= 0 && nextCellPos[1] >= 0)) { //check for out of bounds. //Not working.
             newCell = document.getElementById(`[${nextCellPos[0]}][${nextCellPos[1]}]`);
             let tempPosition = newCell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
             newCellEntity = map[tempPosition[0]][tempPosition[1]];
@@ -89,6 +90,8 @@ async function keyDownHandler(e) {
             playerY = nextCellPos[1];
             //new cell styles.
             newCell.style.fontSize = "15px";
+            //Update the fog of war.
+            showCellsInVision(5, playerX, playerY);
 
             //Choose action, if applicable:-----------------------------------------------------------------------------------------||-----
             //Begin encounters on locations, if they're new.
@@ -101,31 +104,40 @@ async function keyDownHandler(e) {
                     //new tile encounter.
                     await beginEncounter(newCellEntity);
                 }
-            } else if (!game.dialogueSequenceMoves.includes(game.moveCounter + 1) && !newCellEntity.alreadyVisited) { //NO RANDOM ENCOUNTER on special moves or already visited paths.
+            } else if (!game.storyDialogueMoves.includes(game.moveCounter + 1) && !newCellEntity.alreadyVisited) { //NO RANDOM ENCOUNTER on special moves or already visited paths.
                 //Random chance for encounters on untread path tiles.
-                let tempChance = playerRandInt(1, game.randomEncounterChance, "floor");
-                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && tempChance == 1) {
-                    await beginEncounter(newCellEntity);
+                let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
+                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && !game.dialogueLocked && tempChance == 1) {
+                    //await beginEncounter(newCellEntity);
                 }
                 newCellEntity.alreadyVisited = true;
+            }
+
+            //After move, disable dialogueLocked.
+            if (game.dialogueLocked) {
+                game.dialogueLocked = false;
             }
         }
     }
     //special case for move triggers.
-    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD" && !game.encounterInProgress && !e.repeat)) {
+    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !e.repeat) {
         game.moveCounter++;
+        if (game.storyDialogueMoves.includes(game.moveCounter)) { //check move dialogues.
+            storyDialogueHandler("storyMove");
+        }
+
         switch (game.moveCounter) {
             case 1:
                 move1Sequence();
                 break;
         }
-        if (game.firstEncounterWon && !game.firstEncounterDialogue) {                     //After the first fight.
+        if (game.encounterCounter == 1 && !game.firstEncounterDialogue) { //After the first fight.
             game.firstEncounterDialogue = true;
             await fight1WinSequence();
         }
     }
     //If keys are pressed for attack: Actually redirected to buttonPressHandler.
-    if ((e.code == "KeyJ" || e.code == "KeyK") && game.fightInProgress) {//Clicking encounter buttons also redirects here.
+    if ((e.code == "KeyJ" || e.code == "KeyK") && !game.attacksLocked) {//Clicking encounter buttons also redirects here.
         switch (e.code) {
             case "KeyJ": //regular attack
                 if (!player.atkOnCD) {
@@ -141,12 +153,76 @@ async function keyDownHandler(e) {
                 break;
         }
     }
-    if (e.code == "Enter") { //return buttons click.
+    //Toggle inventory.
+    if (e.code == "KeyG") {
+        switch (game.inventoryOpen) {
+            case true: //if inv is open, close it.
+                //pause and unlock EVERYTHING.
+                game.attacksLocked = false;
+                game.movesLocked = false;
+                game.inventoryOpen = false;
+
+                document.getElementById("inventoryDisplay").style.display = "none";
+                if (player.inventory.length > 0) { //reset outputbar.
+                    inventoryPosition = 0;
+                    document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[0].description;
+                } else {
+                    document.getElementById("inventoryDisplay__output").innerHTML = "";
+                }
+                break;
+            case false: //if inv is closed, open it.
+                //pause and lock EVERYTHING.
+                game.attacksLocked = true;
+                game.movesLocked = true;
+                game.inventoryOpen = true;
+
+                //default position.
+                inventoryPosition = 0;
+
+                document.getElementById("inventoryDisplay").style.display = "grid";
+                break;
+        }
+    }
+    if (game.inventoryOpen && (e.code == "ArrowLeft" || e.code == "ArrowRight" || e.code == "Enter")) { //use a pointer to maneuver between inventory items.
+        switch (e.code) {
+            case "ArrowLeft":
+                if ((inventoryPosition - 1) >= 0 && player.inventory.length > 0) {
+                    inventoryPosition = inventoryPosition - 1;
+                    let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
+                    document.getElementById(`${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    //need to reset the other button.
+                    document.getElementById(`${inventoryPosition + 1}`).innerHTML = document.getElementById(`${inventoryPosition + 1}`).innerHTML.slice(5, -5);
+                    document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
+                }
+                break;
+            case "ArrowRight":
+                if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 0) {
+                    inventoryPosition = inventoryPosition + 1;
+                    let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
+                    document.getElementById(`${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    //need to reset the other button.
+                    document.getElementById(`${inventoryPosition - 1}`).innerHTML = document.getElementById(`${inventoryPosition - 1}`).innerHTML.slice(5, -5);
+                    document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
+                }
+                break;
+            case "Enter":
+                if (player.inventory.length > 0) { //if inventory has 1+ items
+                    if (document.getElementById("inventoryDisplay__output").innerHTML.includes("Confirm: ENTER")) { //confirmation prompt.
+                        document.getElementById("inventoryDisplay__output").innerHTML = "";
+                        player.useInventoryItem(inventoryPosition);
+                    } else {
+                        document.getElementById("inventoryDisplay__output").innerHTML = `Use ${player.inventory[inventoryPosition].name}? Confirm: ENTER`
+                    }
+                }
+                break;
+        }
+    }
+    if (!game.inventoryOpen && e.code == "Enter") { //return buttons click.
         document.getElementById("encounterVictoryDialogue__returnButton").click();
     }
 }
 //Button handlers. Attacks from keyDownHandler redirected here.
-function buttonPressHandler(e) {
+async function buttonPressHandler(e) {
     e = e || window.event; //different event handlers.
     var buttonId = e.currentTarget.id;
 
@@ -169,16 +245,22 @@ function buttonPressHandler(e) {
                 procButtonCooldownTimer(buttonId, player.attacks[1].cooldown);
             }
             break;
+        //This returnButton case also starts dialogue sequences at the end of important encounters!!
         case "encounterVictoryDialogue__returnButton": //the return to map button.
+            //boss fights have been handled in win encounter script.
             hideEncounterDialogue();
+            if (game.storyDialogueEncounters.includes(game.encounterCounter)) {
+                await storyDialogueHandler("storyEncounter");
+            }
+
             break;
     }
 }
 
-//Encounter----------------------
+//Encounter------------------------------------------------------------------------------------------------------------------
 //If the player walks into an encounter, start encounterScript. This initializes vars, sets up room, calls encounterFunctionWrapper for the first time.
 async function beginEncounter(cellEntity) { //CELLENTITY, NOT CELL.
-    game.encounterInProgress = true; //Enable J, K keybinds for attacks. Disable movement.
+    game.movesLocked = true; //Enable J, K keybinds for attacks. Disable movement.
 
     //set up the encounter here. Class 1, 2, 3 rooms, from top to bottom.
     //Choose a random number of enemies to be in each room, within a certain range according to room.
@@ -205,38 +287,7 @@ async function beginEncounter(cellEntity) { //CELLENTITY, NOT CELL.
 async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator) {//callback function. Runs when each fight is done, if there are more enemies left in the room.
     //check if encounter is done, then display victory dialogue. This dialogue gets disabled on button click.
     if (currentEnemyIterator > enemiesInRoom) {
-        if (!game.firstEncounterWon) { //if exiting first fight, flip flag for dialogue.
-            game.firstEncounterWon = true;
-        }
-        //Update the alreadyVisited if the fight on this cell is won.
-        cellEntity.alreadyVisited = true;
-        //display victory dialogue.
-        let victoryDialogue = document.getElementById("encounterVictoryDialogue");
-
-        /*WHY CAN'T I GET SIZE RIGHT REEEEEEEEEE
-        let encounterDialogue = document.getElementById("encounterDialogue");
-
-        let rect = encounterDialogue.getBoundingClientRect();
-        //set same size as encounter dialogue. no "auto" here.
-        victoryDialogue.style.width = rect.width;
-        victoryDialogue.style.height = rect.height;
-        console.log(victoryDialogue.style.width);
-        */
-
-        //If the encounter that was just defeated was the room's boss:
-        if (cellEntity.type == "boss encounter") {
-            clearRoomSequence();
-        }
-
-        victoryDialogue.style.display = "grid";
-
-        let tempWishes = 10 * enemiesInRoom; //Might somewhat randomize these.
-        player.addWishes(tempWishes); //update wishes!
-
-        document.getElementById("encounterVictoryDialogue__output__message").innerHTML = "A stranger becomes a well-wisher."; //might be randomized.
-        document.getElementById("encounterVictoryDialogue__header__locationDisplay").innerHTML = cellEntity.name;
-        document.getElementById("encounterVictoryDialogue__output__loot").innerHTML = `Got ${tempWishes} Wishes!`;
-        document.getElementById("encounterVictoryDialogue__returnButton").innerHTML = "Gratitude is honour.";
+        winEncounter(cellEntity, enemiesInRoom);
         return;
     }
     //get canvas ready
@@ -282,7 +333,7 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
     encounterDialogueBox.innerHTML = "";
     encounterDialogueBox.style.opacity = 1;
     //Begin fight.
-    game.encounterInProgress = true; //Enable J, K keybinds for attacks. Disable movement.
+    game.attacksLocked = false; //Enable J, K keybinds for attacks. Disable movement.
     var encounterAnimation = window.requestAnimationFrame(function () { drawEncounter(ctx, canvas, enemy, encounterAnimation, function () { return encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator + 1); }) });
 }
 //Contains: Lose condition, victory dialogue.
@@ -292,7 +343,7 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
     const playerXOriginal = player.x;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.fightInProgress = true; //Fight keys unlocked.
+    game.attacksLocked = false; //Fight keys unlocked.
 
     ctx.textAlign = "center";
     ctx.font = "15px Didot, serif";
@@ -308,7 +359,7 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
 
     //Check for win/loss condition-----------------------------------------------------------------------------------------
     if (player.health <= 0 || enemy.health <= 0) {
-        game.fightInProgress = false;//fight keys locked.
+        game.attacksLocked = true;//fight keys locked.
         window.cancelAnimationFrame(animation); //stop animation. Win condition.
         if (enemy.health <= 0) {
             document.getElementById("encounterDialogue__output__outputBox").innerHTML = enemy.deathDialogue;
@@ -316,7 +367,7 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
         }
         if (player.health <= 0) { //Lose condition
             loseEncounter();
-            return; //can trigger lose script. Put above this return. Exits function and does not continue callback().
+            return;
         }
 
         //only callback if the enemy is dead, and not the player.
@@ -326,7 +377,7 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
     } else {
         //Continue frame if nobody is dead.--------------------------------------------------------------------------------
         //Enemy attacks.
-        if (!enemy.atkOnCD) {
+        if (!enemy.atkOnCD && !game.inventoryOpen) {
             enemy.atkOnCD = true;
             enemy.attackTarget(player)
             setTimeout(function () { enemy.atkOnCD = false; }, enemy.atkCD * 1000);
@@ -338,10 +389,14 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
 //Hides encounter dialogue, after all is done.
 function hideEncounterDialogue() {
     document.getElementById("encounterVictoryDialogue").style.display = "none";
-    game.encounterInProgress = false; //not in combat any more.
+    game.movesLocked = false; //not in combat any more.
+    game.attacksLocked = true;
 }
 //Lose a life. Seperated function for ease of read. Contains: Masquerade update, death dialogue.
 async function loseEncounter() {
+    //iterate deathCounter.
+    game.deathCounter++;
+
     document.getElementById("encounterDialogue__output__outputBox").innerHTML = `The world fades away.`;
     await sleep(outputPause);
 
@@ -379,8 +434,7 @@ async function loseEncounter() {
     //Now begin new dialogues.-----------------------------------------------------------------------------------------
 
     //Begin death dialogue, if necessary.
-    if (game.firstDeath) { //for first deaths.
-        game.firstDeath = false;
+    if (game.deathCounter == 1) { //for first deaths.
         firstDeathSequence();
     }
     if (player.masquerade == player.masqueradeSymbols.length - 1) { //Player on last life.
@@ -393,10 +447,46 @@ async function loseEncounter() {
     }
 
     //return to movement phase.
-    game.encounterInProgress = false;
+    game.movesLocked = false;
+    game.attacksLocked = true;
+}
+//Win a fight!
+async function winEncounter(cellEntity, enemiesInRoom) {
+    //Update the alreadyVisited if the fight on this cell is won.
+    cellEntity.alreadyVisited = true;
+    game.dialogueLocked = true;
+    game.encounterCounter++;
+    //display victory dialogue.
+    let victoryDialogue = document.getElementById("encounterVictoryDialogue");
+
+    /*WHY CAN'T I GET SIZE RIGHT REEEEEEEEEE
+    let encounterDialogue = document.getElementById("encounterDialogue");
+
+    let rect = encounterDialogue.getBoundingClientRect();
+    //set same size as encounter dialogue. no "auto" here.
+    victoryDialogue.style.width = rect.width;
+    victoryDialogue.style.height = rect.height;
+    console.log(victoryDialogue.style.width);
+    */
+
+    //If the encounter that was just defeated was the room's boss:
+    if (cellEntity.type == "boss encounter") {
+        roomCleared();
+    }
+
+    victoryDialogue.style.display = "grid";
+
+    let tempWishes = 10 * enemiesInRoom; //Might somewhat randomize these.
+    player.addWishes(tempWishes); //update wishes!
+
+    document.getElementById("encounterVictoryDialogue__output__message").innerHTML = "A stranger becomes a well-wisher."; //might be randomized.
+    document.getElementById("encounterVictoryDialogue__header__locationDisplay").innerHTML = cellEntity.name;
+    document.getElementById("encounterVictoryDialogue__output__loot").innerHTML = `Got ${tempWishes} Wishes!`;
+    document.getElementById("encounterVictoryDialogue__returnButton").innerHTML = "Gratitude is honour.";
+    return;
 }
 
-//other funtions--------------------------------------------------
+//other funtions---------------------------------------------------------------------------------------------------------------
 function setupCanvas(canvas) {
     // Get the device pixel ratio, falling back to 1.
     var dpr = window.devicePixelRatio || 1;
@@ -411,7 +501,7 @@ function setupCanvas(canvas) {
     ctx.scale(dpr, dpr);
 }
 
-//onload-------------
+//onload------------------------------------------------------------------------------------------------------------------------
 function initPlayerScript(width, height) {
     var boardRows = document.getElementById("gameSpace").children;
     setHoverListener(boardRows);
@@ -420,6 +510,9 @@ function initPlayerScript(width, height) {
     //Give player base attacks.
     player.addNewAttack(new attack("Literature of the Heart", 20, 2, 1, "attack", null, null));
     player.addNewAttack(new attack("Token of Will", null, 5, null, "parry", 3, null));
+    //test inventory
+    player.appendToInventory(new item("test item", "use to test!", "movement", "test1"));
+    player.appendToInventory(new item("test item", "use to test!", "movement", "test1"));
     //set global vars
     playerX = Math.ceil(width / 2) - 1;
     playerY = Math.ceil(height / 2) - 1;

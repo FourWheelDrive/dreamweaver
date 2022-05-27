@@ -6,7 +6,7 @@
     <script type="text/javascript" src="scripts/mapGenerator.js"></script>
 
     <script type="text/javascript" src="scripts/indexScript.js"></script>
-    <script type="text/javascript" src="scripts/enemiesListScript.js"></script>
+    <script type="text/javascript" src="scripts/entityDatabase.js"></script>
     <script type="text/javascript" src="scripts/playerScript.js"></script>
     <script type="text/javascript" src="scripts/mainScript.js"></script>
 
@@ -35,6 +35,17 @@
         </div>
     </div>
 
+    <div id="inventoryDisplay">
+        <p id="inventoryDisplay__header">Inventory</p>
+        <div id="inventoryDisplay__menu"></div>
+        <p id="inventoryDisplay__output"></p>
+        <p id="inventoryDisplay__footer">&lt- -> to navigate, ENTER to select.</p>
+    </div>
+
+    <div id="cursorOutput">
+        <p id="cursorOutput__dislay"></p>
+    </div>
+
     <!-- control panel
     <div id="controlsPanel">
         <p id="controlsPanel__title">Dreamweaver<p>
@@ -55,11 +66,14 @@
             <p id="encounterDialogue__header__locationDisplay"></p>
         </div>
         <div id="encounterDialogue__menu">
-            <button id="encounterDialogue__menu__attackButton" class="encounterDialogue__menu__button" onclick="buttonPressHandler(event)">
-                <span class="encounterDialogue__menu__button__progress"></span> <!--This is the div whose background makes the timer.-->
+            <button id="encounterDialogue__menu__attackButton" class="encounterDialogue__menu__button"
+                onclick="buttonPressHandler(event)">
+                <span class="encounterDialogue__menu__button__progress"></span>
+                <!--This is the div whose background makes the timer.-->
                 <span class="encounterDialogue__menu__button__text">Attack</span>
             </button>
-            <button id="encounterDialogue__menu__parryButton" class="encounterDialogue__menu__button" onclick="buttonPressHandler(event)">
+            <button id="encounterDialogue__menu__parryButton" class="encounterDialogue__menu__button"
+                onclick="buttonPressHandler(event)">
                 <span class="encounterDialogue__menu__button__progress"></span>
                 <span class="encounterDialogue__menu__button__text">Parry</span>
             </button>
@@ -72,9 +86,7 @@
         </div>
     </div>
     <div id="encounterVictoryDialogue">
-        <div id="encounterVictoryDialogue__header">
-            <p id="encounterVictoryDialogue__header__locationDisplay"></p>
-        </div>
+        <p id="encounterVictoryDialogue__header__locationDisplay"></p>
         <div id="encounterVictoryDialogue__output">
             <p id="encounterVictoryDialogue__output__message"></p>
             <p id="encounterVictoryDialogue__output__loot"></p>
@@ -83,9 +95,12 @@
     </div>
 
     <div id="externalOutputBox">
-        <p id="externalOutputBox_output1"></p>
-        <p id="externalOutputBox_output2"></p>
-        <p id="externalOutputBox_output3"></p>
+        <div>
+            <p id="externalOutputBox__encounter"></p>
+        </div>
+        <p id="externalOutputBox__output1"></p>
+        <p id="externalOutputBox__output2"></p>
+        <p id="externalOutputBox__output3"></p>
     </div>
 </body>
 

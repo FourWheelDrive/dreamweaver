@@ -4,7 +4,7 @@ function createMapArray(pathSymbols) {
     for (var i = 0; i < width; i++) {
         array.push([]); //push columns.
         for (var j = 0; j < height; j++) {
-            array[i].push(new Cell("Wall", "wall", pathSymbols[0], null, i, j, false)); //push cells.
+            array[i].push(new Cell("Wall", "wall", pathSymbols[0], null, i, j, false, true)); //push cells.
         }
     }
     return array;
@@ -54,7 +54,7 @@ function createMap(maxTunnels, maxLength) {
                 ((currentColumn === width - 1) && (randomDirection[0] === 1))) { break; } //Break loop.
             else {
                 //Step 5: Update map if everything else is valid.
-                map[currentColumn][currentRow] = new Cell("A Desolate Avenue", "path", pathSymbols[1], baseRoomTier, currentColumn, currentRow, false); //Update tile
+                map[currentColumn][currentRow] = new Cell("A Desolate Avenue", "path", pathSymbols[1], baseRoomTier, currentColumn, currentRow, false, true); //Update tile
 
                 currentColumn += randomDirection[0]; //iterate tile
                 currentRow += randomDirection[1];
@@ -103,7 +103,7 @@ function createRoom() {
     placeLocation(map, xBound, yBound, centerCoord, 3, class3Rooms);
 
     //Generate the shop.
-    map[centerCoord[0]][centerCoord[1]] = new Cell("A Serene Refuge", "shop", "𝄞", null, centerCoord[0], centerCoord[1], true);
+    map[centerCoord[0]][centerCoord[1]] = new Cell("A Serene Refuge", "shop", "𝄞", null, centerCoord[0], centerCoord[1], true, false);
 }
 
 function placeLocation(map, xBound, yBound, centerCoord, roomClass, number) { //picks a location, checks for tests, places location.
@@ -126,8 +126,10 @@ function placeLocation(map, xBound, yBound, centerCoord, roomClass, number) { //
                                 /*
                                 Criteria: closer than 15 tiles, must be beside ";" tile (map[x][y])
                                 */
-                                if (map[x][y].symbol == ";" && calcPythagDistance(randomCoord, centerCoord) < 15) {
-                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(1), "minor encounter", roomClassSymbols[0], 1, randomCoord[0], randomCoord[1], false);
+                                if (map[x][y].symbol == ";" && calcPythagDistance(randomCoord, centerCoord) < 10) {
+                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(1), "minor encounter", roomClassSymbols[0], 1, randomCoord[0], randomCoord[1], false, true);
+                                    //add this position to the roomslist.
+                                    class1Rooms.push(`[${x}][${y}]`);
                                     pathFound = true;
                                 }
                                 break;
@@ -136,7 +138,9 @@ function placeLocation(map, xBound, yBound, centerCoord, roomClass, number) { //
                                 Criteria: must be beside ";" tile (map[x][y])
                                 */
                                 if (map[x][y].symbol == ";") {
-                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(2), "major encounter", roomClassSymbols[1], 2, randomCoord[0], randomCoord[1], false);
+                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(2), "major encounter", roomClassSymbols[1], 2, randomCoord[0], randomCoord[1], false, true);
+                                    //add this position to the roomslist.
+                                    class2Rooms.push(`[${x}][${y}]`);
                                     pathFound = true;
                                 }
                                 break;
@@ -144,8 +148,10 @@ function placeLocation(map, xBound, yBound, centerCoord, roomClass, number) { //
                                 /*
                                 Criteria: must be beside ";" tile (map[x][y]) and more than 10 tiles away.
                                 */
-                                if (map[x][y].symbol == ";" && calcPythagDistance(randomCoord, centerCoord) > 15) {
-                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(3), "boss encounter", roomClassSymbols[2], 3, randomCoord[0], randomCoord[1], true);
+                                if (map[x][y].symbol == ";" && calcPythagDistance(randomCoord, centerCoord) > 14) {
+                                    map[randomCoord[0]][randomCoord[1]] = new Cell(nameLocation(3), "boss encounter", roomClassSymbols[2], 3, randomCoord[0], randomCoord[1], true, true);
+                                    //add this position to the roomslist.
+                                    class3Rooms.push(`[${x}][${y}]`);
                                     pathFound = true;
                                 }
                                 break;
@@ -173,13 +179,54 @@ function nameLocation(roomClass) {//assign names.
             }
             return class2Names[index];
         case 3:
-            var index = randInt(class2Names.length, "near");
-            if (class3Names[index] == undefined) {
-                index -= 1;
+            switch(game.currentRoom){
+                case 1:
+                    return class3Names[0];
             }
-            return class3Names[index];
         case 4:
             return "A Serene Refuge";
+    }
+}
+
+//Show all nodes in radius range. This is the fog of war function.
+function showCellsInVision(radius, x, y) {
+    var minBoundX = x - radius,
+        maxBoundX = x + radius,
+        minBoundY = y - radius,
+        maxBoundY = y + radius;
+    var tempArray = [];
+
+    //create a tempArray of all the elements in a square range.
+    for (var i = 0; i < maxBoundX - minBoundX - 1; i++) {//add each column. Not sure why i have to -1.
+        tempArray.push([]);
+        for (var j = 0; j < maxBoundY - minBoundY - 1; j++) { //add each cell.
+            try { //might be out of bounds.
+                tempArray[i].push(map[i + minBoundX + 1][j + minBoundY + 1]);
+            } catch (err) { }
+        }
+    }
+
+    var coordSetCenter = [Math.ceil(tempArray.length / 2) - 1, Math.ceil(tempArray[0].length / 2) - 1];
+
+    //find all the elements in radius range and set symbols to cell.symbol.
+    for (var i = 0; i < tempArray.length; i++) {//each column:
+        for (var j = 0; j < tempArray[i].length; j++) {
+            let tempDistance = calcPythagDistance([i, j], [coordSetCenter[0], coordSetCenter[1]]);
+
+            if (tempDistance < radius) {
+                try {
+                    let cellEntity = document.getElementById(`[${minBoundX + i + 1}][${minBoundY + j + 1}]`);
+                    cellEntity.innerHTML = map[minBoundX + i + 1][minBoundY + j + 1].symbol;
+                    map[minBoundX + i + 1][minBoundY + j + 1].obscured = false;
+                    //if this is a special location, give it styles.
+                    if (cellEntity.classList.contains("gameSpace__specialLocations")) {
+                        cellEntity.style.fontWeight = "900";
+                        cellEntity.style.fontSize = "20px";
+                        cellEntity.style.fontStretch = "ultra-expanded";
+                    }
+                } catch (err) { }
+            }
+        }
     }
 }
 
@@ -200,14 +247,16 @@ function generateMap(maxTunnels, maxLength) { //pass in generation vars
             let para = document.createElement("p");
             let cellEntity = map[j][i];
 
+            //set ids (coordinates) and classes (type).
             para.setAttribute("id", `[${cellEntity.x}][${cellEntity.y}]`);
-            if(cellEntity.type == "path" || cellEntity.type == "wall"){
+            if (cellEntity.type == "path" || cellEntity.type == "wall") {
                 para.setAttribute("class", `gameSpace__boardCell`);
             } else {
                 para.setAttribute("class", `gameSpace__boardCell gameSpace__specialLocations`);
             }
+            //Switch all elements' symbols to the obscured symbol in fog.
+            let textNode = document.createTextNode(cellEntity.obscuredSymbol);
 
-            let textNode = document.createTextNode(cellEntity.symbol);
             //append child to each element
             para.appendChild(textNode);
             rowDiv.appendChild(para);
@@ -215,4 +264,6 @@ function generateMap(maxTunnels, maxLength) { //pass in generation vars
         //append rowdiv to document
         document.getElementById("gameSpace").appendChild(rowDiv);
     }
+    //calc all visible nodes. Player position begins at center.
+    showCellsInVision(6, Math.ceil(width / 2) - 1, Math.ceil(height / 2) - 1);
 }

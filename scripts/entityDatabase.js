@@ -68,3 +68,20 @@ function createNewEnemy(enemyTier) {
 
     return tempEnemy;
 }
+
+//This file is just a list of items by ID.
+/* ID SCHEME
+C - consumables.
+T - tokens/talismans <-- for the plot.
+*/
+function createNewItem(id){ 
+    switch(id){
+        case "1-T":
+            return new item("Dragon Talisman", "A blessing from the Clairvoyant.", "encounter", "1-T");
+    }
+}
+
+//These are possible victory scripts.
+function createVictoryDialogue(){
+    
+}

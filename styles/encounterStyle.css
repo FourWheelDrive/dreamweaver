@@ -94,6 +94,73 @@ transition: width 1s;
 .encounterDialogue__menu__button__text{
     position: relative;
 }
+/*INVENTORY POPUP, SHOWS UP ALONGSIDE ENCOUNTER----------------------------------------*/
+#inventoryDisplay{
+    display: none;
+    grid-template-areas: "header"
+    "buttonMenu"
+    "output"
+    "footer";
+    grid-template-rows: 1fr 5fr 1fr 1fr;
+
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 40%;
+    height: 50%;
+
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    z-index: 1000;
+}
+#inventoryDisplay > *{
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 90%;
+
+    margin: 10px;
+
+    text-align: center;
+}
+#inventoryDisplay__header{
+    grid-area: header;
+    font-weight: bold;
+    font-size: 15px;
+    line-height: 90%;
+    padding: 10px;
+}
+#inventoryDisplay__menu{
+    grid-area: buttonMenu;
+    display: flexbox;
+    flex-wrap: wrap;
+}
+#inventoryDisplay__output{
+    grid-area: output;
+}
+#inventoryDisplay__footer{
+    grid-area: footer;
+}
+.inventoryDisplay__button{
+    margin: 5px;
+    width: fit-content;
+    height: 20%;
+
+    padding: 0px;
+    white-space: nowrap;
+    text-align: center;
+    
+    border-radius: 0px;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    font-family: monospace;
+    font-size: 15px;
+
+    transition: background-color 1s;
+}
 
 /*VICTORY DIALOGUE POPUP-------------------------------------------------------*/
 #encounterVictoryDialogue{
@@ -126,10 +193,6 @@ transition: width 1s;
     left: 50%;
     transform: translate(-50%);
 }
-
-#encounterVictoryDialogue__header{
-    grid-area: header;
-}
 #encounterVictoryDialogue__output{
     grid-area: output;
     display: flex;
@@ -153,11 +216,16 @@ transition: width 1s;
     background-color: #d6cbab;
 }
 #encounterVictoryDialogue__header__locationDisplay{
-    width: fit-content;
-    font-weight: bold;
-    border-bottom: 1px solid black;
-
-    position: relative;
+    grid-area: header;
+    position: absolute;
     left: 50%;
     transform: translate(-50%);
+
+    width: fit-content;
+    margin: auto;
+    margin-top: 10px;
+
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid black;
 }

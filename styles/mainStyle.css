@@ -168,12 +168,12 @@ body {
     padding: 0px;
 }
 
-.gameSpace__specialLocations {
-    /*Last call takes precedence. Some overlap with gameSpace__boardCell*/
+/*.gameSpace__specialLocations { Deprecated. Replaced by Fog of War methods.
+    /*Last call takes precedence. Some overlap with gameSpace__boardCell
     font-weight: 900;
     font-stretch: ultra-expanded;
     font-size: 20px;
-}
+}*/
 
 /*External dialogue popup style---------------------------------------------------*/
 #externalOutputBox {
@@ -181,6 +181,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 1000;
 
     width: 50%;
     height: 30%;
@@ -201,12 +202,23 @@ body {
 
     text-align: center;
 }
-#externalOutputBox_output1 {
+#externalOutputBox__encounter{
+    position: absolute;
+    left: 5%;
+    top: 5%;
+    font-weight: bold;
+}
+#externalOutputBox__output1 {
     opacity: 1;
 }
-#externalOutputBox_output2 {
+#externalOutputBox__output2 {
     opacity: 0.7;
 }
-#externalOutputBox_output3 {
+#externalOutputBox__output3 {
     opacity: 0.4;
+}
+
+/*Testing*/
+#cursorOutput{
+    display: none;
 }

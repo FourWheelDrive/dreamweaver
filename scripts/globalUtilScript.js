@@ -21,14 +21,18 @@ class Player extends Entity {
         this.masqueradeSymbols = ["⣀⣀⣀⣀⣀", "⣤⣄⣀⣀⣀", "⣦⣤⣄⣀⣀", "⣶⣶⣦⣤⣄", "⣶⣶⣶⣦⣤", "⣶⣶⣶⣶⣶"]; //length of this array is how many lives one has.
 
         this.parryOnCD = false;
+        this.inventory = [];
 
         this.wishes = 0;
         document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${this.health}`;
         document.getElementById("uiGrid__header__soloistDisplay").innerHTML = `Masquerade: ${this.masqueradeSymbols[this.masquerade]}`
     }
+    //setup
     addNewAttack(attack) {
         this.attacks.push(attack);
     }
+
+    //Encounter methods.
     addWishes(newWishes) {
         this.wishes += newWishes;
         document.getElementById("uiGrid__header__wishesDisplay").innerHTML = `Wishes: ${this.wishes}`;
@@ -54,6 +58,21 @@ class Player extends Entity {
         this.health -= damage
         this.statusLine = `Health: ${this.health}`;
         document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${this.health}`;
+    }
+
+    //Inventory methods.
+    appendToInventory(item) {
+        this.inventory.push(item);
+        updateInventoryDisplay();
+    }
+    useInventoryItem(index) {
+        //use the item lol
+        console.log(`used ${this.inventory[index].name}!`);
+        this.deleteFromInventory(index);
+    }
+    deleteFromInventory(index) {
+        this.inventory.splice(index, 1);
+        updateInventoryDisplay();
     }
 
     //Methods for updating stats when Masquerade changes.
@@ -121,6 +140,7 @@ class Enemy extends Entity {
         this.statusLine = `Health: ${this.health}`;
     }
 }
+//player attacks, and items.
 class attack {
     constructor(name, damage, cooldown, stacks, type, effectDuration, effectChance) { //might need to add "name" attribute
         this.name = name;
@@ -137,16 +157,28 @@ class attack {
         this.type = type;
     }
 }
+class item {
+    constructor(name, description, usage, id) {
+        this.name = name;
+        this.description = description;
+        this.usage = usage; //can be: "encounter" or "movement"
+        this.id = id;
+    }
+}
 
 //Cell class for the map array.
-class Cell{
-    constructor(name, type, symbol, tier, positionX, positionY, reVisitable){
+class Cell {
+    constructor(name, type, symbol, tier, positionX, positionY, reVisitable, obscured) {
         this.name = name;     //name shown in encounter popup.
         this.type = type;     //wall, path, location, etc.
         this.tier = tier;     //difficulty of the room, used for generation
         this.symbol = symbol; //to display on map
+        this.obscuredSymbol = "."; //symbol displayed when not viewed.
         this.x = positionX;
         this.y = positionY;
+
+        //for display.
+        this.obscured = obscured;
 
         this.cellID = `[${positionX}][${positionY}]`;
 
@@ -154,23 +186,34 @@ class Cell{
         this.alreadyVisited = false;
         this.reVisitable = reVisitable;
     }
+
+    changeHiddenStatus(symbol) {
+        this.hidden = false;
+        this.symbol = symbol;
+    }
 }
 
 //game class to keep track of all the game stuff!
 class Game {
-    constructor(){
-        this.encounterInProgress = false;
-        this.fightInProgress = false;
+    constructor() {
+        //Flags for attacking and moving.
+        this.attacksLocked = true;
+        this.movesLocked = false;
+        this.inventoryOpen = false; //this will flag things.
+        this.encounterLocked = false; //true on the move after an encounter, so no two in a row.
 
-        this.firstEncounterWon = false;
         this.firstEncounterDialogue = false;
-        this.firstDeath = true;
-        
+
         this.currentRoom = 1;
         this.moveCounter = 0;
-        this.dialogueSequenceMoves = [1]; //check if moveCounter = these, then do the sequences.
-        this.encounterSequenceMoves = [0, 1];
-        this.encounterSequences = [];
+
+        this.deathCounter = 0;
+        this.encounterCounter = 0;
+
+        //REMEMBER TO APPEND THE MOVES OF THE DIALOGUE MOVES HERE----------------------
+        this.storyDialogueMoves = [8];
+        this.storyDialogueEncounters = [2];
+        //-----------------------------------------------------------------------------
 
         this.attackMultiplier = 1;
         this.healthMultiplier = 1;
@@ -199,6 +242,7 @@ var player;
 var enemy = new Enemy(null, null, null, null, null, null, null);
 var globalHeight, globalWidth;
 var playerX, playerY; //<- these are not in Player object. player.x is the canvas position for player.
+var inventoryPosition = 0; //<- defines where the selector is in the inventory.
 //---------------------------Map stuff------------------------------------
 /* Area codes:
 Codes: 
@@ -221,6 +265,9 @@ var height = 30;
 
 //Global var map
 var map;
+var class1Rooms = []; //these lists have the coordinates of all locations.
+var class2Rooms = [];
+var class3Rooms = [];
 
 //names for rooms!
 const class1Names = ["A Derelict Pub", "A Modest Inn"];
@@ -248,7 +295,7 @@ function procButtonCooldownTimer(buttonId, time) {
     let button = document.getElementById(`${buttonId}`);
     let timer = button.querySelector(".encounterDialogue__menu__button__progress");
 
-    if (game.fightInProgress && !button.disabled) {
+    if (!game.attacksLocked && !button.disabled) {
         //Cooldown the button while animation takes place.
         button.disabled = true;
         setTimeout(function () { button.disabled = false; }, time * 1000);
@@ -261,6 +308,30 @@ function procButtonCooldownTimer(buttonId, time) {
         timer.style.transition = `width ${time}s linear` //animation again
         timer.style.width = "0%";
         flushCSS(timer);
+    }
+}
+
+function updateInventoryDisplay() {
+    var menu = document.getElementById("inventoryDisplay__menu");
+    //remove the buttons already on the display first.
+    while (menu.firstChild) {
+        menu.removeChild(menu.lastChild);
+    }
+
+    //update the inventory and generate buttons.
+    for (var i = 0; i < player.inventory.length; i++) {
+        var button = document.createElement("button");
+        if (i == 0) {
+            button.innerHTML = `> ${player.inventory[i].name} <`;
+            document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[i].description;
+        } else {
+            button.innerHTML = player.inventory[i].name;
+        }
+
+        button.setAttribute("id", `${i}`);
+        button.setAttribute("class", `inventoryDisplay__button`);
+
+        menu.appendChild(button);
     }
 }
 
