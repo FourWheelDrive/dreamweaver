@@ -158,7 +158,9 @@ async function keyDownHandler(e) {
         switch (game.inventoryOpen) {
             case true: //if inv is open, close it.
                 //pause and unlock EVERYTHING.
-                game.attacksLocked = false;
+                if(enemy.health > 0){ //if there is an encounter. Enemy is not dead.
+                    game.attacksLocked = false;
+                }
                 game.movesLocked = false;
                 game.inventoryOpen = false;
 
@@ -318,8 +320,8 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
             if (j == 0) {
                 await sleep(outputPause);
             }
-            await ("in", encounterDialogueBox);
             encounterDialogueBox.innerHTML = bossDialogueSequence[j];
+            await fade("in", encounterDialogueBox);
             await sleep(outputPause);
             await fade("out", encounterDialogueBox);
             await sleep(outputPause);
@@ -343,7 +345,6 @@ async function drawEncounter(ctx, canvas, enemy, animation, callback) {
     const playerXOriginal = player.x;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.attacksLocked = false; //Fight keys unlocked.
 
     ctx.textAlign = "center";
     ctx.font = "15px Didot, serif";
