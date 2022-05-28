@@ -1,0 +1,67 @@
+Extensions:
+Procedural Generation
+KeyboardEvent handling
+Regular Expressions (regexp) for splitting strings with multiple separators
+.filter and .split for handling strings and putting them in arrays.
+Inheritance for Player, Enemy entities.
+Cool 2D array of Cell class for the map! I can get fun properties now.
+Async/await for asynchronous tasks.
+
+TO-DO:
+-Fix canvas size.                                                                               DONE
+-MapGenerator should only check adjacent tiles. Corners don't count.                            DONE
+-Update player's attack damage (cooldown?) and parry cd/duration after they die.                DONE
+-Might want to put all my util functions in a util.js so i don't load every time.
+-Maybe keep track of Wishes earned, enemies killed, etc? Shouldn't be hard.
+-Maybe also randomize encounterWin dialogue.
+-FIX FADE. FOR SOME REASON, BOSS'S FADE DIALOGUE FLASHES.
+-Restructure the dialogueSequenceMoves in keyDownHandler to use game.dialogueSequenceMoves[].
+
+Roadmap:
+-Multiple, randomized enemies in each room.                                                     DONE
+-Enemy name, encounter dialogue, death dialogue.                                                DONE
+-Title, loss pages.                                                                         1/2 DONE (no loss page) also no win page.
+-Shop before boss fight? Shop location?                                                         DONE
+-Random encounters on new tiles.                                                                DONE
+-PRIORITY: restructure program. Write 2d array with Cell objects.                     should be DONE
+        -Restructuring map generation complete.                                                 DONE
+        -Restructure move functions.                         SOMETIMES, MOVEMENT BREAKS.        DONE < because encounters are triggering but are broken.
+        -Restructure encounter functions.                    ENEMY FUNCTIONS NOT WORKING.       DONE
+-Cooldown bars. Maybe just grey out buttons and write timers instead?                           DONE
+    -No. Will have to set up a buttonSetUp in like, beginEncounter or something.                DONE
+    -Change .style.transition of the button to `${width} ${attack.cooldown}`                    DONE
+    -Change width from 100 to 0.                                                                DONE
+-REBIND KEYS. How do I get keyPress to fire off button.onclick, or vice-versa?                  DONE
+                         (When closing victory dialogue)        (when attacking)                DONE
+        Keybind -> press button done.                                                           DONE
+        Press button -> keybind?? Also need to restore active click, here.                      DONE
+-Inventory system. Victories give random items.
+    - Give the inventory system a display <p>. Show items' use.                                 DONE
+    - Max inventory size? If > size, use items.
+    - Need to confirm that deleting items works.                                                DONE
+    - Need to code items that work.                                                             
+-Finish shop.
+-When dying on a tile, make it not get greyed out. Possibly just reset playerposition.          DONE
+-Finish boss re-procs.                                                                      1/2 DONE (Have to fight the stage again)
+-Longer intro scene explaining Schopenhauer.
+    - New game.introScene
+    - Enter to skip.
+-Working on dialogues.
+    - Dialogues happen after certain fights. (number of fights, type of fight)
+    - Dialogues happen after boss fights.
+- ^^^^ Check what happens if fight dialogue and move dialogue happen on the same move. (room)
+- FIND A BETTER DIALOGUE STRUCTURE OH MY GOD.
+- FIX THE CSS ASPECT RATIOS ON THE WEBSITE???? OH FUCK.
+- You can attack through the inventory. Fix flags.
+
+-Next Map
+    -New roomMultipliers, new baseRoomTier                                                  1/2 DONE (no baseRoomTier)
+    -clear map, and then make new map. new parameters.                                          DONE
+    -Make new tiers of enemies!
+-Story
+
+
+Some useful algs:
+Get cell position from cell ID:
+let cellPosition = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
+

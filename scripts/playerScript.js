@@ -335,6 +335,9 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
     encounterDialogueBox.innerHTML = "";
     encounterDialogueBox.style.opacity = 1;
     //Begin fight.
+    if(!game.inventoryOpen){ //sometimes it gets inted by starting a fight while inv open.
+        game.attacksLocked = false; //Enable J, K keybinds for attacks. Disable movement.
+    }
     var encounterAnimation = window.requestAnimationFrame(function () { drawEncounter(ctx, canvas, enemy, encounterAnimation, function () { return encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator + 1); }) });
 }
 //Contains: Lose condition, victory dialogue.
