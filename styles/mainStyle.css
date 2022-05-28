@@ -2,7 +2,7 @@ body {
     background-color: #fff8e0;
 }
 
-.uiGrid {
+#mainGameGrid {
     width: 60%;
     aspect-ratio: 4/3;
 
@@ -22,8 +22,7 @@ body {
     gap: 2px;
     padding: 10px;
     border: 1px solid black;
-}
-#mainGameGrid{
+    
     opacity: 0;
 }
 /*Menu elements----------------------------------------------------------------*/

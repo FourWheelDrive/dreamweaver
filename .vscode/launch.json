@@ -8,7 +8,7 @@
             "type": "pwa-chrome",
             "request": "launch",
             "name": "Open main.html",
-            "file": "c:\\Users\\jeffe\\Documents\\CS 30\\Scripting II\\Course Project\\index.html"
+            "file": "C:\\Users\\jeffe\\Documents\\GitHub\\dreamweaver\\index.html"
         }
     ]
 }
