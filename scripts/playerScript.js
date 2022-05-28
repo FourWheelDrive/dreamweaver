@@ -335,7 +335,6 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
     encounterDialogueBox.innerHTML = "";
     encounterDialogueBox.style.opacity = 1;
     //Begin fight.
-    game.attacksLocked = false; //Enable J, K keybinds for attacks. Disable movement.
     var encounterAnimation = window.requestAnimationFrame(function () { drawEncounter(ctx, canvas, enemy, encounterAnimation, function () { return encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator + 1); }) });
 }
 //Contains: Lose condition, victory dialogue.
