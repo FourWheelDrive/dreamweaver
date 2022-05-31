@@ -112,7 +112,7 @@ async function externalOutput(messages, encounter) {
 
     //fade out.
     await fade("out", extenalOutputDiv);
-    document.getElementById("externalOutputBox").style.display = "none";
+    extenalOutputDiv.style.display = "none";
     return;
 
     //tempfunc!-------------------------------------
@@ -238,9 +238,14 @@ async function roomCleared() {
 
 //Game functions
 function loseGame() {
-    window.location.href = "loseResult.html";
+    //set sessionstorage.result
+    sessionStorage.setItem("result", "lose");
+    window.location.href = "results.html";
 }
-function winGame() { }
+function winGame() { //same thing as loseGame(), but win.
+    sessionStorage.setItem("result", "win");
+    window.location.href = "results.html";
+}
 
 //onload
 async function onLoad() {

@@ -108,7 +108,7 @@ async function keyDownHandler(e) {
                 //Random chance for encounters on untread path tiles.
                 let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
                 if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && !game.dialogueLocked && tempChance == 1) {
-                    //await beginEncounter(newCellEntity);
+                    await beginEncounter(newCellEntity);
                 }
                 newCellEntity.alreadyVisited = true;
             }
@@ -431,6 +431,11 @@ async function loseEncounter() {
     document.getElementById(`[${playerX}][${playerY}]`).style.opacity = 1;
 
     player.masqueradeUpdateLives(1); //update lives. Also updates stats! The health update is in here.
+    //lose the game if Masquerade is out of bounds.
+    if (player.masquerade > player.masqueradeSymbols.length - 1) {
+        loseGame();
+        return;
+    }
 
     await fade("in", document.body);
     await sleep(3000);
@@ -438,15 +443,10 @@ async function loseEncounter() {
 
     //Begin death dialogue, if necessary.
     if (game.deathCounter == 1) { //for first deaths.
-        firstDeathSequence();
+        await firstDeathSequence();
     }
     if (player.masquerade == player.masqueradeSymbols.length - 1) { //Player on last life.
-        lastLifeSequence();
-    }
-
-    //lose the game if Masquerade is out of bounds.
-    if (player.masquerade >= player.masqueradeSymbols.length) {
-        loseGame();
+        await lastLifeSequence();
     }
 
     //return to movement phase.
@@ -474,7 +474,8 @@ async function winEncounter(cellEntity, enemiesInRoom) {
 
     //If the encounter that was just defeated was the room's boss:
     if (cellEntity.type == "boss encounter") {
-        roomCleared();
+        //roomCleared(); go to next room. But for this project:
+        winGame();
     }
 
     victoryDialogue.style.display = "grid";

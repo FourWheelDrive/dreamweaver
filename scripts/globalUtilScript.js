@@ -18,6 +18,7 @@ class Player extends Entity {
         this.x = 50;
         this.masquerade = 0;
         //symbols: ⣀ ⣄ ⣤ ⣦ ⣶
+        //this.masqueradeSymbols = ["⣀⣀⣀⣀⣀", "⣶⣶⣶⣶⣶"]; //testing lives.
         this.masqueradeSymbols = ["⣀⣀⣀⣀⣀", "⣤⣄⣀⣀⣀", "⣦⣤⣄⣀⣀", "⣶⣶⣦⣤⣄", "⣶⣶⣶⣦⣤", "⣶⣶⣶⣶⣶"]; //length of this array is how many lives one has.
 
         this.parryOnCD = false;
