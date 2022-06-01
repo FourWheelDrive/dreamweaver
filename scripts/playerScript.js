@@ -90,8 +90,9 @@ async function keyDownHandler(e) {
             playerY = nextCellPos[1];
             //new cell styles.
             newCell.style.fontSize = "15px";
-            //Update the fog of war.
-            showCellsInVision(5, playerX, playerY);
+            //Do game updates.
+            showCellsInVision(5, playerX, playerY); //Fog of war
+            game.movesSinceLastRandomEncounter = game.movesSinceLastRandomEncounter + 1; //random encounter is ++. when this is >= 5, rand encounter is possible.
 
             //Choose action, if applicable:-----------------------------------------------------------------------------------------||-----
             //Begin encounters on locations, if they're new.
@@ -107,7 +108,8 @@ async function keyDownHandler(e) {
             } else if (!game.storyDialogueMoves.includes(game.moveCounter + 1) && !newCellEntity.alreadyVisited) { //NO RANDOM ENCOUNTER on special moves or already visited paths.
                 //Random chance for encounters on untread path tiles.
                 let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
-                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && !game.dialogueLocked && tempChance == 1) {
+                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && !game.dialogueLocked && tempChance == 1 && game.movesSinceLastRandomEncounter >= 5) {
+                    game.movesSinceLastRandomEncounter = 0;
                     await beginEncounter(newCellEntity);
                 }
                 newCellEntity.alreadyVisited = true;

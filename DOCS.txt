@@ -11,11 +11,15 @@ TO-DO:
 -Fix canvas size.                                                                               DONE
 -MapGenerator should only check adjacent tiles. Corners don't count.                            DONE
 -Update player's attack damage (cooldown?) and parry cd/duration after they die.                DONE
--Might want to put all my util functions in a util.js so i don't load every time.
--Maybe keep track of Wishes earned, enemies killed, etc? Shouldn't be hard.
--Maybe also randomize encounterWin dialogue.
--FIX FADE. FOR SOME REASON, BOSS'S FADE DIALOGUE FLASHES.
+-Might want to put all my util functions in a util.js so i don't load every time.               DONE
+-Maybe keep track of Wishes earned, enemies killed, etc? Shouldn't be hard.                         COSMETIC.
+-Maybe also randomize encounterWin dialogue.                                                        COSMETIC.
+-FIX FADE. FOR SOME REASON, BOSS'S FADE DIALOGUE FLASHES.                                       DONE (await delay after fade was too short, began to overlap.)
 -Restructure the dialogueSequenceMoves in keyDownHandler to use game.dialogueSequenceMoves[].
+-Do some testing about player.attack. Make sure player.action doesn't do stupid stuff.
+-Check CSS stuff on different displays.                                                         done? idk if i actually fixed it.
+- Game breaks after more deaths happen. Minimum amount of stats on Masquerade?                  DONE Made new algs.
+- Make a new .txt with all the enemies and item stats?
 
 Roadmap:
 -Multiple, randomized enemies in each room.                                                     DONE
@@ -35,25 +39,33 @@ Roadmap:
                          (When closing victory dialogue)        (when attacking)                DONE
         Keybind -> press button done.                                                           DONE
         Press button -> keybind?? Also need to restore active click, here.                      DONE
--Inventory system. Victories give random items.
+-Inventory system. Victories give random items.                                                     SECONDARY.
     - Give the inventory system a display <p>. Show items' use.                                 DONE
-    - Max inventory size? If > size, use items.
+    - Max inventory size? If > size, use items.                                                     SECONDARY.
     - Need to confirm that deleting items works.                                                DONE
-    - Need to code items that work.                                                             
--Finish shop.
+    - Need to code items that work.                                                                 PRIORITY.
+        - use player.useInventoryItem() for this. check IDs.                                    ^^^^
+    - RESTRUCTURE ALL INVENTORY APPENDS TO USE createNewItem(id).                               DONE
 -When dying on a tile, make it not get greyed out. Possibly just reset playerposition.          DONE
 -Finish boss re-procs.                                                                      1/2 DONE (Have to fight the stage again)
--Longer intro scene explaining Schopenhauer.
-    - New game.introScene
-    - Enter to skip.
--Working on dialogues.
-    - Dialogues happen after certain fights. (number of fights, type of fight)
-    - Dialogues happen after boss fights.
-- ^^^^ Check what happens if fight dialogue and move dialogue happen on the same move. (room)
-- FIND A BETTER DIALOGUE STRUCTURE OH MY GOD.
-- FIX THE CSS ASPECT RATIOS ON THE WEBSITE???? OH FUCK.
-- You can attack through the inventory. Fix flags.
+-Longer intro scene explaining Schopenhauer.                                                        COSMETIC.
+    - New game.introScene                                                                       ^^^^
+    - Enter to skip.                                                                            ^^^^
+-Working on dialogues.                                                                              SECONDARY.
+    - Dialogues happen after certain fights. (number of fights, type of fight)                  ^^^^
+    - Dialogues happen after boss fights.                                                       ^^^^
+- ^^^^ Check what happens if fight dialogue and move dialogue happen on the same move. (room)   <><>TESTING.
+- FIND A BETTER DIALOGUE STRUCTURE OH MY GOD.                                                       PRIORITY.
+    - Dialogue tree? Somehow.                                                                   ^^^^
+- You can attack through the inventory. Fix flags.                                              DONE
+- Make a cooldown for random encounters. No two in a row or somthing like that.                 DONE
+-Shop!! You can spend wishes here.                                                                  PRIORITY.
+    - player.masqueradeUpdateLives(-1) can bring stats more into balance.
+    - player.updateStats(>args to be defined) can tweak a single stat.
+    >>Should proc when player moves back to a Serene Refuge.
 
+
+Roadmap, after the project is done. Story and dialogue stuff, really.
 -Next Map
     -New roomMultipliers, new baseRoomTier                                                  1/2 DONE (no baseRoomTier)
     -clear map, and then make new map. new parameters.                                          DONE

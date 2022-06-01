@@ -42,12 +42,11 @@ class Player extends Entity {
         if (this.health > 0) { //stops from changing after death.
             this.action = "attacking";
             await sleep(1000);
-            target.takeDamage(this.attacks[0].damage);
-            if (this.health > 0) { //need to check again. Might have died during the await sleep.
+            if (this.health > 0 && this.action == "attacking") { //need to check again. Might have died during the await sleep.
+                target.takeDamage(this.attacks[0].damage);
                 document.getElementById("encounterDialogue__output__outputBox").innerHTML = `Hit enemy for ${this.attacks[0].damage}`;
             }
             this.action = "";
-
         }
     }
     async parry() {
@@ -68,6 +67,14 @@ class Player extends Entity {
     }
     useInventoryItem(index) {
         //use the item lol
+        switch(this.inventory[index].id){ //ID goes here. CHECK entityDatabase.js for these.
+            case "DRAGON-T": //Dragon Talisman.
+                break;
+            case "HEALTH-C":
+                break;
+        }
+
+        //output and delete from inv.
         console.log(`used ${this.inventory[index].name}!`);
         this.deleteFromInventory(index);
     }
@@ -86,10 +93,19 @@ class Player extends Entity {
         document.getElementById("uiGrid__header__soloistDisplay").innerHTML = `Masquerade: ${this.masqueradeSymbols[this.masquerade]}`
 
         //update multipliers
-        game.attackMultiplier += deltaLives / 10;
-        game.healthMultiplier -= deltaLives / 10;
-        game.parryCooldownMultipler -= deltaLives / 5;
-        game.parryDurationMultiplier -= deltaLives / 3;
+        if(deltaLives == 1){ //if statement in prep for shop implements. deltaLives can = -1.
+            game.attackMultiplier = game.attackMultiplier * 1.1;
+            game.healthMultiplier = game.healthMultiplier * 0.9;
+            game.parryCooldownMultipler = game.parryCooldownMultipler * 0.8;
+            game.parryDurationMultiplier = game.parryDurationMultiplier * 0.8;
+        }
+        if(deltaLives == -1){ //can be bought with Wishes. Brings stats closer into balance.
+
+        }
+
+        console.log(`attackMultiplier: ${game.attackMultiplier} \n
+parryCooldownMultipler: ${game.parryCooldownMultipler} \n
+parryDurationMultiplier: ${game.parryDurationMultiplier}`)
 
         //update stats
         this.health = Math.round(this.baseHealth * game.healthMultiplier);
@@ -210,6 +226,8 @@ class Game {
 
         this.deathCounter = 0;
         this.encounterCounter = 0;
+        
+        this.movesSinceLastRandomEncounter = 3;
 
         //REMEMBER TO APPEND THE MOVES OF THE DIALOGUE MOVES HERE----------------------
         this.storyDialogueMoves = [8];

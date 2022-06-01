@@ -64,8 +64,6 @@ function createNewEnemy(enemyTier) {
             break;
     }
 
-
-
     return tempEnemy;
 }
 
@@ -74,14 +72,16 @@ function createNewEnemy(enemyTier) {
 C - consumables.
 T - tokens/talismans <-- for the plot.
 */
-function createNewItem(id){ 
-    switch(id){
-        case "1-T":
-            return new item("Dragon Talisman", "A blessing from the Clairvoyant.", "encounter", "1-T");
+function createNewItem(id) {
+    switch (id) {
+        case "DRAGON-T":
+            return new item("Dragon Talisman", "A blessing from the Clairvoyant.", "encounter", id);
+        case "HEALTH-C":
+            return new item("Test Health Potion", "Ruby red, mends the soul.", "any", id);
     }
 }
 
 //These are possible victory scripts.
-function createVictoryDialogue(){
-    
+function createVictoryDialogue() {
+
 }
