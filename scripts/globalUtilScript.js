@@ -5,7 +5,6 @@ class Entity {
         this.health = health;
         this.action = "";
         this.statusLine = `Health: ${this.health}`;
-
         this.atkOnCD = false;
         this.y = 50;
     }
@@ -67,15 +66,9 @@ class Player extends Entity {
     }
     useInventoryItem(index) {
         //use the item lol
-        switch(this.inventory[index].id){ //ID goes here. CHECK entityDatabase.js for these.
-            case "DRAGON-T": //Dragon Talisman.
-                break;
-            case "HEALTH-C":
-                break;
-        }
+        this.inventory[index].useThisItem();
 
         //output and delete from inv.
-        console.log(`used ${this.inventory[index].name}!`);
         this.deleteFromInventory(index);
     }
     deleteFromInventory(index) {
@@ -93,13 +86,13 @@ class Player extends Entity {
         document.getElementById("uiGrid__header__soloistDisplay").innerHTML = `Masquerade: ${this.masqueradeSymbols[this.masquerade]}`
 
         //update multipliers
-        if(deltaLives == 1){ //if statement in prep for shop implements. deltaLives can = -1.
+        if (deltaLives == 1) { //if statement in prep for shop implements. deltaLives can = -1.
             game.attackMultiplier = game.attackMultiplier * 1.1;
             game.healthMultiplier = game.healthMultiplier * 0.9;
             game.parryCooldownMultipler = game.parryCooldownMultipler * 0.8;
             game.parryDurationMultiplier = game.parryDurationMultiplier * 0.8;
         }
-        if(deltaLives == -1){ //can be bought with Wishes. Brings stats closer into balance.
+        if (deltaLives == -1) { //can be bought with Wishes. Brings stats closer into balance.
 
         }
 
@@ -127,7 +120,7 @@ parryDurationMultiplier: ${game.parryDurationMultiplier}`)
     }
 }
 class Enemy extends Entity {
-    constructor(health, attackPower, attackCD, tier, enemyName, dialogue1, dialogue2) {
+    constructor(health, attackPower, attackCD, tier, enemyName, encounterDialogue, deathDialogue) {
         super(health);
         this.atk = attackPower;
         this.atkCD = attackCD;
@@ -136,8 +129,8 @@ class Enemy extends Entity {
 
         //Dialogue.
         this.name = enemyName;
-        this.encounterDialogue = dialogue1;
-        this.deathDialogue = dialogue2;
+        this.encounterDialogue = encounterDialogue;
+        this.deathDialogue = deathDialogue;
     }
 
     async attackTarget(target) {
@@ -180,6 +173,21 @@ class item {
         this.description = description;
         this.usage = usage; //can be: "encounter" or "movement"
         this.id = id;
+    }
+
+    useThisItem() {
+        switch (this.id) {
+            case "DRAGON-T":
+                if(enemy.name == "The Keeper"){
+                    enemy.takeDamage(enemy.health);
+                }
+                break;
+            case "HEALTH-C":
+                player.takeDamage(-5);
+                document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${player.health}`;
+                break;
+        }
+        //console.log(`used ${this.id}!`);
     }
 }
 
@@ -226,7 +234,7 @@ class Game {
 
         this.deathCounter = 0;
         this.encounterCounter = 0;
-        
+
         this.movesSinceLastRandomEncounter = 3;
 
         //REMEMBER TO APPEND THE MOVES OF THE DIALOGUE MOVES HERE----------------------

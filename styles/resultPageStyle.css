@@ -18,7 +18,8 @@ body {
 
     background-color: #fff8e0;
 }
-#pageText {
+
+.pageText {
     font-family: monospace;
     font-size: 15px;
     line-height: 110%;
@@ -27,6 +28,22 @@ body {
     margin: 10px;
 
     text-align: center;
+}
+
+#output1 {
+    opacity: 1;
+}
+
+#output2 {
+    opacity: 0.7;
+}
+
+#output3 {
+    opacity: 0.4;
+}
+
+#output4 {
+    opacity: 0.1;
 }
 
 /*lose page-----------------------------------------------------------*/

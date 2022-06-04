@@ -206,7 +206,7 @@ function showCellsInVision(radius, x, y) {
         }
     }
 
-    var coordSetCenter = [Math.ceil(tempArray.length / 2) - 1, Math.ceil(tempArray[0].length / 2) - 1];
+    var coordSetCenter = [Math.ceil(tempArray.length / 2) - 1, Math.ceil(tempArray[4].length / 2) - 1];
 
     //find all the elements in radius range and set symbols to cell.symbol.
     for (var i = 0; i < tempArray.length; i++) {//each column:

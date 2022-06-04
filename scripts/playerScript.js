@@ -160,7 +160,7 @@ async function keyDownHandler(e) {
         switch (game.inventoryOpen) {
             case true: //if inv is open, close it.
                 //pause and unlock EVERYTHING.
-                if(enemy.health > 0){ //if there is an encounter. Enemy is not dead.
+                if (enemy.health > 0) { //if there is an encounter. Enemy is not dead.
                     game.attacksLocked = false;
                 }
                 game.movesLocked = false;
@@ -277,7 +277,7 @@ async function beginEncounter(cellEntity) { //CELLENTITY, NOT CELL.
             enemiesInRoom = playerRandInt(3, 5, "near");
             break;
         case "boss encounter":
-            enemiesInRoom = playerRandInt(6, 7, "near");
+            enemiesInRoom = 6;
             break;
         case "path": //random path encounters.
             enemiesInRoom = playerRandInt(1, 1, "near");
@@ -289,7 +289,7 @@ async function beginEncounter(cellEntity) { //CELLENTITY, NOT CELL.
 //Contains: set up for loot, boss entity creation and dialogue setup.
 //Also contains: Victory condition, room progression
 async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator) {//callback function. Runs when each fight is done, if there are more enemies left in the room.
-    //check if encounter is done, then display victory dialogue. This dialogue gets disabled on button click.
+    //Exit encounter if all enemies dead.
     if (currentEnemyIterator > enemiesInRoom) {
         winEncounter(cellEntity, enemiesInRoom);
         return;
@@ -303,32 +303,54 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
     document.getElementById("encounterDialogue").style.display = "grid";
     document.getElementById("encounterDialogue__header__locationDisplay").innerHTML = cellEntity.name;
 
-    //create enemy (from enemiesListScript.js)
-    enemy = createNewEnemy(baseRoomTier);
-
-    //Dialogue sequences before fights.
     var encounterDialogueBox = document.getElementById("encounterDialogue__output__outputBox");
-    if (cellEntity.type == "boss encounter" && currentEnemyIterator == enemiesInRoom) { //Boss sequences. Didn't proc.
-        let bossDialogueSequence = [];
-        //Pick each boss's dialogue.
-        switch (game.currentRoom) {
-            case 1: //first room's boss.
-                enemy = new Enemy(100, 20, 5, 5, "The Storied Clairvoyant", "The Storied Clairvoyant scowls.", "Not so wide-eyed after all.");
-                bossDialogueSequence = ["The Storied Clairvoyant scowls.", "Too intent.", "Too uncertain.", "Too naive."]
+    //------------------------------------------------Case for bosses--------------------------------------------------------||
+    if (cellEntity.type == "boss encounter") {
+        switch (game.currentRoom) { //switch for specific boss rooms.
+            case 1: //First room.
+                //Set boss room enemies. These have special names?
+                enemy = createNewEnemy(baseRoomTier);
+                //On certain enemies in boss room, there are even specialer enemies.
+                //The Keeper.
+                if (currentEnemyIterator == 2) {
+                    enemy = createNewEnemy("X-1", "The Keeper");
+                }
+                //The Clairvoyant. Clairvoyant is the boss at the end.
+                if (currentEnemyIterator == enemiesInRoom) {
+                    enemy = createNewEnemy("X-1", "The Clairvoyant");
+
+                    let bossDialogueSequence = [];
+                    bossDialogueSequence = ["The Storied Clairvoyant scowls.", "Too intent.", "Too uncertain.", "Too naive."]
+                    //boss dialogue sequences.
+                    for (var j = 0; j < bossDialogueSequence.length; j++) {
+                        if (j == 0) {
+                            await sleep(outputPause);
+                        }
+                        encounterDialogueBox.innerHTML = bossDialogueSequence[j];
+                        await fade("in", encounterDialogueBox);
+                        await sleep(outputPause);
+                        await fade("out", encounterDialogueBox);
+                        await sleep(outputPause);
+                    }
+                }
+
+                //not boss dialogue sequences.
+                if (enemy.name != "The Storied Clairvoyant") {
+                    //Dialogue sequences before fights.
+                    var encounterDialogueBox = document.getElementById("encounterDialogue__output__outputBox");
+                    encounterDialogueBox.innerHTML = enemy.encounterDialogue;
+                    await sleep(outputPause);
+                }
                 break;
         }
-        //boss dialogue sequences.
-        for (var j = 0; j < bossDialogueSequence.length; j++) {
-            if (j == 0) {
-                await sleep(outputPause);
-            }
-            encounterDialogueBox.innerHTML = bossDialogueSequence[j];
-            await fade("in", encounterDialogueBox);
-            await sleep(outputPause);
-            await fade("out", encounterDialogueBox);
-            await sleep(outputPause);
-        }
-    } else {//Normal dialogue.
+    } else if (cellEntity.type == "minor encounter" || cellEntity.type == "major encounter" || cellEntity.type == "path") {
+        //--------------------------------------------Case for others-------------------------------------------------------||
+        //create enemy (from enemiesListScript.js)
+        enemy = createNewEnemy(baseRoomTier);
+
+        //Start dialogue.
+        //Dialogue sequences before fights.
+        var encounterDialogueBox = document.getElementById("encounterDialogue__output__outputBox");
         encounterDialogueBox.innerHTML = enemy.encounterDialogue;
         await sleep(outputPause);
     }
@@ -337,7 +359,7 @@ async function encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyI
     encounterDialogueBox.innerHTML = "";
     encounterDialogueBox.style.opacity = 1;
     //Begin fight.
-    if(!game.inventoryOpen){ //sometimes it gets inted by starting a fight while inv open.
+    if (!game.inventoryOpen) { //sometimes it gets inted by starting a fight while inv open.
         game.attacksLocked = false; //Enable J, K keybinds for attacks. Disable movement.
     }
     var encounterAnimation = window.requestAnimationFrame(function () { drawEncounter(ctx, canvas, enemy, encounterAnimation, function () { return encounterFunctionWrapper(cellEntity, enemiesInRoom, currentEnemyIterator + 1); }) });
@@ -517,8 +539,8 @@ function initPlayerScript(width, height) {
     player.addNewAttack(new attack("Literature of the Heart", 20, 2, 1, "attack", null, null));
     player.addNewAttack(new attack("Token of Will", null, 5, null, "parry", 3, null));
     //test inventory
-    player.appendToInventory(new item("test item", "use to test!", "movement", "test1"));
-    player.appendToInventory(new item("test item", "use to test!", "movement", "test1"));
+    player.appendToInventory(createNewItem("DRAGON-T"));
+    player.appendToInventory(createNewItem("HEALTH-C"));
     //set global vars
     playerX = Math.ceil(width / 2) - 1;
     playerY = Math.ceil(height / 2) - 1;
