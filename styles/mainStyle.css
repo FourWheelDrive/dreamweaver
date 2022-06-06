@@ -217,6 +217,14 @@ body {
     opacity: 0.4;
 }
 
+/*Shop popup style----------------------------------------------------------------*/
+#shopDisplay{
+    display: none;
+
+    grid-template-areas: "header"
+    ""
+}
+
 /*Testing*/
 #cursorOutput{
     display: none;

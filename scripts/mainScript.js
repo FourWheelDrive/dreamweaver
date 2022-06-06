@@ -249,6 +249,8 @@ function winGame() { //same thing as loseGame(), but win.
 
 //onload
 async function onLoad() {
+    //document.getElementById("shopDisplay").style.display = "grid";
+
     await openingDialogue();
     await fade("in", document.getElementById("mainGameGrid"));
 

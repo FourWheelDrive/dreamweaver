@@ -20,6 +20,7 @@ TO-DO:
 -Check CSS stuff on different displays.                                                         done? idk if i actually fixed it.
 - Game breaks after more deaths happen. Minimum amount of stats on Masquerade?                  DONE Made new algs.
 - Make a new .txt with all the enemies and item stats?
+- sometimes, attack will just stop for no reason.                                                   PRIORITY
 
 Roadmap:
 -Multiple, randomized enemies in each room.                                                     DONE
@@ -81,3 +82,8 @@ Some useful algs:
 Get cell position from cell ID:
 let cellPosition = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
 
+Notes:
+♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ ♟ << some new symbols.
+℘ ℐ ℑ ℒ 
+
+𐎑 ಥ
