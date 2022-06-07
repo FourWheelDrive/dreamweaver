@@ -221,8 +221,9 @@ body {
 #shopDisplay{
     display: none;
 
-    grid-template-areas: "header"
-    ""
+    grid-template-areas: "header" /*header contains title.*/
+    "outputBar menu" /*outputBar contains descriptions of items. Menu is similar to inventory menu.*/
+    "footer" /*footer contains health, Wishes, Masquerade?*/
 }
 
 /*Testing*/
