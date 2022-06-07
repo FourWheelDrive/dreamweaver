@@ -236,7 +236,7 @@ async function roomCleared() {
     await fade("in", document.getElementById("mainGameGrid"));
 }
 
-//Game functions
+//Game functions-----------------------------------------------------------------------------------
 function loseGame() {
     //set sessionstorage.result
     sessionStorage.setItem("result", "lose");
@@ -245,6 +245,61 @@ function loseGame() {
 function winGame() { //same thing as loseGame(), but win.
     sessionStorage.setItem("result", "win");
     window.location.href = "results.html";
+}
+
+//Shop functions-----------------------------------------------------------------------------------
+function initializeShop(){//this is the same algorithm that the player's inventory uses to update, actually.
+    var shopMenu = document.getElementById("shopDisplay__menu");
+    //remove the buttons already on the display first.
+    while (shopMenu.firstChild) {
+        shopMenu.removeChild(shopMenu.lastChild);
+    }
+
+    //add new items to game.shopInventory.
+    let baseShopItems = 4;
+    for(var i = 0; i < baseShopItems + game.currentRoom; i++){//as you progress through rooms, there are more items in shop.
+        game.shopInventory.push(returnRandomItem());
+    }
+    console.log(game.shopInventory)
+
+    //Make new buttons for the shop.
+        for (var j = 0; j < game.shopInventory.length; j++) {
+            var button = document.createElement("button");
+            if (j == 0) {
+                button.innerHTML = `> ${game.shopInventory[j].name} <`;
+                document.getElementById("shopDisplay__output__outputDisplay").innerHTML = game.shopInventory[j].description;
+            } else {
+                button.innerHTML = game.shopInventory[j].name;
+            }
+    
+            button.setAttribute("id", `shop button ${j}`);
+            button.setAttribute("class", `shopDisplay__menu__button`);
+    
+            shopMenu.appendChild(button);
+        }
+}
+function openShop(operation){
+    if (operation == "open"){
+        game.attacksLocked = true;
+        game.movesLocked = true;
+
+        //default shop position
+        shopPosition = 0;
+        document.getElementById("shopDisplay").style.display = "grid";
+    }
+    if (operation == "close"){
+        game.attacksLocked = false;
+        game.movesLocked = false;
+
+        document.getElementById("shopDisplay").style.display = "none";
+
+        if (game.shopInventory.length > 0) { //reset outputbar.
+            shopPosition = 0;
+            document.getElementById("shopDisplay__output__outputDisplay").innerHTML = player.inventory[0].description;
+        } else {
+            document.getElementById("shopDisplay__output__outputDisplay").innerHTML = "";
+        }
+    }
 }
 
 //onload
@@ -262,6 +317,8 @@ async function onLoad() {
     gameSpace.style.opacity = 0;
     generateMap(70, 15);
 
+    initializeShop();
+
     await fade("in", gameSpace);
-    initPlayerScript(width, height);
+    initPlayerScript(mapWidth, mapHeight);
 }

@@ -98,7 +98,7 @@ async function keyDownHandler(e) {
             //Begin encounters on locations, if they're new.
             if (newCell.classList.contains("gameSpace__specialLocations") && (!newCellEntity.alreadyVisited || newCellEntity.reVisitable)) { //change size of special locations on walked on.
                 if (newCellEntity.type == "shop") {
-                    //put shop func here
+                    openShop("open");
                 } else if (newCellEntity.type == "boss encounter" && newCellEntity.alreadyVisited) {
                     //Boss revisit dialogue func
                 } else {
@@ -122,7 +122,7 @@ async function keyDownHandler(e) {
         }
     }
     //special case for move triggers.
-    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !e.repeat) {
+    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.movesLocked && !e.repeat) {
         game.moveCounter++;
         if (game.storyDialogueMoves.includes(game.moveCounter)) { //check move dialogues.
             storyDialogueHandler("storyMove");
@@ -193,9 +193,9 @@ async function keyDownHandler(e) {
                 if ((inventoryPosition - 1) >= 0 && player.inventory.length > 0) {
                     inventoryPosition = inventoryPosition - 1;
                     let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
-                    document.getElementById(`${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
                     //need to reset the other button.
-                    document.getElementById(`${inventoryPosition + 1}`).innerHTML = document.getElementById(`${inventoryPosition + 1}`).innerHTML.slice(5, -5);
+                    document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML = document.getElementById(`${inventoryPosition + 1}`).innerHTML.slice(5, -5);
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
@@ -203,9 +203,9 @@ async function keyDownHandler(e) {
                 if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 0) {
                     inventoryPosition = inventoryPosition + 1;
                     let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
-                    document.getElementById(`${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
                     //need to reset the other button.
-                    document.getElementById(`${inventoryPosition - 1}`).innerHTML = document.getElementById(`${inventoryPosition - 1}`).innerHTML.slice(5, -5);
+                    document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML = document.getElementById(`${inventoryPosition - 1}`).innerHTML.slice(5, -5);
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;

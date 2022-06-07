@@ -168,10 +168,9 @@ class attack {
     }
 }
 class item {
-    constructor(name, description, usage, id) {
+    constructor(name, description, id) {
         this.name = name;
         this.description = description;
-        this.usage = usage; //can be: "encounter" or "movement"
         this.id = id;
     }
 
@@ -185,6 +184,9 @@ class item {
             case "HEALTH-C":
                 player.takeDamage(-5);
                 document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${player.health}`;
+                break;
+            case "TEST-C":
+                console.log("yeah, this is big brain time");
                 break;
         }
         //console.log(`used ${this.id}!`);
@@ -229,6 +231,7 @@ class Game {
 
         this.firstEncounterDialogue = false;
 
+        //Flags for dialogue.
         this.currentRoom = 1;
         this.moveCounter = 0;
 
@@ -241,13 +244,16 @@ class Game {
         this.storyDialogueMoves = [8];
         this.storyDialogueEncounters = [2];
         //-----------------------------------------------------------------------------
-
+        //Multipliers for game progression.
         this.attackMultiplier = 1;
         this.healthMultiplier = 1;
         this.parryCooldownMultipler = 1;
         this.parryDurationMultiplier = 1;
 
         this.randomEncounterChance = 7;
+
+        //shop inventory.
+        this.shopInventory = [];
     }
 }
 
@@ -270,6 +276,7 @@ var enemy = new Enemy(null, null, null, null, null, null, null);
 var globalHeight, globalWidth;
 var playerX, playerY; //<- these are not in Player object. player.x is the canvas position for player.
 var inventoryPosition = 0; //<- defines where the selector is in the inventory.
+var shopPosition = 0; //<- defines where the selector is in the shop
 //---------------------------Map stuff------------------------------------
 /* Area codes:
 Codes: 
@@ -287,8 +294,8 @@ var baseRoomTier = 1; //iterate this each room? Defines random encounter difficu
 var roomClassMultiplier = [1, 1, 1]; //follows convention above.
 const roomClassSymbols = ["♪", "𝅘𝅥𝅯", "𝅘𝅥𝅰", "𝄞"];
 var pathSymbols = ["#", ";"];
-var width = 30;
-var height = 30;
+var mapWidth = 30;
+var mapHeight = 30;
 
 //Global var map
 var map;
@@ -355,7 +362,7 @@ function updateInventoryDisplay() {
             button.innerHTML = player.inventory[i].name;
         }
 
-        button.setAttribute("id", `${i}`);
+        button.setAttribute("id", `inventory button ${i}`);
         button.setAttribute("class", `inventoryDisplay__button`);
 
         menu.appendChild(button);

@@ -100,11 +100,20 @@ T - tokens/talismans <-- for the plot.
 function createNewItem(id) {
     switch (id) {
         case "DRAGON-T":
-            return new item("Dragon Talisman", "A blessing from the Clairvoyant. \n Give this to the Keeper!", "encounter", id);
+            return new item("Dragon Talisman", "A blessing from the Clairvoyant. \n Give this to the Keeper!", id);
         case "HEALTH-C":
-            return new item("Test Health Potion", "Ruby red, mends the soul.", "any", id);
+            return new item("Test Health Potion", "Ruby red, mends the soul.", id);
+        case "TEST-C":
+            return new item("Test consumable", "testy boi", id);
     }
 }
+function returnRandomItem() { //only consumables in the shop? We'll see.
+    var itemIDs = ["HEALTH-C", "TEST-C"];
+    var id = randInt(1, "round");
+
+    return createNewItem(itemIDs[id]);
+}
+
 
 //These are possible victory scripts.
 function createVictoryDialogue() {

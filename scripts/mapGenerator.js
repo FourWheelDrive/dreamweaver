@@ -1,9 +1,9 @@
 //generate map
 function createMapArray(pathSymbols) {
     var array = [];
-    for (var i = 0; i < width; i++) {
+    for (var i = 0; i < mapWidth; i++) {
         array.push([]); //push columns.
-        for (var j = 0; j < height; j++) {
+        for (var j = 0; j < mapHeight; j++) {
             array[i].push(new Cell("Wall", "wall", pathSymbols[0], null, i, j, false, true)); //push cells.
         }
     }
@@ -21,12 +21,12 @@ function createMap(maxTunnels, maxLength) {
         randomDirection;
 
     //Make the array
-    var map = createMapArray(pathSymbols, width, height);
+    var map = createMapArray(pathSymbols, mapWidth, mapHeight);
     //Step 1: Random initial position.
     /*let currentRow = randInt(dimensions, "floor");
     currentColumn = randInt(dimensions, "floor");*/
-    let currentRow = Math.ceil(height / 2) - 1;
-    let currentColumn = Math.ceil(width / 2) - 1;
+    let currentRow = Math.ceil(mapHeight / 2) - 1;
+    let currentColumn = Math.ceil(mapWidth / 2) - 1;
 
     while (maxTunnels > 0) {
         //Step 2: Random direction.
@@ -50,8 +50,8 @@ function createMap(maxTunnels, maxLength) {
             //checks each tile.
             if (((currentRow === 0) && (randomDirection[1] === -1)) ||
                 ((currentColumn === 0) && (randomDirection[0] === -1)) ||
-                ((currentRow === height - 1) && (randomDirection[1] === 1)) ||
-                ((currentColumn === width - 1) && (randomDirection[0] === 1))) { break; } //Break loop.
+                ((currentRow === mapHeight - 1) && (randomDirection[1] === 1)) ||
+                ((currentColumn === mapWidth - 1) && (randomDirection[0] === 1))) { break; } //Break loop.
             else {
                 //Step 5: Update map if everything else is valid.
                 map[currentColumn][currentRow] = new Cell("A Desolate Avenue", "path", pathSymbols[1], baseRoomTier, currentColumn, currentRow, false, true); //Update tile
@@ -265,5 +265,5 @@ function generateMap(maxTunnels, maxLength) { //pass in generation vars
         document.getElementById("gameSpace").appendChild(rowDiv);
     }
     //calc all visible nodes. Player position begins at center.
-    showCellsInVision(6, Math.ceil(width / 2) - 1, Math.ceil(height / 2) - 1);
+    showCellsInVision(6, Math.ceil(mapWidth / 2) - 1, Math.ceil(mapHeight / 2) - 1);
 }

@@ -44,7 +44,7 @@ Roadmap:
     - Give the inventory system a display <p>. Show items' use.                                 DONE
     - Max inventory size? If > size, use items.                                                     SECONDARY.
     - Need to confirm that deleting items works.                                                DONE
-    - Need to code items that work.                                                             DONEPRIORITY.
+    - Need to code items that work.                                                             DONE
         - use player.useInventoryItem() for this. check IDs.                                    DONE
         - figure out why useThisItem() isn't working.                                           DONE
         - DRAGON-TALISMAN doesn't work. Why?????                                                DONE (enemy.name is the property, not enemy.enemyName)
@@ -61,6 +61,8 @@ Roadmap:
 - FIND A BETTER DIALOGUE STRUCTURE OH MY GOD.                                                       PRIORITY.
     - Dialogue tree? Somehow.                                                                   ^^^^
     - For this project, keep track of Witness and Champion to get Dragon Talisman.
+-May require a better item structure.                                                               SECONDARY.
+    - Array with all item IDs? I'm not sure, but keeping track of them is going to be hard.
 - You can attack through the inventory. Fix flags.                                              DONE
 - Make a cooldown for random encounters. No two in a row or somthing like that.                 DONE
 -Shop!! You can spend wishes here.                                                                  PRIORITY.
@@ -68,7 +70,7 @@ Roadmap:
     - player.updateStats(>args to be defined) can tweak a single stat.
     >>Should proc when player moves back to a Serene Refuge.
     - Make a new name for health pot.
-
+-PlayerScript.js: change encounters for Major/Minor encounters.
 
 Roadmap, after the project is done. Story and dialogue stuff, really.
 -Next Map
