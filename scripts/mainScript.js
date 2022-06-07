@@ -317,7 +317,7 @@ async function onLoad() {
     gameSpace.style.opacity = 0;
     generateMap(70, 15);
 
-    initializeShop();
+    //initializeShop();
 
     await fade("in", gameSpace);
     initPlayerScript(mapWidth, mapHeight);
