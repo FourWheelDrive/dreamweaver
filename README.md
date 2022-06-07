@@ -1,2 +1,2 @@
 # dreamweaver
-A game written in JS for a course project.
+An (in progress) game written in JS for a course project.
