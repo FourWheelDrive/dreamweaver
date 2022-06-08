@@ -156,7 +156,7 @@ async function keyDownHandler(e) {
         }
     }
     //Toggle inventory.
-    if (e.code == "KeyG") {
+    if (e.code == "KeyG" && game.inventoryOpen) {
         switch (game.inventoryOpen) {
             case true: //if inv is open, close it.
                 //pause and unlock EVERYTHING.
@@ -187,25 +187,37 @@ async function keyDownHandler(e) {
                 break;
         }
     }
+    //Close shop.
+    if(e.code == "KeyH" && game.shopOpen){
+        openShop("close");
+    }
     if (game.inventoryOpen && (e.code == "ArrowLeft" || e.code == "ArrowRight" || e.code == "Enter")) { //use a pointer to maneuver between inventory items.
         switch (e.code) {
             case "ArrowLeft":
-                if ((inventoryPosition - 1) >= 0 && player.inventory.length > 0) {
+                if ((inventoryPosition - 1) >= 0 && player.inventory.length > 1) {
                     inventoryPosition = inventoryPosition - 1;
-                    let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
-                    document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    //Change new button at pos (right)
+                    let newButtonEntity = document.getElementById(`inventory button ${inventoryPosition}`);
+                    newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
                     //need to reset the other button.
-                    document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML = document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML.slice(5, -5);
+                    let previousButtonEntity = document.getElementById(`inventory button ${inventoryPosition + 1}`);
+                    previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
+
+                    //update output.
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
             case "ArrowRight":
-                if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 0) {
+                if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 1) {
                     inventoryPosition = inventoryPosition + 1;
-                    let temp = document.getElementById(`inventory button ${inventoryPosition}`).innerHTML;
-                    document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
+                    //change new button at pos (left)
+                    let newButtonEntity = document.getElementById(`inventory button ${inventoryPosition}`);
+                    newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
                     //need to reset the other button.
-                    document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML = document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML.slice(5, -5);
+                    let previousButtonEntity = document.getElementById(`inventory button ${inventoryPosition - 1}`);
+                    previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5);
+
+                    //update output
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
@@ -221,11 +233,43 @@ async function keyDownHandler(e) {
                 break;
         }
     }
-    if (game.shopOpen && (e.code == "ArrowLeft" || e.code == "ArrowRight" || e.code == "Enter")) { //pointer, but for shop items.
+    if (game.shopOpen && (e.code == "ArrowUp" || e.code == "ArrowDown" || e.code == "Enter")) { //pointer, but for shop items. same alg.
         switch (e.code) {
-            case "ArrowLeft":
+            case "ArrowUp":
+                if ((shopPosition - 1) >= 0 && game.shopInventory.length > 1) {
+                    shopPosition = shopPosition - 1;
+                    //update new button
+                    let newButtonEntity = document.getElementById(`shop button ${shopPosition}`);
+                    newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
+                    newButtonEntity.scrollIntoView({ behaviour: "smooth", block: "nearest" });
+
+                    //update previous button
+                    let previousButtonEntity = document.getElementById(`shop button ${shopPosition + 1}`);
+                    previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5);
+
+                    //update things.
+                    let newShopItem = game.shopInventory[shopPosition];
+                    document.getElementById("shopDisplay__output__outputDisplay").innerHTML = newShopItem.description;
+                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = newShopItem.cost;
+                }
                 break;
-            case "ArrowRight":
+            case "ArrowDown":
+                if ((shopPosition + 1) < game.shopInventory.length && game.shopInventory.length > 1) {
+                    shopPosition = shopPosition + 1;
+                    //update new button
+                    let newButtonEntity = document.getElementById(`shop button ${shopPosition}`);
+                    newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
+                    newButtonEntity.scrollIntoView({ behaviour: "smooth", block: "nearest" });
+
+                    //update previous button
+                    let previousButtonEntity = document.getElementById(`shop button ${shopPosition - 1}`);
+                    previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5);
+
+                    //update things.
+                    let newShopItem = game.shopInventory[shopPosition];
+                    document.getElementById("shopDisplay__output__outputDisplay").innerHTML = newShopItem.description;
+                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = newShopItem.cost;
+                }
                 break;
             case "Enter":
                 break;

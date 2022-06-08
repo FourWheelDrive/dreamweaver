@@ -254,9 +254,11 @@ function initializeShop(){//this is the same algorithm that the player's invento
     while (shopMenu.firstChild) {
         shopMenu.removeChild(shopMenu.lastChild);
     }
+    //make instructions.
+    document.getElementById("shopDisplay__output__instructions").innerHTML = "UP, DOWN to navigate. ENTER to select. H to exit."
 
     //add new items to game.shopInventory.
-    let baseShopItems = 4;
+    let baseShopItems = 10;
     for(var i = 0; i < baseShopItems + game.currentRoom; i++){//as you progress through rooms, there are more items in shop.
         let tempItem = returnRandomItem()
         game.shopInventory.push(tempItem);
@@ -283,6 +285,9 @@ function openShop(operation){
         game.attacksLocked = true;
         game.movesLocked = true;
         game.shopOpen = true;
+
+        document.getElementById("shopDisplay__output__wishesDisplay").innerHTML = `Wishes: ${player.wishes}`;
+        document.getElementById("shopDisplay__output__masqueradeDisplay").innerHTML = `Masquerade: ${player.masqueradeSymbols[player.masquerade]}`;
 
         //default shop position
         shopPosition = 0;

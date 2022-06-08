@@ -20,7 +20,7 @@
     <div id="mainGameGrid" class="uiGrid">
         <div id="uiGrid__header">
             <p id="uiGrid__header__healthDisplay" class="uiGrid__text"> </p>
-            <p id="uiGrid__header__wishesDisplay" class="uiGrid__text"> </p>
+            <p id="uiGrid__header__wishesDisplay" class="uiGrid__text">Wishes: 0</p>
             <p id="uiGrid__header__hoverDisplay" class="uiGrid__text"> </p>
         </div>
 
@@ -39,7 +39,7 @@
         <p id="inventoryDisplay__header">Inventory</p>
         <div id="inventoryDisplay__menu"></div>
         <p id="inventoryDisplay__output"></p>
-        <p id="inventoryDisplay__footer">&lt- -> to navigate, ENTER to select.</p>
+        <p id="inventoryDisplay__footer">UP, DOWN to navigate. ENTER to select.</p>
     </div>
 
     <div id="cursorOutput">
@@ -111,11 +111,13 @@
 
         </div>
         <div id="shopDisplay__output">
+            <p id="shopDisplay__output__wishesDisplay" class="shopDisplay__text"></p>
+            <p id="shopDisplay__output__masqueradeDisplay" class="shopDisplay__text"></p>
             <p id="shopDisplay__output__outputDisplay" class="shopDisplay__text"></p>
             <p id="shopDisplay__output__costDisplay" class="shopDisplay__text"></p>
         </div>
         <div id="shopDisplay__footer">
-            <p id="shopDisplay__output__wishesDisplay" class="shopDisplay__text"></p>
+            <p id="shopDisplay__output__instructions" class="shopDisplay__text"></p>
         </div>
     </div>
 </body>
