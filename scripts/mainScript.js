@@ -258,9 +258,9 @@ function initializeShop(){//this is the same algorithm that the player's invento
     //add new items to game.shopInventory.
     let baseShopItems = 4;
     for(var i = 0; i < baseShopItems + game.currentRoom; i++){//as you progress through rooms, there are more items in shop.
-        game.shopInventory.push(returnRandomItem());
+        let tempItem = returnRandomItem()
+        game.shopInventory.push(tempItem);
     }
-    console.log(game.shopInventory)
 
     //Make new buttons for the shop.
         for (var j = 0; j < game.shopInventory.length; j++) {
@@ -306,18 +306,18 @@ function openShop(operation){
 async function onLoad() {
     //document.getElementById("shopDisplay").style.display = "grid";
 
-    await openingDialogue();
+    //await openingDialogue();
     await fade("in", document.getElementById("mainGameGrid"));
 
     console.log("this is working");
     createOutputBoxes();
-    await move0Sequence();
+    //await move0Sequence();
 
     let gameSpace = document.getElementById("gameSpace");
     gameSpace.style.opacity = 0;
     generateMap(70, 15);
 
-    //initializeShop();
+    initializeShop();
 
     await fade("in", gameSpace);
     initPlayerScript(mapWidth, mapHeight);

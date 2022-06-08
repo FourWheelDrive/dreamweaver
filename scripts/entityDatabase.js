@@ -109,9 +109,9 @@ function createNewItem(id) {
 }
 function returnRandomItem() { //only consumables in the shop? We'll see.
     var itemIDs = ["HEALTH-C", "TEST-C"];
-    var id = randInt(1, "round");
+    var randnum = randInt(1, "near");
 
-    return createNewItem(itemIDs[id]);
+    return createNewItem(itemIDs[randnum]);
 }
 
 

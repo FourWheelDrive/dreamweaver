@@ -66,6 +66,9 @@ Roadmap:
 - You can attack through the inventory. Fix flags.                                              DONE
 - Make a cooldown for random encounters. No two in a row or somthing like that.                 DONE
 -Shop!! You can spend wishes here.                                                                  PRIORITY.
+    - Write <- and -> to work with both inventory and shop.
+    - CSS for shop is broken. Specifically, grid.
+    >>The following are ideas.
     - player.masqueradeUpdateLives(-1) can bring stats more into balance.
     - player.updateStats(>args to be defined) can tweak a single stat.
     >>Should proc when player moves back to a Serene Refuge.
