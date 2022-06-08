@@ -168,10 +168,11 @@ class attack {
     }
 }
 class item {
-    constructor(name, description, id) {
+    constructor(id, name, description, cost) {
         this.name = name;
         this.description = description;
         this.id = id;
+        this.cost = cost;
     }
 
     useThisItem() {
@@ -227,6 +228,7 @@ class Game {
         this.attacksLocked = true;
         this.movesLocked = false;
         this.inventoryOpen = false; //this will flag things.
+        this.shopOpen = false;
         this.encounterLocked = false; //true on the move after an encounter, so no two in a row.
 
         this.firstEncounterDialogue = false;

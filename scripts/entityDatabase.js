@@ -100,11 +100,11 @@ T - tokens/talismans <-- for the plot.
 function createNewItem(id) {
     switch (id) {
         case "DRAGON-T":
-            return new item("Dragon Talisman", "A blessing from the Clairvoyant. \n Give this to the Keeper!", id);
+            return new item(id, "Dragon Talisman", "A blessing from the Clairvoyant. \n Give this to the Keeper!", null);
         case "HEALTH-C":
-            return new item("Test Health Potion", "Ruby red, mends the soul.", id);
+            return new item(id, "Test Health Potion", "Ruby red, mends the soul.", 30);
         case "TEST-C":
-            return new item("Test consumable", "testy boi", id);
+            return new item(id, "Test consumable", "testy boi", 5);
     }
 }
 function returnRandomItem() { //only consumables in the shop? We'll see.

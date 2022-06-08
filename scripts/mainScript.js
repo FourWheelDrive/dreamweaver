@@ -282,6 +282,7 @@ function openShop(operation){
     if (operation == "open"){
         game.attacksLocked = true;
         game.movesLocked = true;
+        game.shopOpen = true;
 
         //default shop position
         shopPosition = 0;
@@ -290,6 +291,7 @@ function openShop(operation){
     if (operation == "close"){
         game.attacksLocked = false;
         game.movesLocked = false;
+        game.shopOpen = false;
 
         document.getElementById("shopDisplay").style.display = "none";
 

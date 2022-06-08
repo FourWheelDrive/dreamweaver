@@ -195,17 +195,17 @@ async function keyDownHandler(e) {
                     let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
                     document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
                     //need to reset the other button.
-                    document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML = document.getElementById(`${inventoryPosition + 1}`).innerHTML.slice(5, -5);
+                    document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML = document.getElementById(`inventory button ${inventoryPosition + 1}`).innerHTML.slice(5, -5);
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
             case "ArrowRight":
                 if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 0) {
                     inventoryPosition = inventoryPosition + 1;
-                    let temp = document.getElementById(`${inventoryPosition}`).innerHTML;
+                    let temp = document.getElementById(`inventory button ${inventoryPosition}`).innerHTML;
                     document.getElementById(`inventory button ${inventoryPosition}`).innerHTML = `> ${temp} <`;
                     //need to reset the other button.
-                    document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML = document.getElementById(`${inventoryPosition - 1}`).innerHTML.slice(5, -5);
+                    document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML = document.getElementById(`inventory button ${inventoryPosition - 1}`).innerHTML.slice(5, -5);
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
@@ -218,6 +218,16 @@ async function keyDownHandler(e) {
                         document.getElementById("inventoryDisplay__output").innerHTML = `Use ${player.inventory[inventoryPosition].name}? Confirm: ENTER`
                     }
                 }
+                break;
+        }
+    }
+    if (game.shopOpen && (e.code == "ArrowLeft" || e.code == "ArrowRight" || e.code == "Enter")) { //pointer, but for shop items.
+        switch (e.code) {
+            case "ArrowLeft":
+                break;
+            case "ArrowRight":
+                break;
+            case "Enter":
                 break;
         }
     }
