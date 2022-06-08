@@ -156,7 +156,7 @@ async function keyDownHandler(e) {
         }
     }
     //Toggle inventory.
-    if (e.code == "KeyG" && game.inventoryOpen) {
+    if (e.code == "KeyG") {
         switch (game.inventoryOpen) {
             case true: //if inv is open, close it.
                 //pause and unlock EVERYTHING.
@@ -191,9 +191,9 @@ async function keyDownHandler(e) {
     if(e.code == "KeyH" && game.shopOpen){
         openShop("close");
     }
-    if (game.inventoryOpen && (e.code == "ArrowLeft" || e.code == "ArrowRight" || e.code == "Enter")) { //use a pointer to maneuver between inventory items.
+    if (game.inventoryOpen && (e.code == "ArrowUp" || e.code == "ArrowDown" || e.code == "Enter")) { //use a pointer to maneuver between inventory items.
         switch (e.code) {
-            case "ArrowLeft":
+            case "ArrowUp":
                 if ((inventoryPosition - 1) >= 0 && player.inventory.length > 1) {
                     inventoryPosition = inventoryPosition - 1;
                     //Change new button at pos (right)
@@ -207,7 +207,7 @@ async function keyDownHandler(e) {
                     document.getElementById("inventoryDisplay__output").innerHTML = player.inventory[inventoryPosition].description;
                 }
                 break;
-            case "ArrowRight":
+            case "ArrowDown":
                 if ((inventoryPosition + 1) < player.inventory.length && player.inventory.length > 1) {
                     inventoryPosition = inventoryPosition + 1;
                     //change new button at pos (left)

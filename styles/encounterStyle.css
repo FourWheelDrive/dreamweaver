@@ -1,5 +1,5 @@
 /*ENCOUNTER DIALOGUE POPUP-------------------------------------------------------*/
-#encounterDialogue{
+#encounterDialogue {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -9,23 +9,25 @@
     height: auto;
     display: none;
     grid-template-areas: "header header"
-    "actionMenu canvas"
-    "actionMenu outputBox";
+        "actionMenu canvas"
+        "actionMenu outputBox";
     grid-template-columns: 1fr 2fr;
     grid-template-rows: 1fr fit-content(30%) 1fr;
 
     border: 1px solid black;
     background-color: #fff8e0;
 }
-#encounterDialogue > * {
+
+#encounterDialogue>* {
     padding: 0px;
     margin: 0px;
 }
 
-#encounterDialogue__header{
+#encounterDialogue__header {
     grid-area: header;
 }
-#encounterDialogue__menu{
+
+#encounterDialogue__menu {
     width: auto;
     grid-area: actionMenu;
 
@@ -33,20 +35,21 @@
     flex-wrap: wrap;
 }
 
-#encounterDialogue__displaySpace{
+#encounterDialogue__displaySpace {
     width: auto;
     grid-area: canvas;
 
     display: flex;
     justify-content: center;
 }
-#encounterDialogue__output{
+
+#encounterDialogue__output {
     grid-area: outputBox;
     display: flex;
     justify-content: center;
 }
 
-#encounterDialogue__header__locationDisplay{
+#encounterDialogue__header__locationDisplay {
     font-family: monospace;
     font-weight: bold;
     font-size: 15px;
@@ -56,7 +59,8 @@
 
     padding-left: 10px;
 }
-#encounterDialogue__output__outputBox{
+
+#encounterDialogue__output__outputBox {
     font-family: monospace;
     font-size: 15px;
     line-height: 90%;
@@ -65,8 +69,9 @@
     text-align: center;
 }
 
-.encounterDialogue__menu__button{
-    position: relative; /*For the cooldown timer stuff!*/
+.encounterDialogue__menu__button {
+    position: relative;
+    /*For the cooldown timer stuff!*/
     margin: 5px;
     margin-right: 0px;
     height: 40px;
@@ -79,28 +84,33 @@
     font-family: monospace;
     font-size: 15px;
 }
+
 /*.encounterDialogue__menu__button:active:enabled {
     background-color: #d6cbab;
 }*/
-.encounterDialogue__menu__button__progress{/*Button cooldown timer!*/
-position: absolute;
-height: 100%;
-width: 0%; /*use JS to change.*/
-top: 0;
-left: 0;
-background:#d6cbab;
-transition: width 1s;
+.encounterDialogue__menu__button__progress {
+    /*Button cooldown timer!*/
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    /*use JS to change.*/
+    top: 0;
+    left: 0;
+    background: #d6cbab;
+    transition: width 1s;
 }
-.encounterDialogue__menu__button__text{
+
+.encounterDialogue__menu__button__text {
     position: relative;
 }
+
 /*INVENTORY POPUP, SHOWS UP ALONGSIDE ENCOUNTER----------------------------------------*/
-#inventoryDisplay{
+#inventoryDisplay {
     display: none;
     grid-template-areas: "header"
-    "buttonMenu"
-    "output"
-    "footer";
+        "buttonMenu"
+        "output"
+        "footer";
     grid-template-rows: 1fr 5fr 1fr 1fr;
 
     position: absolute;
@@ -116,7 +126,8 @@ transition: width 1s;
 
     z-index: 1000;
 }
-#inventoryDisplay > *{
+
+#inventoryDisplay>* {
     font-family: monospace;
     font-size: 15px;
     line-height: 90%;
@@ -125,33 +136,45 @@ transition: width 1s;
 
     text-align: center;
 }
-#inventoryDisplay__header{
+
+#inventoryDisplay__header {
     grid-area: header;
     font-weight: bold;
     font-size: 15px;
     line-height: 90%;
     padding: 10px;
 }
-#inventoryDisplay__menu{
+
+#inventoryDisplay__menu {
     grid-area: buttonMenu;
-    display: flexbox;
-    flex-wrap: wrap;
+    overflow: scroll;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-#inventoryDisplay__output{
+
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+#inventoryDisplay__output {
     grid-area: output;
 }
-#inventoryDisplay__footer{
+
+#inventoryDisplay__footer {
     grid-area: footer;
 }
-.inventoryDisplay__button{
-    margin: 5px;
-    width: fit-content;
-    height: 20%;
 
-    padding: 0px;
+.inventoryDisplay__button {
+    margin: 5px;
+    width: 300px;
+    height: 50px;
+
+    padding: 5px;
     white-space: nowrap;
     text-align: center;
-    
+
     border-radius: 0px;
     border: 1px solid black;
     background-color: #fff8e0;
@@ -163,7 +186,7 @@ transition: width 1s;
 }
 
 /*VICTORY DIALOGUE POPUP-------------------------------------------------------*/
-#encounterVictoryDialogue{
+#encounterVictoryDialogue {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -173,14 +196,15 @@ transition: width 1s;
     height: 30%;
     display: none;
     grid-template-areas: "header"
-    "output"
-    "button";
+        "output"
+        "button";
     grid-template-rows: 1fr 3fr 1fr;
 
     border: 1px solid black;
     background-color: #fff8e0;
 }
-#encounterVictoryDialogue > *{
+
+#encounterVictoryDialogue>* {
     font-family: monospace;
     font-size: 15px;
     line-height: 90%;
@@ -193,12 +217,14 @@ transition: width 1s;
     left: 50%;
     transform: translate(-50%);
 }
-#encounterVictoryDialogue__output{
+
+#encounterVictoryDialogue__output {
     grid-area: output;
     display: flex;
     flex-direction: column;
 }
-#encounterVictoryDialogue__returnButton{
+
+#encounterVictoryDialogue__returnButton {
     grid-area: button;
 
     margin: 5px;
@@ -212,10 +238,12 @@ transition: width 1s;
     font-family: monospace;
     font-size: 15px;
 }
+
 #encounterVictoryDialogue__returnButton:active {
     background-color: #d6cbab;
 }
-#encounterVictoryDialogue__header__locationDisplay{
+
+#encounterVictoryDialogue__header__locationDisplay {
     grid-area: header;
     position: absolute;
     left: 50%;
