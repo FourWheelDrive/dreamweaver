@@ -258,7 +258,7 @@ function initializeShop() {//this is the same algorithm that the player's invent
     document.getElementById("shopDisplay__output__instructions").innerHTML = "UP, DOWN to navigate. ENTER to select. H to exit."
 
     //add new items to game.shopInventory.
-    let baseShopItems = 10;
+    let baseShopItems = 4;
     for (var i = 0; i < baseShopItems + game.currentRoom; i++) {//as you progress through rooms, there are more items in shop.
         let tempItem = returnRandomItem()
         game.shopInventory.push(tempItem);
@@ -336,12 +336,12 @@ function openShop(operation) {
 
 //onload
 async function onLoad() {
-    //await openingDialogue();
+    await openingDialogue();
     await fade("in", document.getElementById("mainGameGrid"));
 
     console.log("this is working");
     createOutputBoxes();
-    //await move0Sequence();
+    await move0Sequence();
 
     let gameSpace = document.getElementById("gameSpace");
     gameSpace.style.opacity = 0;

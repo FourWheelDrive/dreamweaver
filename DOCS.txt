@@ -63,20 +63,21 @@ Roadmap:
     - For this project, keep track of Witness and Champion to get Dragon Talisman.
 -May require a better item structure.                                                               SECONDARY.
     - Array with all item IDs? I'm not sure, but keeping track of them is going to be hard.
+    - Also, might need a tier attribute for items. Higher tiers in later rooms.                     SECONDARY. (in the future when story comes.)
 - You can attack through the inventory. Fix flags.                                              DONE
 - Make a cooldown for random encounters. No two in a row or somthing like that.                 DONE
--Shop!! You can spend wishes here.                                                                  PRIORITY.
-    - Write <- and -> to work with both inventory and shop.
-    - CSS for shop is broken. Specifically, grid.
+-Shop!! You can spend wishes here.                                                              DONEPRIORITY.
+    - Write <- and -> to work with both inventory and shop.                                     DONE
+    - CSS for shop is broken. Specifically, grid.                                               DONE
     >>The following are ideas.
     - player.masqueradeUpdateLives(-1) can bring stats more into balance.
     - player.updateStats(>args to be defined) can tweak a single stat.
-    >>Should proc when player moves back to a Serene Refuge.
+    >>Should proc when player moves back to a Serene Refuge.                                    DONE
     - Make a new name for health pot.
-    - IF INVENTORY IS OPENED IN SHOP, USING ITEMS BREAKS.
+    - IF INVENTORY IS OPENED IN SHOP, USING ITEMS BREAKS.                                       DONE
         - display inv in shop window? Block inv from opening in shop.                           DONE
-    - Shop delete item functions must actually update the shop's buttons.
-    - Also, if the player doesn't have enough Wishes, you can't buy.
+    - Shop delete item functions must actually update the shop's buttons.                       DONE
+    - Also, if the player doesn't have enough Wishes, you can't buy.                            DONE
 -PlayerScript.js: change encounters for Major/Minor encounters.
 
 Roadmap, after the project is done. Story and dialogue stuff, really.

@@ -23,7 +23,7 @@ class Player extends Entity {
         this.parryOnCD = false;
         this.inventory = [];
 
-        this.wishes = 100;
+        this.wishes = 0;
         
         //set up header!
         document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${this.health}`;
@@ -242,6 +242,18 @@ class Game {
         this.firstEncounterDialogue = false;
 
         //Flags for dialogue.
+        /*
+        Brainstorming architecture.
+        game.gameState to regulate where the board is.
+        = [L0, BDR0, SR0]? <this acts as the finite state.
+        use encounterCounter and moveCounter to track activity since change in gameState.
+        depending on gameState, proc events?
+            > on each gameState we can check gameState for procs based on Counters.
+
+        The issue with this: check at greater gameStates are going to get really complicated, really quick.
+        Might need to make a spreadsheet with a tree. this is unavoidable. ^
+        */
+
         this.currentRoom = 1;
         this.moveCounter = 0;
 

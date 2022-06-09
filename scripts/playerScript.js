@@ -122,7 +122,8 @@ async function keyDownHandler(e) {
         }
     }
     //special case for move triggers.
-    if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.movesLocked && !e.repeat) {
+    //old dialogue check.
+    /*if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.movesLocked && !e.repeat) {
         game.moveCounter++;
         if (game.storyDialogueMoves.includes(game.moveCounter)) { //check move dialogues.
             storyDialogueHandler("storyMove");
@@ -137,7 +138,7 @@ async function keyDownHandler(e) {
             game.firstEncounterDialogue = true;
             await fight1WinSequence();
         }
-    }
+    }*/
     //If keys are pressed for attack: Actually redirected to buttonPressHandler.
     if ((e.code == "KeyJ" || e.code == "KeyK") && !game.attacksLocked) {//Clicking encounter buttons also redirects here.
         switch (e.code) {
