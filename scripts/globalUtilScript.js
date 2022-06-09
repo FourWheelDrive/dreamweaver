@@ -43,14 +43,16 @@ class Player extends Entity {
             if (this.health > 0 && this.action == "attacking") { //need to check again. Might have died during the await sleep.
                 target.takeDamage(this.attacks[0].damage);
                 document.getElementById("encounterDialogue__output__outputBox").innerHTML = `Hit enemy for ${this.attacks[0].damage}`;
+                this.action = "";
             }
-            this.action = "";
         }
     }
     async parry() {
         this.action = "parrying";
         await sleep(this.attacks[1].effectDuration * 1000);
-        this.action = "";
+        if(this.action == "parying"){
+            this.action = "";
+        }
     }
     takeDamage(damage) {
         this.health -= damage

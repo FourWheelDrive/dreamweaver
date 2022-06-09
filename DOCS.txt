@@ -21,6 +21,11 @@ TO-DO:
 - Game breaks after more deaths happen. Minimum amount of stats on Masquerade?                  DONE Made new algs.
 - Make a new .txt with all the enemies and item stats?
 - sometimes, attack will just stop for no reason.                                                   PRIORITY
+    - exiting inventory seems to be the issue?
+        - Nope, this isn't it. I think it's dying that is the issue.
+    - first attack after exiting inventory dies.
+    - Also, for some reason, atkCD seems to decrease.
+-inventory sometimes breaks.                                                                        PRIORITY.
 
 Roadmap:
 -Multiple, randomized enemies in each room.                                                     DONE
@@ -66,7 +71,7 @@ Roadmap:
     - Also, might need a tier attribute for items. Higher tiers in later rooms.                     SECONDARY. (in the future when story comes.)
 - You can attack through the inventory. Fix flags.                                              DONE
 - Make a cooldown for random encounters. No two in a row or somthing like that.                 DONE
--Shop!! You can spend wishes here.                                                              DONEPRIORITY.
+-Shop!! You can spend wishes here.                                                              DONE
     - Write <- and -> to work with both inventory and shop.                                     DONE
     - CSS for shop is broken. Specifically, grid.                                               DONE
     >>The following are ideas.

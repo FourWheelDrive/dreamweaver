@@ -157,7 +157,7 @@ async function keyDownHandler(e) {
         }
     }
     //Toggle inventory.
-    if (e.code == "KeyG") {
+    if (e.code == "KeyG" && !e.repeat) {
         switch (game.inventoryOpen) {
             case true: //if inv is open, close it.
                 //pause and unlock EVERYTHING.
