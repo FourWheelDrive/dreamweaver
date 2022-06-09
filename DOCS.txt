@@ -73,6 +73,10 @@ Roadmap:
     - player.updateStats(>args to be defined) can tweak a single stat.
     >>Should proc when player moves back to a Serene Refuge.
     - Make a new name for health pot.
+    - IF INVENTORY IS OPENED IN SHOP, USING ITEMS BREAKS.
+        - display inv in shop window? Block inv from opening in shop.                           DONE
+    - Shop delete item functions must actually update the shop's buttons.
+    - Also, if the player doesn't have enough Wishes, you can't buy.
 -PlayerScript.js: change encounters for Major/Minor encounters.
 
 Roadmap, after the project is done. Story and dialogue stuff, really.

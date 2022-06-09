@@ -23,8 +23,11 @@ class Player extends Entity {
         this.parryOnCD = false;
         this.inventory = [];
 
-        this.wishes = 0;
+        this.wishes = 100;
+        
+        //set up header!
         document.getElementById("uiGrid__header__healthDisplay").innerHTML = `Health: ${this.health}`;
+        document.getElementById("uiGrid__header__wishesDisplay").innerHTML = `Wishes: ${this.wishes}`;
         document.getElementById("uiGrid__header__soloistDisplay").innerHTML = `Masquerade: ${this.masqueradeSymbols[this.masquerade]}`
     }
     //setup
@@ -33,10 +36,6 @@ class Player extends Entity {
     }
 
     //Encounter methods.
-    addWishes(newWishes) {
-        this.wishes += newWishes;
-        document.getElementById("uiGrid__header__wishesDisplay").innerHTML = `Wishes: ${this.wishes}`;
-    }
     async attackTarget(target) {
         if (this.health > 0) { //stops from changing after death.
             this.action = "attacking";
@@ -74,6 +73,15 @@ class Player extends Entity {
     deleteFromInventory(index) {
         this.inventory.splice(index, 1);
         updateInventoryDisplay();
+    }
+    //Wishes methods.
+    addWishes(newWishes) {
+        this.wishes += newWishes;
+        document.getElementById("uiGrid__header__wishesDisplay").innerHTML = `Wishes: ${this.wishes}`;
+    }
+    consumeWishes(mod){
+        this.wishes = this.wishes - mod;
+        document.getElementById("uiGrid__header__wishesDisplay").innerHTML = `Wishes: ${this.wishes}`;
     }
 
     //Methods for updating stats when Masquerade changes.

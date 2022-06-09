@@ -13,7 +13,7 @@ async function snapdragonDialogue() {
     await externalOutput(["snapdragon test 1", "snapdragon test 2"], "The Storied Clairvoyant");
 }
 async function vernalWitnessDialogue(step) {
-    switch(step){
+    switch (step) {
         case "E-2":
             await externalOutput(["More test dialogue."], "The Vernal Witness");
             break;
@@ -248,7 +248,7 @@ function winGame() { //same thing as loseGame(), but win.
 }
 
 //Shop functions-----------------------------------------------------------------------------------
-function initializeShop(){//this is the same algorithm that the player's inventory uses to update, actually.
+function initializeShop() {//this is the same algorithm that the player's inventory uses to update, actually.
     var shopMenu = document.getElementById("shopDisplay__menu");
     //remove the buttons already on the display first.
     while (shopMenu.firstChild) {
@@ -259,29 +259,54 @@ function initializeShop(){//this is the same algorithm that the player's invento
 
     //add new items to game.shopInventory.
     let baseShopItems = 10;
-    for(var i = 0; i < baseShopItems + game.currentRoom; i++){//as you progress through rooms, there are more items in shop.
+    for (var i = 0; i < baseShopItems + game.currentRoom; i++) {//as you progress through rooms, there are more items in shop.
         let tempItem = returnRandomItem()
         game.shopInventory.push(tempItem);
     }
 
     //Make new buttons for the shop.
-        for (var j = 0; j < game.shopInventory.length; j++) {
-            var button = document.createElement("button");
-            if (j == 0) {
-                button.innerHTML = `> ${game.shopInventory[j].name} <`;
-                document.getElementById("shopDisplay__output__outputDisplay").innerHTML = game.shopInventory[j].description;
-            } else {
-                button.innerHTML = game.shopInventory[j].name;
-            }
-    
-            button.setAttribute("id", `shop button ${j}`);
-            button.setAttribute("class", `shopDisplay__menu__button`);
-    
-            shopMenu.appendChild(button);
+    for (var j = 0; j < game.shopInventory.length; j++) {
+        var button = document.createElement("button");
+        if (j == 0) {
+            button.innerHTML = `> ${game.shopInventory[j].name} <`;
+            document.getElementById("shopDisplay__output__outputDisplay").innerHTML = game.shopInventory[j].description;
+            document.getElementById("shopDisplay__output__costDisplay").innerHTML = `Will consume: ${game.shopInventory[j].cost} wishes`;
+        } else {
+            button.innerHTML = game.shopInventory[j].name;
         }
+
+        button.setAttribute("id", `shop button ${j}`);
+        button.setAttribute("class", `shopDisplay__menu__button`);
+
+        shopMenu.appendChild(button);
+    }
 }
-function openShop(operation){
-    if (operation == "open"){
+function refreshShop() { //regenerate buttons, but don't make new items.
+    var shopMenu = document.getElementById("shopDisplay__menu");
+    //remove the buttons already on the display first.
+    while (shopMenu.firstChild) {
+        shopMenu.removeChild(shopMenu.lastChild);
+    }
+    
+    //Make new buttons for the shop.
+    for (var j = 0; j < game.shopInventory.length; j++) {
+        var button = document.createElement("button");
+        if (j == 0) {
+            button.innerHTML = `> ${game.shopInventory[j].name} <`;
+            document.getElementById("shopDisplay__output__outputDisplay").innerHTML = game.shopInventory[j].description;
+            document.getElementById("shopDisplay__output__costDisplay").innerHTML = `Will consume: ${game.shopInventory[j].cost} wishes`;
+        } else {
+            button.innerHTML = game.shopInventory[j].name;
+        }
+
+        button.setAttribute("id", `shop button ${j}`);
+        button.setAttribute("class", `shopDisplay__menu__button`);
+
+        shopMenu.appendChild(button);
+    }
+}
+function openShop(operation) {
+    if (operation == "open") {
         game.attacksLocked = true;
         game.movesLocked = true;
         game.shopOpen = true;
@@ -293,7 +318,7 @@ function openShop(operation){
         shopPosition = 0;
         document.getElementById("shopDisplay").style.display = "grid";
     }
-    if (operation == "close"){
+    if (operation == "close") {
         game.attacksLocked = false;
         game.movesLocked = false;
         game.shopOpen = false;
@@ -311,8 +336,6 @@ function openShop(operation){
 
 //onload
 async function onLoad() {
-    //document.getElementById("shopDisplay").style.display = "grid";
-
     //await openingDialogue();
     await fade("in", document.getElementById("mainGameGrid"));
 
@@ -324,6 +347,7 @@ async function onLoad() {
     gameSpace.style.opacity = 0;
     generateMap(70, 15);
 
+    //fill shop with items.
     initializeShop();
 
     await fade("in", gameSpace);

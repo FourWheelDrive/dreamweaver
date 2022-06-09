@@ -188,7 +188,7 @@ async function keyDownHandler(e) {
         }
     }
     //Close shop.
-    if(e.code == "KeyH" && game.shopOpen){
+    if (e.code == "KeyH" && game.shopOpen) {
         openShop("close");
     }
     if (game.inventoryOpen && (e.code == "ArrowUp" || e.code == "ArrowDown" || e.code == "Enter")) { //use a pointer to maneuver between inventory items.
@@ -199,6 +199,7 @@ async function keyDownHandler(e) {
                     //Change new button at pos (right)
                     let newButtonEntity = document.getElementById(`inventory button ${inventoryPosition}`);
                     newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
+                    newButtonEntity.scrollIntoView({ behaviour: "smooth", block: "nearest" });
                     //need to reset the other button.
                     let previousButtonEntity = document.getElementById(`inventory button ${inventoryPosition + 1}`);
                     previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
@@ -213,6 +214,7 @@ async function keyDownHandler(e) {
                     //change new button at pos (left)
                     let newButtonEntity = document.getElementById(`inventory button ${inventoryPosition}`);
                     newButtonEntity.innerHTML = `> ${newButtonEntity.innerHTML} <`;
+                    newButtonEntity.scrollIntoView({ behaviour: "smooth", block: "nearest" });
                     //need to reset the other button.
                     let previousButtonEntity = document.getElementById(`inventory button ${inventoryPosition - 1}`);
                     previousButtonEntity.innerHTML = previousButtonEntity.innerHTML.slice(5, -5);
@@ -226,6 +228,14 @@ async function keyDownHandler(e) {
                     if (document.getElementById("inventoryDisplay__output").innerHTML.includes("Confirm: ENTER")) { //confirmation prompt.
                         document.getElementById("inventoryDisplay__output").innerHTML = "";
                         player.useInventoryItem(inventoryPosition);
+
+                        //reset pos
+                        inventoryPosition = 0;
+                        if(player.inventory.length > 0){
+                            let firstButton = document.getElementById(`inventory button ${inventoryPosition}`);
+                            //firstButton.innerHTML = `> ${firstButton.innerHTML} <`;
+                            firstButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
+                        }
                     } else {
                         document.getElementById("inventoryDisplay__output").innerHTML = `Use ${player.inventory[inventoryPosition].name}? Confirm: ENTER`
                     }
@@ -250,7 +260,7 @@ async function keyDownHandler(e) {
                     //update things.
                     let newShopItem = game.shopInventory[shopPosition];
                     document.getElementById("shopDisplay__output__outputDisplay").innerHTML = newShopItem.description;
-                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = newShopItem.cost;
+                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = `Will consume: ${newShopItem.cost} wishes`;
                 }
                 break;
             case "ArrowDown":
@@ -268,10 +278,40 @@ async function keyDownHandler(e) {
                     //update things.
                     let newShopItem = game.shopInventory[shopPosition];
                     document.getElementById("shopDisplay__output__outputDisplay").innerHTML = newShopItem.description;
-                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = newShopItem.cost;
+                    document.getElementById("shopDisplay__output__costDisplay").innerHTML = `Will consume: ${newShopItem.cost} wishes`;
                 }
                 break;
             case "Enter":
+                if (!game.inventoryOpen) {
+                    let outputDisplay = document.getElementById("shopDisplay__output__outputDisplay");
+                    //Purchase confirmed:
+                    if (outputDisplay.innerHTML.includes("Confirm: ENTER")) {
+                        if (player.wishes >= game.shopInventory[shopPosition].cost) {
+                            outputDisplay.innerHTML = "";
+
+                            //add to inventory and remove wishes.
+                            player.appendToInventory(game.shopInventory[shopPosition]);
+                            player.consumeWishes(game.shopInventory[shopPosition].cost);
+                            //remove from shop.
+                            game.shopInventory.splice(shopPosition, 1);
+                            //remove button.
+                            refreshShop(); //can't actually just .removeChild, because IDs get messed up.
+
+                            //reset position.
+                            shopPosition = 0;
+                            if(game.shopInventory.length > 0){
+                                let firstButton = document.getElementById(`shop button ${shopPosition}`);
+                                //firstButton.innerHTML = `> ${firstButton.innerHTML} <`;
+                                firstButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
+                            }
+                        } else { //if not enough money.
+                            outputDisplay.innerHTML = "Well-wishes are not freely given.";
+                        }
+                    } else {
+                        //confirm purchase?
+                        outputDisplay.innerHTML = `Buy ${game.shopInventory[shopPosition].name}? Confirm: ENTER`;
+                    }
+                }
                 break;
         }
     }
