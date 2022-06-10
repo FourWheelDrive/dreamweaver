@@ -348,9 +348,10 @@ async function buttonPressHandler(e) {
         case "encounterVictoryDialogue__returnButton": //the return to map button.
             //boss fights have been handled in win encounter script.
             hideEncounterDialogue();
-            if (game.storyDialogueEncounters.includes(game.encounterCounter)) {
+            //Old dialogue handler.
+            /*if (game.storyDialogueEncounters.includes(game.encounterCounter)) {
                 await storyDialogueHandler("storyEncounter");
-            }
+            }*/
 
             break;
     }

@@ -20,12 +20,12 @@ TO-DO:
 -Check CSS stuff on different displays.                                                         done? idk if i actually fixed it.
 - Game breaks after more deaths happen. Minimum amount of stats on Masquerade?                  DONE Made new algs.
 - Make a new .txt with all the enemies and item stats?
-- sometimes, attack will just stop for no reason.                                                   PRIORITY
+- sometimes, attack will just stop for no reason.                                               done???? Keep an eye on this fix. PRIORITY
     - exiting inventory seems to be the issue?
         - Nope, this isn't it. I think it's dying that is the issue.
     - first attack after exiting inventory dies.
     - Also, for some reason, atkCD seems to decrease.
--inventory sometimes breaks.                                                                        PRIORITY.
+-inventory sometimes breaks.                                                                    done???? Keep an eye on this fix. PRIORITY.
 
 Roadmap:
 -Multiple, randomized enemies in each room.                                                     DONE
@@ -87,7 +87,7 @@ Roadmap:
 
 Roadmap, after the project is done. Story and dialogue stuff, really.
 -Next Map
-    -New roomMultipliers, new baseRoomTier                                                  1/2 DONE (no baseRoomTier)
+    -New roomMultipliers, new baseRoomTier                                                  1/2 DONE (no baseRoomTier, no re-initializeShop()).
     -clear map, and then make new map. new parameters.                                          DONE
     -Make new tiers of enemies!
 -Story
