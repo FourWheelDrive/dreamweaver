@@ -264,9 +264,9 @@ class Game {
 
         this.movesSinceLastRandomEncounter = 3;
 
-        //REMEMBER TO APPEND THE MOVES OF THE DIALOGUE MOVES HERE----------------------
-        this.storyDialogueMoves = [8];
-        this.storyDialogueEncounters = [2];
+        //These are for the game dialogue and story progression.
+        this.gameTime = 0;                  //<-- this defines the progression.
+        this.gameState = [0, 0, 0, 0, 0, 0];                //<-- this defines the events and state. Make a spreadsheet for this.
         //-----------------------------------------------------------------------------
         //Multipliers for game progression.
         this.attackMultiplier = 1;

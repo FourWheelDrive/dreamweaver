@@ -84,6 +84,7 @@ Roadmap:
     - Shop delete item functions must actually update the shop's buttons.                       DONE
     - Also, if the player doesn't have enough Wishes, you can't buy.                            DONE
 -PlayerScript.js: change encounters for Major/Minor encounters.
+-Make a better instruction manual! Maybe in the first encounter? (probably not).
 
 Roadmap, after the project is done. Story and dialogue stuff, really.
 -Next Map
