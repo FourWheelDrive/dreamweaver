@@ -93,6 +93,7 @@ Roadmap, after the project is done. Story and dialogue stuff, really.
     -Make new tiers of enemies!
 -Story
 
+New rooms: represent chapters?
 
 Some useful algs:
 Get cell position from cell ID:
