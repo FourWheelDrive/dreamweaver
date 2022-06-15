@@ -47,6 +47,8 @@ body {
 
     display: none;
     flex-direction: column;
+    
+    overflow: scroll;
 }
 
 .controlsPanel__text {

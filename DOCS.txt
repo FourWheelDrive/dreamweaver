@@ -15,8 +15,6 @@ TO-DO:
 -Maybe keep track of Wishes earned, enemies killed, etc? Shouldn't be hard.                         COSMETIC.
 -Maybe also randomize encounterWin dialogue.                                                        COSMETIC.
 -FIX FADE. FOR SOME REASON, BOSS'S FADE DIALOGUE FLASHES.                                       DONE (await delay after fade was too short, began to overlap.)
--Restructure the dialogueSequenceMoves in keyDownHandler to use game.dialogueSequenceMoves[].
--Do some testing about player.attack. Make sure player.action doesn't do stupid stuff.
 -Check CSS stuff on different displays.                                                         done? idk if i actually fixed it.
 - Game breaks after more deaths happen. Minimum amount of stats on Masquerade?                  DONE Made new algs.
 - Make a new .txt with all the enemies and item stats?

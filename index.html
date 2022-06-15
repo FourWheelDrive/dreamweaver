@@ -1,38 +1,47 @@
 <!DOCTYPE html>
 <html>
-    <header>
-        <script type="text/javascript" src="scripts/globalUtilScript.js"></script>
-        <script type="text/javascript" src="scripts/mainScript.js"></script> <!--for fade()-->
-        <script type="text/javascript" src="scripts/indexScript.js"></script>
-        <link rel="stylesheet" href="styles/indexStyle.css">
-    </header>
-    <body>
-        <div id="titleScreen">
-            <div id="titleScreen__menu">
-                <p id="titleScreen__menu__title">DREAMWEAVER</p>
-                <p id="titleScreen__menu_rotatingText" class="controlsPanel__text"></p>
+<header>
+    <script type="text/javascript" src="scripts/globalUtilScript.js"></script>
+    <script type="text/javascript" src="scripts/mainScript.js"></script>
+    <!--for fade()-->
+    <script type="text/javascript" src="scripts/indexScript.js"></script>
+    <link rel="stylesheet" href="styles/indexStyle.css">
+</header>
 
-                <button id="titleScreen__menu__playButton" class="controlsPanel__button" onclick="startGame()">Into the Dusk</button>
-                <button id="titleScreen__menu__controlsButton"class="controlsPanel__button" onclick="showControls()">A Mentor's Lessons</button>
-                
-                <p id="titleScreen__menu__credits" class="controlsPanel__text">NYAC #7701</p>
-                <p id="titleScreen__menu__version" class="controlsPanel__text">Version 0.3.5</p>
-                <!--link github, discord here?-->
-            </div>
-        </div>
+<body>
+    <div id="titleScreen">
+        <div id="titleScreen__menu">
+            <p id="titleScreen__menu__title">DREAMWEAVER</p>
+            <p id="titleScreen__menu_rotatingText" class="controlsPanel__text"></p>
 
-        <div id="controlsPanel">
-            <p id="titleScreen__menu__title">DREAMWEAVER<p>
-            <p class="controlsPanel__text">
-                Movement phase: <br>
-                W, A, S, D......Explore the map <br>
-                <br>
-                Engagement phase: <br>
-                J........................Attack <br>
-                K.........................Parry <br>
-                G..............Toggle Inventory <br>
-            </p>
-            <button id="controlsPanel__returnButton" class="controlsPanel__button" onclick="hideControls()">Return to the threshold.</button>
+            <button id="titleScreen__menu__playButton" class="controlsPanel__button" onclick="startGame()">Into the
+                Dusk</button>
+            <button id="titleScreen__menu__controlsButton" class="controlsPanel__button" onclick="showControls()">A
+                Mentor's Lessons</button>
+
+            <p id="titleScreen__menu__credits" class="controlsPanel__text">NYAC #7701</p>
+            <p id="titleScreen__menu__version" class="controlsPanel__text">Version 0.3.6</p>
+            <!--link github, discord here?-->
         </div>
-    </body>
+    </div>
+
+    <div id="controlsPanel">
+        <p id="titleScreen__menu__title">DREAMWEAVER
+        <p>
+            <!--Figure out which instructions must be given here. 
+            They should be simple, and the rest can be given during the game.-->
+        <p class="controlsPanel__text">
+            Movement phase: <br>
+            W, A, S, D......Explore the map <br>
+            <br>
+            Engagement phase: <br>
+            J........................Attack <br>
+            K.........................Parry <br>
+            G..............Toggle Inventory <br>
+        </p>
+        <button id="controlsPanel__returnButton" class="controlsPanel__button" onclick="hideControls()">Return to the
+            threshold.</button>
+    </div>
+</body>
+
 </html>
