@@ -93,6 +93,8 @@ Roadmap, after the project is done. Story and dialogue stuff, really.
 
 New rooms: represent chapters?
 Will focus on the first room for now. Setup for next chapters, but perhaps room 1 can be an exposition??
+Room 1 is exposition. No routes will be locked out, but exploring will aware player with more Talismans.
+18/06/22: Began game outline!
 
 Some useful algs:
 Get cell position from cell ID:
