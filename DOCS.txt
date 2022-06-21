@@ -96,6 +96,7 @@ Will focus on the first room for now. Setup for next chapters, but perhaps room 
 Room 1 is exposition. No routes will be locked out, but exploring will aware player with more Talismans.
 18/06/22: Began game outline!
 19/06/22: Considering linear progression? I'd rather some dilemmas, though.
+Thinking about rules. It is preferable to offer SIMPLE INITIAL RULES but offer ELABORATION IN GAME.
 
 Some useful algs:
 Get cell position from cell ID:
