@@ -243,19 +243,10 @@ class Game {
 
         this.firstEncounterDialogue = false;
 
+        //Flags for move system.
+        this.movedThisTurn = false;
+        
         //Flags for dialogue.
-        /*
-        Brainstorming architecture.
-        game.gameState to regulate where the board is.
-        = [L0, BDR0, SR0]? <this acts as the finite state.
-        use encounterCounter and moveCounter to track activity since change in gameState.
-        depending on gameState, proc events?
-            > on each gameState we can check gameState for procs based on Counters.
-
-        The issue with this: check at greater gameStates are going to get really complicated, really quick.
-        Might need to make a spreadsheet with a tree. this is unavoidable. ^
-        */
-
         this.currentRoom = 1;
         this.moveCounter = 0;
 
@@ -265,7 +256,7 @@ class Game {
         this.movesSinceLastRandomEncounter = 3;
 
         //These are for the game dialogue and story progression.
-        this.gameTime = 0;                  //<-- this defines the progression.
+        this.gameTime = 0;                                   //<-- this defines the progression.
         this.gameState = [0, 0, 0, 0, 0, 0];                //<-- this defines the events and state. Make a spreadsheet for this.
         //-----------------------------------------------------------------------------
         //Multipliers for game progression.
@@ -278,6 +269,9 @@ class Game {
 
         //shop inventory.
         this.shopInventory = [];
+
+        //setup header.
+        document.getElementById("uiGrid__header__ageDisplay").innerHTML = `Age: ${this.gameTime}`;
     }
 }
 

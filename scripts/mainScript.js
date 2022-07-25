@@ -336,12 +336,12 @@ function openShop(operation) {
 
 //onload
 async function onLoad() {
-    //await openingDialogue();
+    await openingDialogue();
     await fade("in", document.getElementById("mainGameGrid"));
 
     console.log("this is working");
     createOutputBoxes();
-    //await move0Sequence();
+    await move0Sequence();
 
     let gameSpace = document.getElementById("gameSpace");
     gameSpace.style.opacity = 0;

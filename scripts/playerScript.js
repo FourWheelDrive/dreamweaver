@@ -45,7 +45,7 @@ async function keyDownHandler(e) {
         //Make an array [x][y] of position. .filter removes whitespace from split.
         let currentCellPos = currentCell.id.split(/[\[\]]/).filter(element => element.length >= 1);
         let currentCellEntity = map[currentCellPos[0]][currentCellPos[1]];
-
+        //deltapos depending on key pressed.
         switch (e.code) {
             case "KeyW":
                 newDirection = directions[2];
@@ -71,7 +71,7 @@ async function keyDownHandler(e) {
             newCellEntity = map[tempPosition[0]][tempPosition[1]];
         }
 
-        //move player:
+        //Move system goes here!!! Move player and check for events.
         if (newCell != null && newCellEntity.type != "wall") { //if the cell to move to is NOT a wall:
             //update previously visited cell.
             currentCell.innerHTML = currentCellEntity.symbol; //change cell back to original character.
@@ -108,37 +108,14 @@ async function keyDownHandler(e) {
             } else if (!game.storyDialogueMoves.includes(game.moveCounter + 1) && !newCellEntity.alreadyVisited) { //NO RANDOM ENCOUNTER on special moves or already visited paths.
                 //Random chance for encounters on untread path tiles.
                 let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
-                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && !game.dialogueLocked && tempChance == 1 && game.movesSinceLastRandomEncounter >= 5) {
+                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && tempChance == 1 && game.movesSinceLastRandomEncounter >= 5) {
                     game.movesSinceLastRandomEncounter = 0;
                     await beginEncounter(newCellEntity);
                 }
                 newCellEntity.alreadyVisited = true;
             }
-
-            //After move, disable dialogueLocked.
-            if (game.dialogueLocked) {
-                game.dialogueLocked = false;
-            }
         }
     }
-    //special case for move triggers.
-    //old dialogue check.
-    /*if ((e.code == "KeyW" || e.code == "KeyA" || e.code == "KeyS" || e.code == "KeyD") && !game.movesLocked && !e.repeat) {
-        game.moveCounter++;
-        if (game.storyDialogueMoves.includes(game.moveCounter)) { //check move dialogues.
-            storyDialogueHandler("storyMove");
-        }
-
-        switch (game.moveCounter) {
-            case 1:
-                move1Sequence();
-                break;
-        }
-        if (game.encounterCounter == 1 && !game.firstEncounterDialogue) { //After the first fight.
-            game.firstEncounterDialogue = true;
-            await fight1WinSequence();
-        }
-    }*/
     //If keys are pressed for attack: Actually redirected to buttonPressHandler.
     if ((e.code == "KeyJ" || e.code == "KeyK") && !game.attacksLocked) {//Clicking encounter buttons also redirects here.
         switch (e.code) {
@@ -577,7 +554,6 @@ async function loseEncounter() {
 async function winEncounter(cellEntity, enemiesInRoom) {
     //Update the alreadyVisited if the fight on this cell is won.
     cellEntity.alreadyVisited = true;
-    game.dialogueLocked = true;
     game.encounterCounter++;
     //display victory dialogue.
     let victoryDialogue = document.getElementById("encounterVictoryDialogue");
