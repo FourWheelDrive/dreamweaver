@@ -97,6 +97,12 @@ async function keyDownHandler(e) {
             //Choose action, if applicable:-----------------------------------------------------------------------------------------||-----
             //Begin encounters on locations, if they're new.
             if (newCell.classList.contains("gameSpace__specialLocations") && (!newCellEntity.alreadyVisited || newCellEntity.reVisitable)) { //change size of special locations on walked on.
+                //Change the map symbol for the tile.
+                if (currentCellEntity.type == "minor encounter" || currentCellEntity.type == "major encounter" || currentCellEntity.type == "boss encounter"){
+                    currentCellEntity.updateSymbol();
+                    currentCell.innerHTML = currentCellEntity.symbol;
+                }
+                //Begin dialogue or encounter as necessary.
                 if (newCellEntity.type == "shop") {
                     openShop("open");
                 } else if (newCellEntity.type == "boss encounter" && newCellEntity.alreadyVisited) {
@@ -345,16 +351,16 @@ async function beginEncounter(cellEntity) { //CELLENTITY, NOT CELL.
     var enemiesInRoom;
     switch (cellEntity.type) {
         case "minor encounter":
-            enemiesInRoom = playerRandInt(1, 3, "near");
+            enemiesInRoom = 2;
             break;
         case "major encounter":
-            enemiesInRoom = playerRandInt(3, 5, "near");
+            enemiesInRoom = 3;
             break;
         case "boss encounter":
-            enemiesInRoom = 6;
+            enemiesInRoom = 5;
             break;
         case "path": //random path encounters.
-            enemiesInRoom = playerRandInt(1, 1, "near");
+            enemiesInRoom = 1;
             break;
     }
     encounterFunctionWrapper(cellEntity, enemiesInRoom, 1);
@@ -577,7 +583,7 @@ async function winEncounter(cellEntity, enemiesInRoom) {
 
     victoryDialogue.style.display = "grid";
 
-    let tempWishes = 10 * enemiesInRoom; //Might somewhat randomize these.
+    let tempWishes = enemiesInRoom; //Might somewhat randomize these.
     player.addWishes(tempWishes); //update wishes!
 
     document.getElementById("encounterVictoryDialogue__output__message").innerHTML = "A stranger becomes a well-wisher."; //might be randomized.

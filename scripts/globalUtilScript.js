@@ -210,8 +210,11 @@ class Cell {
         this.name = name;     //name shown in encounter popup.
         this.type = type;     //wall, path, location, etc.
         this.tier = tier;     //difficulty of the room, used for generation
-        this.symbol = symbol; //to display on map
+
+
+        this.symbol = symbol; //actual symbol
         this.obscuredSymbol = "."; //symbol displayed when not viewed.
+
         this.x = positionX;
         this.y = positionY;
 
@@ -224,10 +227,8 @@ class Cell {
         this.alreadyVisited = false;
         this.reVisitable = reVisitable;
     }
-
-    changeHiddenStatus(symbol) {
-        this.hidden = false;
-        this.symbol = symbol;
+    updateSymbol(){ //Change displaySymbol to regular symbol.
+        this.displaySymbol = this.symbol;
     }
 }
 
@@ -265,7 +266,7 @@ class Game {
         this.parryCooldownMultipler = 1;
         this.parryDurationMultiplier = 1;
 
-        this.randomEncounterChance = 7;
+        this.randomEncounterChance = 9;
 
         //shop inventory.
         this.shopInventory = [];

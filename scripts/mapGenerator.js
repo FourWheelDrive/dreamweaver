@@ -179,7 +179,7 @@ function nameLocation(roomClass) {//assign names.
             }
             return class2Names[index];
         case 3:
-            switch(game.currentRoom){
+            switch (game.currentRoom) {
                 case 1:
                     return class3Names[0];
             }
@@ -215,14 +215,15 @@ function showCellsInVision(radius, x, y) {
 
             if (tempDistance < radius) {
                 try {
-                    let cellEntity = document.getElementById(`[${minBoundX + i + 1}][${minBoundY + j + 1}]`);
-                    cellEntity.innerHTML = map[minBoundX + i + 1][minBoundY + j + 1].symbol;
+                    let cell = document.getElementById(`[${minBoundX + i + 1}][${minBoundY + j + 1}]`);
+                    //Change the map symbol for the tile.
+                    cell.innerHTML = map[minBoundX + i + 1][minBoundY + j + 1].symbol;
                     map[minBoundX + i + 1][minBoundY + j + 1].obscured = false;
                     //if this is a special location, give it styles.
-                    if (cellEntity.classList.contains("gameSpace__specialLocations")) {
-                        cellEntity.style.fontWeight = "900";
-                        cellEntity.style.fontSize = "20px";
-                        cellEntity.style.fontStretch = "ultra-expanded";
+                    if (cell.classList.contains("gameSpace__specialLocations")) {
+                        cell.style.fontWeight = "900";
+                        cell.style.fontSize = "20px";
+                        cell.style.fontStretch = "ultra-expanded";
                     }
                 } catch (err) { }
             }
