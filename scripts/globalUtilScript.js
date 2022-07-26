@@ -269,9 +269,6 @@ class Game {
 
         //shop inventory.
         this.shopInventory = [];
-
-        //setup header.
-        document.getElementById("uiGrid__header__ageDisplay").innerHTML = `Age: ${this.gameTime}`;
     }
 }
 

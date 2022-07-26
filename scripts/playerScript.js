@@ -105,10 +105,11 @@ async function keyDownHandler(e) {
                     //new tile encounter.
                     await beginEncounter(newCellEntity);
                 }
-            } else if (!game.storyDialogueMoves.includes(game.moveCounter + 1) && !newCellEntity.alreadyVisited) { //NO RANDOM ENCOUNTER on special moves or already visited paths.
+            } else if (game.movesSinceLastRandomEncounter >= 5){
                 //Random chance for encounters on untread path tiles.
                 let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
-                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && tempChance == 1 && game.movesSinceLastRandomEncounter >= 5) {
+                console.log(tempChance)
+                if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && tempChance == 1) {
                     game.movesSinceLastRandomEncounter = 0;
                     await beginEncounter(newCellEntity);
                 }
