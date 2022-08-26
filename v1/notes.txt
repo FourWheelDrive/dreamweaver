@@ -1,0 +1,40 @@
+ctrl shift f "NOTE:" to view commented notes.
+
+Some decisions to be made:
+- Control scheme? Keyboard or mouse?
+- Hide room tiers?
+    - Need to investigate to find out what they are?
+    - Escape option?
+- Change enemies to reflect people more? Old mentions of vices can be revealed after conflict.
+- Where does shop show up? Center or end of stage?
+    - how many stages?
+- Items?
+    - health pot.
+    - Talismen?
+- Should SEEKER even be able to die? Or is the ending just real bad?
+    - I think SEEKER should be able to die.
+
+General planning:
+- Dungeon crawler progesses through some number of rooms.
+- Game dictated by Masquerade value. Player gains Masquerade upon death.
+    - The world is a tough place. Even if SEEKER wants to drive away the vices, they sometimes harm them.
+        - Masquerade is a measure of the defenses SEEKER puts up.
+    - As Masquerade increases:
+        - SEEKER's combat potential is increased.
+        - Each level:
+           - Health increases by 3 points.
+           - ATK increases by 2 points.
+    - Masquerade decreased by:
+        - Spending Wishes
+        - End-of-room shop?????
+
+Notes:
+- //TAG: TEST OUTPUT
+Search for this ^ for all console.log debugging.
+
+
+To-Do:
+- See class CELL for some ideas about cell.name!
+- Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.
+- Check which vars in class GAME actually matter. Also name them better.
+    - check if need var to track moves since last battle.

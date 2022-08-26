@@ -1,0 +1,86 @@
+<!--
+    Contents [main.html]:
+    Everything.
+    1) Title page
+    1.1) Guide, explanation of mechanics
+    2) Game page
+    2.1) Map
+    2.2) Game elements display
+    2.2.1) Health
+    2.2.2) Wishes
+    2.2.3) Current position
+    2.2.4) Hovered position
+    2.2.A) Masquerade
+    2.2.B) Room position
+    2.3) Dialogue display -> Just sidebar. Either expand sidebar or make text smaller, for more room.
+    2.4) Battle display
+    2.4.1) Battle interface
+    2.4.2) Action menu
+    2.5) Inventory
+    2.6) Shop
+-->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script type="text/javascript" src="scripts\mainScript.js"></script>
+
+    <link rel="stylesheet" href="styles\mainStyle.css">
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body onload="initializeGame()">
+    <!--Title Page-->
+    <div id="main__title" class="container">
+
+    </div>
+    <div id="main__title__tutorial" class="container">
+
+    </div>
+    <!--Game Page-->
+    <div id="game__page">
+        <!--Header for navigation. Ooh! Maybe only display one, nav with arrow keys for keyboard controls?-->
+        <div id="game__page__header">
+            <button id="game__page__header__left" class="windowNavButtons"
+                onclick="windowNavButtonHandler(event)">&lt</button>
+            <h1 id="game__page__header__windowDisplay">test window name "main"</h1>
+            <button id="game__page__header__right" class="windowNavButtons"
+                onclick="windowNavButtonHandler(event)">&gt</button>
+        </div>
+        <!--gameSpace will handle all UI display elements.-->
+        <div id="game__page__gameSpace">
+            <div id="game__page__gameSpace__map">
+                <p>Window Test 0.0.1 Map</p>
+                <!--Movement Phase-->
+            </div>
+            <div id="game__page__gameSpace__encounter">
+                <p>Window Test 0.0.2 Encounter</p>
+                <!--Encounter Phase-->
+            </div>
+            <div id="game__page__gameSpace__inventory">
+                <p>Window Test 0.0.3 Inventory</p>
+                <!--Inventory Display-->
+            </div>
+            <div id="game__page__gameSpace__shop">
+                <p>Window Test 0.0.4 Shop</p>
+                <!--End of the Room Shop-->
+            </div>
+        </div>
+        <!--footer for game elements-->
+        <div id="game__page__footer">
+            <p id="game__page__footer__health"></p>
+            <p id="game__page__footer__wishes"></p>
+            <p id="game__page__footer__masquerade"></p>
+            <p id="game__page__footer__position"></p>
+        </div>
+        <!--display for outputs.-->
+        <div id="game__page__outputBar"></div>
+    </div>
+    <!--Battle Page-->
+    <!--Inventory Page-->
+    <!--Shop Page-->
+</body>
+
+</html>
