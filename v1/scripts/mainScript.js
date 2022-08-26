@@ -28,6 +28,8 @@ async function windowNavButtonHandler(e) {
         document.getElementById("game__page__gameSpace__encounter").style.display = "none";
         document.getElementById("game__page__gameSpace__inventory").style.display = "none";
         document.getElementById("game__page__gameSpace__shop").style.display = "none";
+
+        //Show new window.
         switch(windowDirectory[currentWindowIndex]){
             case "map":
                 document.getElementById("game__page__gameSpace__map").style.display = "block";
@@ -45,6 +47,17 @@ async function windowNavButtonHandler(e) {
     }
     //update title.
     document.getElementById("game__page__header__windowDisplay").innerHTML = `test window name \"${windowDirectory[currentWindowIndex]}\"`;
+    //update displays.
+    if(currentWindowIndex - 1 < 0){
+        document.getElementById("game__page__header__leftWindowDisplay").innerHTML = `${windowDirectory[windowDirectory.length - 1]}`;
+    } else {
+        document.getElementById("game__page__header__leftWindowDisplay").innerHTML = `${windowDirectory[currentWindowIndex - 1]}`;
+    }
+    if(currentWindowIndex + 1 > windowDirectory.length - 1){
+        document.getElementById("game__page__header__rightWindowDisplay").innerHTML = `${windowDirectory[0]}`;
+    } else {
+        document.getElementById("game__page__header__rightWindowDisplay").innerHTML = `${windowDirectory[currentWindowIndex + 1]}`;
+    }
 }
 
 async function keyDownHandler(e){

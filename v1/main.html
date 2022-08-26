@@ -43,11 +43,17 @@
     <div id="game__page">
         <!--Header for navigation. Ooh! Maybe only display one, nav with arrow keys for keyboard controls?-->
         <div id="game__page__header">
-            <button id="game__page__header__left" class="windowNavButtons"
+            <div class="navDiv">
+                <button id="game__page__header__left" class="windowNavButtons"
                 onclick="windowNavButtonHandler(event)">&lt</button>
+                <p id="game__page__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
+            </div>
             <h1 id="game__page__header__windowDisplay">test window name "main"</h1>
-            <button id="game__page__header__right" class="windowNavButtons"
+            <div class="navDiv">
+                <button id="game__page__header__right" class="windowNavButtons"
                 onclick="windowNavButtonHandler(event)">&gt</button>
+                <p id="game__page__header__rightWindowDisplay" class="navWindowDisplay">encounter</p>
+            </div>
         </div>
         <!--gameSpace will handle all UI display elements.-->
         <div id="game__page__gameSpace">
