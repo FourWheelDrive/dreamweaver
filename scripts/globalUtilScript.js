@@ -114,7 +114,7 @@ var game = new Game();
 /*
 Contents [class CELL]:
 
-IN CELL, MAKE A FUNCTION. DEPENDING ON CELL TYPE, IT PICKS ITS OWN NAME!!!!!!! Also could depend on room!
+IN CELL, MAKE A FUNCTION. DEPENDING ON CELL TYPE, IT PICKS ITS OWN NAME!!!!!!!
 */
 class Cell{
     constructor(name, symbol, positionX, positionY) {
@@ -140,6 +140,9 @@ class Cell{
                     case "path":
                         //make an array. get random number in arr.length. return element at index.
                         namesList = ["A Dusty Path", "A Desolate Avenue"] //Boulevard, street.
+                        return namesList[randInt(namesList.length-1)];
+                    case "testLocations":
+                        namesList = ["A Cool Place", "A Grand Estate"];
                         return namesList[randInt(namesList.length-1)];
                 }
                 break;
@@ -167,6 +170,20 @@ class WallCell extends Cell{
         super(name, symbol, positionX, positionY);
     }
 }
+class TestLocationCell extends Cell{
+    constructor(name, symbol, positionX, positionY){
+        super(name, symbol, positionX, positionY);
+    }
+    firstVisit(){}
+    getName(){
+        this.name = super.cellNameGenerator("testLocations", game.room);
+    }
+    //NOTE: may move this into super class like getName() because there will be different types of room classes.
+    getSymbol(){
+        var testLocationSymbols = ["B", "F", "A"];
+        this.symbol = testLocationSymbols[randInt(testLocationSymbols.length-1)];
+    }
+}
 
 //==============================================================Global functions
 function randInt(max) { //Random function, maximum inclusive.
@@ -174,4 +191,11 @@ function randInt(max) { //Random function, maximum inclusive.
 }
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+function calcPythagDistance(coordSetOne, coordSetCenter) {
+    var differenceX = (coordSetOne[0] - coordSetCenter[0]);
+    var differenceY = (coordSetOne[1] - coordSetCenter[1]);
+
+    var distanceFromCenter = Math.sqrt((differenceX) ** 2 + (differenceY) ** 2);
+    return distanceFromCenter;
 }

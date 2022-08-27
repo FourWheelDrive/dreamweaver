@@ -73,13 +73,14 @@ function initializeGame(){
     //Input handler.
     document.addEventListener("keydown", keyDownHandler, false);
 
-    var mapWidth = 30, mapHeight = 30;
+    var mapWidth = 31, mapHeight = 31;
     var maxTunnels = 80, maxLength = 10;
     //generate array of walls
     var mapArray = createMapArray(mapWidth, mapHeight);
     //generate random paths procedurally
     mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
     //generate random locations of interest
+    mapArray = placeLocation(mapArray, mapWidth-1, mapHeight-1, 0);
     //push complete mapArray to DOM
     pushMapToDOM(mapArray);
 }
