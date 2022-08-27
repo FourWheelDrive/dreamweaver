@@ -24,7 +24,9 @@
 <html>
 
 <head>
+    <script type="text/javascript" src="scripts\globalUtilScript.js"></script>
     <script type="text/javascript" src="scripts\mainScript.js"></script>
+    <script type="text/javascript" src="scripts\mapGeneratorScript.js"></script>
 
     <link rel="stylesheet" href="styles\mainStyle.css">
 
@@ -40,49 +42,49 @@
 
     </div>
     <!--Game Page-->
-    <div id="game__page">
+    <div id="gamePage">
         <!--Header for navigation. Ooh! Maybe only display one, nav with arrow keys for keyboard controls?-->
-        <div id="game__page__header">
+        <div id="gamePage__header">
             <div class="navDiv">
-                <button id="game__page__header__left" class="windowNavButtons"
+                <button id="gamePage__header__left" class="windowNavButtons"
                 onclick="windowNavButtonHandler(event)">&lt</button>
-                <p id="game__page__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
+                <p id="gamePage__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
             </div>
-            <h1 id="game__page__header__windowDisplay">test window name "main"</h1>
+            <h1 id="gamePage__header__windowDisplay">test window name "main"</h1>
             <div class="navDiv">
-                <button id="game__page__header__right" class="windowNavButtons"
+                <button id="gamePage__header__right" class="windowNavButtons"
                 onclick="windowNavButtonHandler(event)">&gt</button>
-                <p id="game__page__header__rightWindowDisplay" class="navWindowDisplay">encounter</p>
+                <p id="gamePage__header__rightWindowDisplay" class="navWindowDisplay">encounter</p>
             </div>
         </div>
         <!--gameSpace will handle all UI display elements.-->
-        <div id="game__page__gameSpace">
-            <div id="game__page__gameSpace__map">
-                <p>Window Test 0.0.1 Map</p>
+        <div id="gamePage__gameSpace">
+            <div id="gamePage__gameSpace__map">
                 <!--Movement Phase-->
             </div>
-            <div id="game__page__gameSpace__encounter">
+            <div id="gamePage__gameSpace__encounter">
                 <p>Window Test 0.0.2 Encounter</p>
                 <!--Encounter Phase-->
             </div>
-            <div id="game__page__gameSpace__inventory">
+            <div id="gamePage__gameSpace__inventory">
                 <p>Window Test 0.0.3 Inventory</p>
                 <!--Inventory Display-->
             </div>
-            <div id="game__page__gameSpace__shop">
+            <div id="gamePage__gameSpace__shop">
                 <p>Window Test 0.0.4 Shop</p>
                 <!--End of the Room Shop-->
             </div>
         </div>
         <!--footer for game elements-->
-        <div id="game__page__footer">
-            <p id="game__page__footer__health"></p>
-            <p id="game__page__footer__wishes"></p>
-            <p id="game__page__footer__masquerade"></p>
-            <p id="game__page__footer__position"></p>
+        <div id="gamePage__footer">
+            <p id="gamePage__footer__health"></p>
+            <p id="gamePage__footer__wishes"></p>
+            <p id="gamePage__footer__masquerade"></p>
+            <p id="gamePage__footer__position"></p>
+            <p id="gamePage__footer__cellName"></p>
         </div>
         <!--display for outputs.-->
-        <div id="game__page__outputBar"></div>
+        <div id="gamePage__outputBar"></div>
     </div>
     <!--Battle Page-->
     <!--Inventory Page-->

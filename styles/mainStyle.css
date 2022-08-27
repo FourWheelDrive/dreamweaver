@@ -20,9 +20,9 @@ h1 {
 }
 
 /*gameSpace grid for UI display elements*/
-#game__page{
+#gamePage{
     width: 80%;
-    aspect-ratio: 2/1;
+    aspect-ratio: 11/6;
 
     display: grid;
     position: absolute;
@@ -38,19 +38,18 @@ h1 {
 
     border: 1px solid black;
 }
-/*#game__page > *{
+/*#gamePage > *{
     border: 1px dotted red;
 }*/
 
 /*Header*/
-#game__page__header{
+#gamePage__header{
     grid-area: header;
 
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
     align-content: center;
-    row-gap: 30%;
 
     padding-top: 2%;
 }
@@ -71,7 +70,7 @@ h1 {
     font-size: 20px;
     line-height: 100%;
 
-    width: 60%;
+    width: 30%;
     aspect-ratio: 1/1;
     margin: auto;
 }
@@ -81,37 +80,61 @@ h1 {
     text-align: center;
     width: 100%;
 }
-#game__page__header__windowDisplay{
+#gamePage__header__windowDisplay{
     border-bottom: 1px solid black;
     min-width: 50%;
     width: 0;
 }
 
 /*This one will change as the windows do.*/
-#game__page__gameSpace{
+#gamePage__gameSpace{
     grid-area: gameSpace;
 }
 /*Windows! Maybe put these in a different file.*/
-#game__page__gameSpace__map{
-    display: block;
+#gamePage__gameSpace__map{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
-#game__page__gameSpace__encounter{
+.mapRow{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+.mapCell{
+    font-family: monospace;
+    font-size: 15px;
+    line-height: 90%;
+
+    height: 14px;
+    width: 14px;
+
+    text-align: center;
+    opacity: 0.8;
+
+    margin: 1px;
+    padding: 0px;
+}
+
+#gamePage__gameSpace__encounter{
     display: none;
 }
-#game__page__gameSpace__inventory{
+#gamePage__gameSpace__inventory{
     display: none;
 }
-#game__page__gameSpace__shop{
+#gamePage__gameSpace__shop{
     display: none;
 }
 
 /*footer*/
-#game__page__footer{
+#gamePage__footer{
     grid-area: footer;
 }
 
 /*output*/
-#game__page__outputBar{
+#gamePage__outputBar{
     grid-area: outputBar;
 
     margin: 3%;

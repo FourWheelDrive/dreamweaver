@@ -150,24 +150,21 @@ class Cell{
         }
     }
 }
-class PathCell{
+class PathCell extends Cell{
     constructor(name, symbol, positionX, positionY) {
         super(name, symbol, positionX, positionY);
     }
+    //NOTE: randomEncounters can be called from PathCell only!
     randomEncounterCheck(){
 
     }
     getName(){
         this.name = super.cellNameGenerator("path", game.room);
-        console.log(this.name); //TAG: TEST OUTPUT
     }
 }
-class WallCell{
+class WallCell extends Cell{
     constructor(name, symbol, positionX, positionY){
         super(name, symbol, positionX, positionY);
-    }
-    getName(){
-        this.name = "A Wall";
     }
 }
 
