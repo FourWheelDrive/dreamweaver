@@ -80,7 +80,11 @@ function initializeGame(){
     //generate random paths procedurally
     mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
     //generate random locations of interest
-    mapArray = placeLocation(mapArray, mapWidth-1, mapHeight-1, 0);
+    var centerCoord = [(mapWidth-1) / 2, (mapHeight-1) / 2];
+    mapArray = placeLocation(mapArray, mapWidth-1, mapHeight-1, centerCoord, 0);
     //push complete mapArray to DOM
     pushMapToDOM(mapArray);
+    
+    //calc all visible nodes. Player position begins at center.
+    showCellsInVision(5, centerCoord[0], centerCoord[1], mapArray);
 }

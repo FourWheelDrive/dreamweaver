@@ -50,6 +50,12 @@ class Entity{
     }
 }
 
+class Player extends Entity{
+    constructor(){
+        super();
+    }
+}
+
 //=====================================================Combat utility classes
 class attack {
     constructor(name, damage, cooldown) {
@@ -120,9 +126,7 @@ class Cell{
     constructor(name, symbol, positionX, positionY) {
         this.name = name;                               //name shown in encounter popup.
 
-        this.symbol = symbol;                           //actual symbol
-        this.hiddenSymbol = ".";                        //symbol when out of vision and not viewed.
-        this.hidden = true;
+        this.symbol = symbol;
 
         this.mapX = positionX;                          //Map positions.
         this.mapY = positionY;

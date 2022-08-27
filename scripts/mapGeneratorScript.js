@@ -71,9 +71,7 @@ function createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray) {
 }
 
 //This places specified locations at random positions beside at least one PathCell.
-function placeLocation(mapArray, xBound, yBound, roomClass) {
-    //set up centerCoord.
-    var centerCoord = [xBound / 2, yBound / 2];
+function placeLocation(mapArray, xBound, yBound, centerCoord, roomClass) {
 
     let pathFound = false;
     while (!pathFound) {
@@ -125,12 +123,12 @@ function pushMapToDOM(mapArray) { //pass in generation vars
             let cellEntity = mapArray[j][i];
 
             //set ids (coordinates) and classes (type).
-            para.setAttribute("id", `[${cellEntity.x}][${cellEntity.y}]`);
+            para.setAttribute("id", `[${cellEntity.mapX}][${cellEntity.mapY}]`);
             para.setAttribute("class", "mapCell");
 
             //Switch all elements' symbols to the obscured symbol in fog.
             //NOTE: change the following cellEntity.symbol to "," when fog of war comes.
-            let textNode = document.createTextNode(cellEntity.symbol);
+            let textNode = document.createTextNode(".");
 
             //append child to each element
             para.appendChild(textNode);
@@ -139,12 +137,10 @@ function pushMapToDOM(mapArray) { //pass in generation vars
         //append rowdiv to document
         document.getElementById("gamePage__gameSpace__map").appendChild(rowDiv);
     }
-    //calc all visible nodes. Player position begins at center.
-    //showCellsInVision(6, Math.ceil(mapWidth / 2) - 1, Math.ceil(mapHeight / 2) - 1);
 }
 
 //Show cells in vision. This is the fog of war function.
-/*function showCellsInVision(radius, x, y) {
+function showCellsInVision(radius, x, y, mapArray) {
     var minBoundX = x - radius,
         maxBoundX = x + radius,
         minBoundY = y - radius,
@@ -156,11 +152,10 @@ function pushMapToDOM(mapArray) { //pass in generation vars
         tempArray.push([]);
         for (var j = 0; j < maxBoundY - minBoundY - 1; j++) { //add each cell.
             try { //might be out of bounds.
-                tempArray[i].push(map[i + minBoundX + 1][j + minBoundY + 1]);
+                tempArray[i].push(mapArray[i + minBoundX + 1][j + minBoundY + 1]);
             } catch (err) { }
         }
     }
-
     var coordSetCenter = [Math.ceil(tempArray.length / 2) - 1, Math.ceil(tempArray[4].length / 2) - 1];
 
     //find all the elements in radius range and set symbols to cell.symbol.
@@ -172,16 +167,15 @@ function pushMapToDOM(mapArray) { //pass in generation vars
                 try {
                     let cell = document.getElementById(`[${minBoundX + i + 1}][${minBoundY + j + 1}]`);
                     //Change the map symbol for the tile.
-                    cell.innerHTML = map[minBoundX + i + 1][minBoundY + j + 1].symbol;
-                    map[minBoundX + i + 1][minBoundY + j + 1].obscured = false;
+                    cell.innerHTML = mapArray[minBoundX + i + 1][minBoundY + j + 1].symbol;
                     //if this is a special location, give it styles.
-                    if (cell.classList.contains("gameSpace__specialLocations")) {
+                    if (!mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof PathCell && !mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof WallCell) {
                         cell.style.fontWeight = "900";
                         cell.style.fontSize = "20px";
                         cell.style.fontStretch = "ultra-expanded";
                     }
-                } catch (err) { }
+                } catch (err) {}
             }
         }
     }
-}*/
+}
