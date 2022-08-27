@@ -1,77 +1,25 @@
 const windowDirectory = ["map", "encounter", "inventory", "shop"];
 var currentWindowIndex = 0;
 
-async function windowNavButtonHandler(e) {
-    e = e || window.event; //different event handlers.
-    var buttonId = e.currentTarget.id;
+//Draw and clear player.
+function showPlayer(player){
 
-    switch(buttonId){
-        case "gamePage__header__left":
-            currentWindowIndex = currentWindowIndex - 1;
-            if(currentWindowIndex < 0){
-                currentWindowIndex = windowDirectory.length - 1;
-            }
-            break;
-        case "gamePage__header__right":
-            currentWindowIndex = currentWindowIndex + 1;
-            if(currentWindowIndex > windowDirectory.length - 1){
-                currentWindowIndex = 0;
-            }
-            break;
-    }
-
-    //If the button pressed was to change window, then do this after iterating window index.
-    //NOTE: Checks might be made here later for gameState if window switches are valid.
-    if(buttonId == "gamePage__header__left" || buttonId == "gamePage__header__right"){
-        //first set all to display none, then display new one.
-        document.getElementById("gamePage__gameSpace__map").style.display = "none";
-        document.getElementById("gamePage__gameSpace__encounter").style.display = "none";
-        document.getElementById("gamePage__gameSpace__inventory").style.display = "none";
-        document.getElementById("gamePage__gameSpace__shop").style.display = "none";
-
-        //Show new window.
-        switch(windowDirectory[currentWindowIndex]){
-            case "map":
-                document.getElementById("gamePage__gameSpace__map").style.display = "block";
-                break;
-            case "encounter":
-                document.getElementById("gamePage__gameSpace__encounter").style.display = "block";
-                break;
-            case "inventory":
-                document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
-                break;
-            case "shop":
-                document.getElementById("gamePage__gameSpace__shop").style.display = "block";
-                break;
-        }
-    }
-    //update title.
-    document.getElementById("gamePage__header__windowDisplay").innerHTML = `test window name \"${windowDirectory[currentWindowIndex]}\"`;
-    //update displays.
-    if(currentWindowIndex - 1 < 0){
-        document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = `${windowDirectory[windowDirectory.length - 1]}`;
-    } else {
-        document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = `${windowDirectory[currentWindowIndex - 1]}`;
-    }
-    if(currentWindowIndex + 1 > windowDirectory.length - 1){
-        document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = `${windowDirectory[0]}`;
-    } else {
-        document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = `${windowDirectory[currentWindowIndex + 1]}`;
-    }
+    var currentCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
+    currentCell.innerHTML = player.canvasSymbol;
+    currentCell.style.fontWeight = "900";
 }
-
-async function keyDownHandler(e){
-    if(e.code == "ArrowLeft" && !e.repeat){
-        document.getElementById("gamePage__header__left").click();
-    }
-    if(e.code == "ArrowRight" && !e.repeat){
-        document.getElementById("gamePage__header__right").click();
+function clearPlayer(player, mapArray){
+    var previousCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
+    var cellEntity = mapArray[player.mapPosition[0]][player.mapPosition[1]];
+    previousCell.innerHTML = cellEntity.symbol;
+    //NOTE: this may change as more room types are added.
+    previousCell.style.fontWeight = "400";
+    if(cellEntity instanceof PathCell){
+        previousCell.style.opacity = "0.5";
     }
 }
 
 function initializeGame(){
-    //Input handler.
-    document.addEventListener("keydown", keyDownHandler, false);
 
     var mapWidth = 31, mapHeight = 31;
     var maxTunnels = 80, maxLength = 10;
@@ -87,4 +35,12 @@ function initializeGame(){
     
     //calc all visible nodes. Player position begins at center.
     showCellsInVision(5, centerCoord[0], centerCoord[1], mapArray);
+
+    //init player
+    var player = new Player(10, "@");
+    player.getInitialPosition(mapWidth, mapHeight);
+    showPlayer(player);
+
+    //Input handler.
+    document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player), false);
 }

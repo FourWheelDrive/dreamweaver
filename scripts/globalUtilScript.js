@@ -36,23 +36,57 @@ Contents [class ENTITY]:
 3.1) Cooldown boolean
 3.2) Attack array
 */
-class Entity{
+
+class Entity {
     constructor(health, canvasSymbol) {
         this.health = health;
-
-        this.action = "";                               //action: attacking, parrying
-        this.statusLine = `Health: ${this.health}`;     //statusLine: health.
-
-        this.atkOnCD = false;
-
         this.canvasSymbol = canvasSymbol;
         this.canvasY = 50;                              //Y position of entity element on canvas.
+
+        /*Player can have a few stances:
+        Idle ""
+        Channelling "Channelling"
+        Attacking "Attacking"
+        Parrying "Parrying" */
+        this.status = "";
+        /*Special Effects list, for now
+        Heavy Armour?
+        Stun 
+        can only apply 1 buff/debuff to an entity at a time. Adding another replaces!*/
+        this.buffEffect = "";
+        this.debuffEffect = "";
+
+        //Canvas stuff.
+        this.actionLine = this.status;                  //action: attacking, parrying
+        this.statusLine = `Health: ${this.health}`;     //statusLine: health.
+        this.buffLine = this.buffEffect;
+        this.debuffLine = this.debuffEffect;
     }
 }
 
-class Player extends Entity{
-    constructor(){
-        super();
+class Player extends Entity {
+    constructor(health, canvasSymbol) {
+        super(health, canvasSymbol);
+        this.attacks = [];                              //Array of attack objects.
+        this.inventory = [];                            //Array of item objects.
+        this.masquerade = 0;
+        this.wishes = 0;
+
+        this.mapPosition = [];
+
+        //some canvas display elements.
+        this.canvasX = 50;
+
+        //set up header.
+        document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}`;
+        document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+        document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
+    }
+    addNewAttack(newAttack) {
+        this.attacks.push(newAttack);
+    }
+    getInitialPosition(mapWidth, mapHeight) {
+        this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
 }
 
@@ -63,6 +97,14 @@ class attack {
 
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
+
+        /*Attacks have four phases:
+        Idle
+        Channelling
+        Attacking
+        Cooldown
+        */
+        this.status = "idle";
     }
 }
 
@@ -99,7 +141,7 @@ class Game {
 
         this.inventoryOpen = false;
         this.shopOpen = false;
-        
+
         this.randomEncounterCooldown = 3;
         this.randomEncounterChance = 0.1;
         //-----------------------------------------------------------------------------
@@ -114,15 +156,13 @@ class Game {
     }
 }
 
-var game = new Game();
-
 //=====================================================CELL-based classes
 /*
 Contents [class CELL]:
 
 IN CELL, MAKE A FUNCTION. DEPENDING ON CELL TYPE, IT PICKS ITS OWN NAME!!!!!!!
 */
-class Cell{
+class Cell {
     constructor(name, symbol, positionX, positionY) {
         this.name = name;                               //name shown in encounter popup.
 
@@ -136,18 +176,18 @@ class Cell{
         this.visited = false;                           //Boolean for display and revisits.
     }
     //func called by other cell types. Depending on caller and room, returns a name.
-    cellNameGenerator(type, room){
+    cellNameGenerator(type, room) {
         var namesList;
-        switch(room){
+        switch (room) {
             case 1:
-                switch(type){ //each room will need this same switch.
+                switch (type) { //each room will need this same switch.
                     case "path":
                         //make an array. get random number in arr.length. return element at index.
                         namesList = ["A Dusty Path", "A Desolate Avenue"] //Boulevard, street.
-                        return namesList[randInt(namesList.length-1)];
+                        return namesList[randInt(namesList.length - 1)];
                     case "testLocations":
                         namesList = ["A Cool Place", "A Grand Estate"];
-                        return namesList[randInt(namesList.length-1)];
+                        return namesList[randInt(namesList.length - 1)];
                 }
                 break;
             case 2:
@@ -157,41 +197,41 @@ class Cell{
         }
     }
 }
-class PathCell extends Cell{
+class PathCell extends Cell {
     constructor(name, symbol, positionX, positionY) {
         super(name, symbol, positionX, positionY);
     }
     //NOTE: randomEncounters can be called from PathCell only!
-    randomEncounterCheck(){
+    randomEncounterCheck() {
 
     }
-    getName(){
+    getName() {
         this.name = super.cellNameGenerator("path", game.room);
     }
 }
-class WallCell extends Cell{
-    constructor(name, symbol, positionX, positionY){
+class WallCell extends Cell {
+    constructor(name, symbol, positionX, positionY) {
         super(name, symbol, positionX, positionY);
     }
 }
-class TestLocationCell extends Cell{
-    constructor(name, symbol, positionX, positionY){
+class TestLocationCell extends Cell {
+    constructor(name, symbol, positionX, positionY) {
         super(name, symbol, positionX, positionY);
     }
-    firstVisit(){}
-    getName(){
+    firstVisit() { }
+    getName() {
         this.name = super.cellNameGenerator("testLocations", game.room);
     }
     //NOTE: may move this into super class like getName() because there will be different types of room classes.
-    getSymbol(){
+    getSymbol() {
         var testLocationSymbols = ["B", "F", "A"];
-        this.symbol = testLocationSymbols[randInt(testLocationSymbols.length-1)];
+        this.symbol = testLocationSymbols[randInt(testLocationSymbols.length - 1)];
     }
 }
 
 //==============================================================Global functions
 function randInt(max) { //Random function, maximum inclusive.
-    return Math.floor(Math.random() * (max+1));
+    return Math.floor(Math.random() * (max + 1));
 }
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -203,3 +243,6 @@ function calcPythagDistance(coordSetOne, coordSetCenter) {
     var distanceFromCenter = Math.sqrt((differenceX) ** 2 + (differenceY) ** 2);
     return distanceFromCenter;
 }
+
+//===============================================================Global Variables
+var game = new Game();

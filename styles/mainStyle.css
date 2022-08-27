@@ -90,47 +90,28 @@ h1 {
 #gamePage__gameSpace{
     grid-area: gameSpace;
 }
-/*Windows! Maybe put these in a different file.*/
-#gamePage__gameSpace__map{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-.mapRow{
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-}
-.mapCell{
-    font-family: monospace;
-    font-size: 15px;
-    line-height: 90%;
-
-    height: 14px;
-    width: 14px;
-
-    text-align: center;
-    opacity: 0.8;
-
-    margin: 1px;
-    padding: 0px;
-}
-
-#gamePage__gameSpace__encounter{
-    display: none;
-}
-#gamePage__gameSpace__inventory{
-    display: none;
-}
-#gamePage__gameSpace__shop{
-    display: none;
-}
 
 /*footer*/
 #gamePage__footer{
     grid-area: footer;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    align-content: center;
+}
+#gamePage__footer > *{
+    border: 1px dotted red;
+}
+#gamePage__footer__position{
+    padding-left: 5%;
+    border-left: 1px solid black;
+    min-width: 5%;
+    width: 0;
+}
+#gamePage__footer__cellName{
+    min-width: 10%;
+    width: 0;
 }
 
 /*output*/
