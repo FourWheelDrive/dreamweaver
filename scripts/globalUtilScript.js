@@ -164,10 +164,9 @@ Contents [class CELL]:
 IN CELL, MAKE A FUNCTION. DEPENDING ON CELL TYPE, IT PICKS ITS OWN NAME!!!!!!!
 */
 class Cell {
-    constructor(name, symbol, positionX, positionY) {
-        this.name = name;                               //name shown in encounter popup.
-
-        this.symbol = symbol;
+    constructor(positionX, positionY) {
+        this.name;                             //name shown in encounter popup.
+        this.symbol;
 
         this.mapX = positionX;                          //Map positions.
         this.mapY = positionY;
@@ -186,6 +185,9 @@ class Cell {
                         //make an array. get random number in arr.length. return element at index.
                         namesList = ["A Dusty Path", "A Desolate Avenue"] //Boulevard, street.
                         return namesList[randInt(namesList.length - 1)];
+                    case "minorLocation":
+                        namesList = ["A Test Name"];
+                        return namesList[randInt(namesList.length - 1)];
                     case "testLocations":
                         namesList = ["A Cool Place", "A Grand Estate"];
                         return namesList[randInt(namesList.length - 1)];
@@ -197,36 +199,55 @@ class Cell {
                 break;
         }
     }
+    //func called by other cell types. Returns symbols depending on caller and room.
+    cellSymbolGenerator(type, room){
+        var symbolsList;
+        if(type == "path"){
+            return ";";
+        }
+        switch(room){
+            case 1:
+                switch(type){
+                    case "minorLocation":
+                        symbolsList = ["B", "F", "A"];
+                        return symbolsList[randInt(symbolsList.length - 1)];
+                }
+                break;
+            case 2:
+                break;
+        }
+    }
 }
 class PathCell extends Cell {
-    constructor(name, symbol, positionX, positionY) {
-        super(name, symbol, positionX, positionY);
+    constructor(positionX, positionY) {
+        super(positionX, positionY);
     }
     //NOTE: randomEncounters can be called from PathCell only!
     randomEncounterCheck() {
 
     }
-    getName() {
-        this.name = super.cellNameGenerator("path", game.room);
+    initializeCell() {
+        this.name = super.cellNameGenerator("path", game.currentRoom);
+        this.symbol = super.cellSymbolGenerator("path", game.currentRoom);
     }
 }
 class WallCell extends Cell {
-    constructor(name, symbol, positionX, positionY) {
-        super(name, symbol, positionX, positionY);
+    constructor(positionX, positionY) {
+        super(positionX, positionY);
+        this.name = "";
+        this.symbol = "#";
     }
 }
-class TestLocationCell extends Cell {
-    constructor(name, symbol, positionX, positionY) {
-        super(name, symbol, positionX, positionY);
+class MinorEncounterCell extends Cell{
+    constructor(positionX, positionY){
+        super(positionX, positionY);
     }
-    firstVisit() { }
-    getName() {
-        this.name = super.cellNameGenerator("testLocations", game.room);
+    initializeCell(){
+        this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
+        this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
-    //NOTE: may move this into super class like getName() because there will be different types of room classes.
-    getSymbol() {
-        var testLocationSymbols = ["B", "F", "A"];
-        this.symbol = testLocationSymbols[randInt(testLocationSymbols.length - 1)];
+    firstVisit(){ //Start encounter.
+
     }
 }
 

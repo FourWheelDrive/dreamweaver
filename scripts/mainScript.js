@@ -21,21 +21,10 @@ function clearPlayer(player, mapArray) {
 }
 
 function initializeGame() {
-
+    //create map for new room.
     var mapWidth = 31, mapHeight = 31;
     var maxTunnels = 80, maxLength = 10;
-    //generate array of walls
-    var mapArray = createMapArray(mapWidth, mapHeight);
-    //generate random paths procedurally
-    mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
-    //generate random locations of interest
-    var centerCoord = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
-    mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, 0);
-    //push complete mapArray to DOM
-    pushMapToDOM(mapArray);
-
-    //calc all visible nodes. Player position begins at center.
-    showCellsInVision(5, centerCoord[0], centerCoord[1], mapArray);
+    var mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
 
     //init player
     var player = new Player(10, "@");

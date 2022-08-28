@@ -112,7 +112,7 @@ async function playerMovementHandler(e, mapArray, player) {
     nextCellPos = [parseInt(currentCellPos[0]) + newDirection[0], parseInt(currentCellPos[1]) + newDirection[1]];
     let newCell, newCellEntity;
 
-    if ((nextCellPos[0] < mapArray.length && nextCellPos[1] <= mapArray[0].length) && (nextCellPos[0] >= 0 && nextCellPos[1] >= 0)) { //check for out of bounds. //Not working.
+    if ((nextCellPos[0] < mapArray.length && nextCellPos[1] < mapArray[0].length) && (nextCellPos[0] >= 0 && nextCellPos[1] >= 0)) { //check for out of bounds. //Not working.
         newCell = document.getElementById(`[${nextCellPos[0]}][${nextCellPos[1]}]`);
         let tempPosition = newCell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
         newCellEntity = mapArray[tempPosition[0]][tempPosition[1]];

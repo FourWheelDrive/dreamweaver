@@ -4,7 +4,7 @@ function createMapArray(mapWidth, mapHeight) {
     for (var i = 0; i < mapWidth; i++) {
         array.push([]); //push columns.
         for (var j = 0; j < mapHeight; j++) {
-            array[i].push(new WallCell("", "#", i, j)); //push cells.
+            array[i].push(new WallCell(i, j)); //push cells.
         }
     }
     return array;
@@ -52,8 +52,8 @@ function createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray) {
                 ((currentColumn === mapWidth - 1) && (randomDirection[0] === 1))) { break; } //Break loop.
             else {
                 //Step 5: Update map if everything else is valid.
-                mapArray[currentColumn][currentRow] = new PathCell("temp_name", ";", currentColumn, currentRow); //Update tile
-                mapArray[currentColumn][currentRow].getName(); //call internal function to set name.
+                mapArray[currentColumn][currentRow] = new PathCell(currentColumn, currentRow); //Update tile
+                mapArray[currentColumn][currentRow].initializeCell(); //call internal function to set name.
 
                 currentColumn += randomDirection[0]; //iterate tile
                 currentRow += randomDirection[1];
@@ -89,11 +89,10 @@ function placeLocation(mapArray, xBound, yBound, centerCoord, roomClass) {
 
                     //This is the actual test part. Scalability comes from here!
                     switch (roomClass) {
-                        case 0: //test case.
-                            if (mapArray[x][y] instanceof PathCell) {
-                                mapArray[randomCoord[0]][randomCoord[1]] = new TestLocationCell("temp_name", "temp_symbol", randomCoord[0], randomCoord[1]);
-                                mapArray[randomCoord[0]][randomCoord[1]].getName();
-                                mapArray[randomCoord[0]][randomCoord[1]].getSymbol();
+                        case 1: //test case.
+                            if (mapArray[x][y] instanceof PathCell && (mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell || mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell)) {
+                                mapArray[randomCoord[0]][randomCoord[1]] = new MinorEncounterCell(randomCoord[0], randomCoord[1]);
+                                mapArray[randomCoord[0]][randomCoord[1]].initializeCell();
 
                                 pathFound = true;
                             }
@@ -177,4 +176,24 @@ function showCellsInVision(radius, x, y, mapArray) {
             }
         }
     }
+}
+
+//Put them all together.
+function generateNewRoom(room, mapWidth, mapHeight, maxTunnels, maxLength){
+    //generate array of walls
+    var mapArray = createMapArray(mapWidth, mapHeight);
+    //generate random paths procedurally
+    mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
+    //generate random locations of interest
+    var centerCoord = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
+    for (var i = 0; i < 10; i++){
+        mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, 1);
+    }
+    //push complete mapArray to DOM
+    pushMapToDOM(mapArray);
+
+    //calc all visible nodes. Player position begins at center.
+    showCellsInVision(5, centerCoord[0], centerCoord[1], mapArray);
+
+    return mapArray;
 }
