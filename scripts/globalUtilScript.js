@@ -43,7 +43,7 @@ class Entity {
         this.canvasSymbol = canvasSymbol;
         this.canvasY = 50;                              //Y position of entity element on canvas.
 
-        /*Player can have a few stances:
+        /*Entity can have a few stances:
         Idle ""
         Channelling "Channelling"
         Attacking "Attacking"
@@ -61,6 +61,12 @@ class Entity {
         this.statusLine = `Health: ${this.health}`;     //statusLine: health.
         this.buffLine = this.buffEffect;
         this.debuffLine = this.debuffEffect;
+    }
+
+    changeHealth(difference){
+        this.health = this.health - difference;
+        this.statusLine = `Health: ${this.health}`;
+        //NOTE: also needs to update display on the thing.
     }
 }
 
@@ -92,17 +98,25 @@ class Player extends Entity {
 
 //=====================================================Combat utility classes
 class attack {
-    constructor(name, damage, cooldown) {
+    constructor(name, damage, cooldown, channelling, effect = "none", effectDuration = "0") {
         this.name = name;
 
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
+        this.baseChannelling = channelling;
+
+        /*Currently only one effect exists.
+        - None: none.
+        - Stun: for a certain number of attacks, attack does not land.
+        */
+        this.effect = effect;
+        this.effectDuration = effectDuration;
 
         /*Attacks have four phases:
-        Idle
-        Channelling
-        Attacking
-        Cooldown
+        Idle            - ready to be procced
+        Channelling     - procced, delay before fire. Any other action cancels.
+        Attacking       - Attack hits, do damage.
+        Cooldown        - Cooldown begins after proc. Can't be procced in this time.
         */
         this.status = "idle";
     }

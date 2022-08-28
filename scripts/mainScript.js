@@ -1,6 +1,27 @@
 const windowDirectory = ["map", "encounter", "inventory", "shop"];
 var currentWindowIndex = 0;
 
+//Display position listeners.
+//UI vars
+function setHoverListener(mapArray) {
+    var boardRows = document.getElementById("gamePage__gameSpace__map").children;
+
+    for (var i = 0; i < boardRows.length; i++) { //for each row div:
+        let rowCells = boardRows[i].children;
+        for (var j = 0; j < rowCells.length; j++) { //for each column cell in a row:
+            let cell = rowCells[j];
+            cell.addEventListener("mouseover", function () { //this updates the display according to cell id.
+                let tempString = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1); //get cell coords
+                let position = tempString.toString().split(/[\[\]\,]/);
+                let cellEntity = mapArray[position[0]][position[1]];
+                
+                document.getElementById("gamePage__footer__position").innerHTML = tempString;
+                document.getElementById("gamePage__footer__cellName").innerHTML = cellEntity.name;
+            })
+        }
+    }
+}
+
 //Draw and clear player.
 function showPlayer(player) {
 
@@ -33,4 +54,5 @@ function initializeGame() {
 
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player), false);
+    setHoverListener(mapArray);
 }

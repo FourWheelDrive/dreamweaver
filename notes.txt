@@ -38,3 +38,12 @@ To-Do:
 - Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.
 - Check which vars in class GAME actually matter. Also name them better.
     - check if need var to track moves since last battle.
+
+
+Some ideas about attack effects.
+- Stun
+- Bleed
+- Thorn Armor (buff)
+
+some attacks are not attacks at all, but pure buffs or debuffs.
+0 basedamage, 0 channelling
