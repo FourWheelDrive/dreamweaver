@@ -96,8 +96,15 @@ class Player extends Entity {
     }
 }
 
+class Enemy extends Entity {
+    constructor(health, canvasSymbol, attack){
+        super(health, canvasSymbol);
+        this.attacks = attack;
+    }
+}
+
 //=====================================================Combat utility classes
-class attack {
+class Attack {
     constructor(name, damage, cooldown, channelling, effect = "none", effectDuration = "0") {
         this.name = name;
 
@@ -119,6 +126,10 @@ class attack {
         Cooldown        - Cooldown begins after proc. Can't be procced in this time.
         */
         this.status = "idle";
+    }
+    //Call this when enemy or player procs attack.
+    attackProcced(caller){
+
     }
 }
 

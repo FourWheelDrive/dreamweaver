@@ -2,7 +2,6 @@ const windowDirectory = ["map", "encounter", "inventory", "shop"];
 var currentWindowIndex = 0;
 
 //Display position listeners.
-//UI vars
 function setHoverListener(mapArray) {
     var boardRows = document.getElementById("gamePage__gameSpace__map").children;
 
@@ -16,7 +15,11 @@ function setHoverListener(mapArray) {
                 let cellEntity = mapArray[position[0]][position[1]];
                 
                 document.getElementById("gamePage__footer__position").innerHTML = tempString;
-                document.getElementById("gamePage__footer__cellName").innerHTML = cellEntity.name;
+                if(cell.innerHTML != "."){
+                    document.getElementById("gamePage__footer__cellName").innerHTML = cellEntity.name;
+                } else {
+                    document.getElementById("gamePage__footer__cellName").innerHTML = "";
+                }
             })
         }
     }
@@ -54,5 +57,12 @@ function initializeGame() {
 
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player), false);
+    //Hover listener.
     setHoverListener(mapArray);
 }
+
+/*List of attack templates.
+new Attack("basic attack", 1, 2, 0);
+new Attack("parry", 0, 0, 0, "parry", 3);
+new Attack("heavy attack", 3, 4, 1);
+*/

@@ -47,13 +47,13 @@ async function windowNavButtonHandler(e) {
         //Show new window.
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
-                document.getElementById("gamePage__gameSpace__map").style.display = "block";
+                document.getElementById("gamePage__gameSpace__map").style.display = "flex";
                 if(game.gameState != "encounter"){
                     game.gameState = "movement";
                 }
                 break;
             case "encounter":
-                document.getElementById("gamePage__gameSpace__encounter").style.display = "block";
+                document.getElementById("gamePage__gameSpace__encounter").style.display = "grid";
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
