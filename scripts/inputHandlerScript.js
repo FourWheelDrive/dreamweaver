@@ -11,7 +11,7 @@ async function keyDownHandler(mapArray, player, e) {
     }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
-    if ((e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
+    if ((e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") && game.gameState == "movement") {
         playerMovementHandler(e, mapArray, player);
     }
 }
@@ -48,12 +48,16 @@ async function windowNavButtonHandler(e) {
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
                 document.getElementById("gamePage__gameSpace__map").style.display = "block";
+                if(game.gameState != "encounter"){
+                    game.gameState = "movement";
+                }
                 break;
             case "encounter":
                 document.getElementById("gamePage__gameSpace__encounter").style.display = "block";
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
+                game.gameState = "inventory";
                 break;
             case "shop":
                 document.getElementById("gamePage__gameSpace__shop").style.display = "block";
@@ -121,58 +125,4 @@ async function playerMovementHandler(e, mapArray, player) {
         showCellsInVision(5, player.mapPosition[0], player.mapPosition[1], mapArray);
         showPlayer(player);
     }
-
-
-    /*
-    //Move system goes here!!! Move player and check for events.
-    if (newCell != null && newCellEntity.type != "wall") { //if the cell to move to is NOT a wall:
-        //update previously visited cell.
-        currentCell.innerHTML = currentCellEntity.symbol; //change cell back to original character.
-        if (currentCell.classList.contains("gameSpace__specialLocations")) {
-            if (!currentCellEntity.reVisitable) { //revisitable tiles don't get greyed out.
-                currentCell.style.opacity = 0.3;
-            }
-            currentCell.style.fontSize = "20px";
-        } else {
-            currentCell.style.fontWeight = "normal";
-            currentCell.style.opacity = 0.3;
-        }
-
-        //update new cell.
-        playerX = nextCellPos[0]; //move player.
-        playerY = nextCellPos[1];
-        //new cell styles.
-        newCell.style.fontSize = "15px";
-        //Do game updates.
-        showCellsInVision(5, playerX, playerY); //Fog of war
-        game.movesSinceLastRandomEncounter = game.movesSinceLastRandomEncounter + 1; //random encounter is ++. when this is >= 5, rand encounter is possible.
-
-        //Choose action, if applicable:-----------------------------------------------------------------------------------------||-----
-        //Begin encounters on locations, if they're new.
-        if (newCell.classList.contains("gameSpace__specialLocations") && (!newCellEntity.alreadyVisited || newCellEntity.reVisitable)) { //change size of special locations on walked on.
-            //Change the map symbol for the tile.
-            if (currentCellEntity.type == "minor encounter" || currentCellEntity.type == "major encounter" || currentCellEntity.type == "boss encounter") {
-                currentCellEntity.updateSymbol();
-                currentCell.innerHTML = currentCellEntity.symbol;
-            }
-            //Begin dialogue or encounter as necessary.
-            if (newCellEntity.type == "shop") {
-                openShop("open");
-            } else if (newCellEntity.type == "boss encounter" && newCellEntity.alreadyVisited) {
-                //Boss revisit dialogue func
-            } else {
-                //new tile encounter.
-                await beginEncounter(newCellEntity);
-            }
-        } else if (game.movesSinceLastRandomEncounter >= 5) {
-            //Random chance for encounters on untread path tiles.
-            let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
-            console.log(tempChance)
-            if (newCellEntity.type == "path" && !newCellEntity.alreadyVisited && tempChance == 1) {
-                game.movesSinceLastRandomEncounter = 0;
-                await beginEncounter(newCellEntity);
-            }
-            newCellEntity.alreadyVisited = true;
-        }
-    }*/
 }

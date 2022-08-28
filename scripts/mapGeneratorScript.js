@@ -169,10 +169,9 @@ function showCellsInVision(radius, x, y, mapArray) {
                     //Change the map symbol for the tile.
                     cell.innerHTML = mapArray[minBoundX + i + 1][minBoundY + j + 1].symbol;
                     //if this is a special location, give it styles.
-                    if (!mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof PathCell && !mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof WallCell) {
-                        cell.style.fontWeight = "900";
-                        cell.style.fontSize = "20px";
-                        cell.style.fontStretch = "ultra-expanded";
+                    if (mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof PathCell == false && mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof WallCell == false) {
+                        cell.style.fontWeight = "700";
+                        cell.style.fontStretch = "expanded";
                     }
                 } catch (err) {}
             }

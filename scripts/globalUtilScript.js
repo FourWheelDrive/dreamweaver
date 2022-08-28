@@ -115,18 +115,19 @@ Contents [class GAME]:
 */
 class Game {
     constructor() {
-        this.gameState = "title";
+        this.gameState = "movement";
         /*
         game.gameState values:
         100 - title
         101 - end, ending
         102 - end, death
 
-        0 - Turn begins, movement.
-        1 - Move made. Determine next step.
-        10 - Encounter on this turn. <<-- Dialogue happens (before or after?) encounter.
-        11 - Dialogue on this turn.
-        2 - End of turn. Final updates to flags and Masquerade. Could handle deaths.
+        10 - Movement Phase
+        11 - Encounter Phase
+        12 - Inventory Phase
+        13 - Shop Phase
+        20 - Dialogue Phase
+        0 - End of turn. Final updates to flags and Masquerade. Could handle deaths.
         */
 
         this.currentRoom = 1;
