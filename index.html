@@ -67,16 +67,33 @@
             <div id="gamePage__gameSpace__encounter">
                 <!--Encounter Phase-->
                 <div id="gamePage__gameSpace__encounter__header">
-                    <p id="gamePage__gameSpace__encounter__header__locationDisplay"></p>
+                    <h1 id="gamePage__gameSpace__encounter__header__locationDisplay">test encounter location name</h1>
                 </div>
                 <!--contains 4 attack slots.-->
+                <h1 id="gamePage__gameSpace__encounter__menuTitle">ACTIONS</h1>
                 <div id="gamePage__gameSpace__encounter__menu">
                     <button id="gamePage__gameSpace__encounter__menu__button1" class="encounterButton">test button 1</button>
                     <button id="gamePage__gameSpace__encounter__menu__button2" class="encounterButton">test button 2</button>
                     <button id="gamePage__gameSpace__encounter__menu__button3" class="encounterButton">test button 3</button>
                     <button id="gamePage__gameSpace__encounter__menu__button4" class="encounterButton">test button 4</button>
                 </div>
-                <canvas id="gamePage__gameSpace__encounter__canvas" width="500" height="300"></canvas>
+                <!--"Canvas"-->
+                <div id="gamePage__gameSpace__encounter__canvas">
+                    <!--icons-->
+                    <p id="gamePage__gameSpace__encounter__canvas__player">@</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__enemy">&</p>
+                    
+                    <!--Dialogue outputs.-->
+                    <p id="gamePage__gameSpace__encounter__canvas__playerStatus">teststatus</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__output">testoutput</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__enemyStatus">teststatus</p>
+
+                    <!--Boxes for buffs/debuffs.-->
+                    <p id="gamePage__gameSpace__encounter__canvas__pbuff" class="buffStatusDisplay">+</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__pdebuff" class="debuffStatusDisplay">-</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__ebuff" class="buffStatusDisplay">+</p>
+                    <p id="gamePage__gameSpace__encounter__canvas__edebuff" class="debuffStatusDisplay">-</p>
+                </div>
             </div>
             <div id="gamePage__gameSpace__inventory">
                 <p>Window Test 0.0.3 Inventory</p>

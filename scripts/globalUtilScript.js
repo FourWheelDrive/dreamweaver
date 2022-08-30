@@ -23,6 +23,10 @@ Contents [globalUtilityScript.js]:
 3.3) buttonCooldownTimer(buttonID, time)
 3.4) updateInvDisplay?????????
 3.5) randInt
+
+4) Cooldown Handler Classes
+4.1) Cooldown Manager
+4.2) Cooldown Data
 */
 
 //=====================================================ENTITY-based classes
@@ -41,7 +45,6 @@ class Entity {
     constructor(health, canvasSymbol) {
         this.health = health;
         this.canvasSymbol = canvasSymbol;
-        this.canvasY = 50;                              //Y position of entity element on canvas.
 
         /*Entity can have a few stances:
         Idle ""
@@ -79,9 +82,6 @@ class Player extends Entity {
         this.wishes = 0;
 
         this.mapPosition = [];
-
-        //some canvas display elements.
-        this.canvasX = 50;
 
         //set up header.
         document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}`;
@@ -128,7 +128,11 @@ class Attack {
         this.status = "idle";
     }
     //Call this when enemy or player procs attack.
-    attackProcced(caller){
+    attackProcced(caller, target){
+
+    }
+    //After attack is procced, call cooldown.
+    goOnCooldown(caller){
 
     }
 }
@@ -275,6 +279,15 @@ class MinorEncounterCell extends Cell{
 
     }
 }
+
+//=====================================================COOLDOWN classes
+class CooldownHandler{
+
+}
+class CooldownData{
+    
+}
+
 
 //==============================================================Global functions
 function randInt(max) { //Random function, maximum inclusive.

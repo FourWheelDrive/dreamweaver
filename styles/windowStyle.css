@@ -30,25 +30,71 @@
 /*Encounter window. ===========================*/
 #gamePage__gameSpace__encounter{
     display: none;
-    grid-template-areas: "header header"
+    grid-template-areas: "menuTitle header"
     "menu canvas";
     grid-template-columns: 1fr 3fr;
-    grid-template-rows: 1fr 9fr;
-
-    border: 1px solid green;
-}
-#gamePage__gameSpace__encounter>*{
-    border: 1px solid blue;
+    grid-template-rows: 2fr 9fr;
 }
 #gamePage__gameSpace__encounter__header{
     grid-area: header;
+}
+#gamePage__gameSpace__encounter__menuTitle{
+    grid-area: menuTitle;
+    text-decoration: underline;
 }
 #gamePage__gameSpace__encounter__canvas{
     margin: auto;
     padding: 0px;
     grid-area: canvas;
 
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-areas: "player player null enemy enemy"
+    "pstatus pstatus null estatus estatus"
+    "pbuff pdebuff output ebuff edebuff";
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
+
     border: 1px solid black;
+}
+#gamePage__gameSpace__encounter__canvas__player{
+    grid-area: player;
+    margin-bottom: 0;
+}
+#gamePage__gameSpace__encounter__canvas__pbuff{
+    grid-area: pbuff;
+}
+#gamePage__gameSpace__encounter__canvas__pdebuff{
+    grid-area: pdebuff;
+}
+#gamePage__gameSpace__encounter__canvas__output{
+    grid-area: output;
+}
+#gamePage__gameSpace__encounter__canvas__enemy{
+    grid-area: enemy;
+    margin-bottom: 0;
+}
+#gamePage__gameSpace__encounter__canvas__ebuff{
+    grid-area: ebuff;
+}
+#gamePage__gameSpace__encounter__canvas__edebuff{
+    grid-area: edebuff;
+}
+#gamePage__gameSpace__encounter__canvas__playerStatus{
+    grid-area: pstatus;
+}
+#gamePage__gameSpace__encounter__canvas__enemyStatus{
+    grid-area: estatus;
+}
+.buffStatusDisplay{
+    border: 1px solid black;
+    margin: 10%;
+}
+.debuffStatusDisplay{
+    border: 1px dotted black;
+    margin: 10%;
 }
 #gamePage__gameSpace__encounter__menu{
     margin: 0px;
@@ -57,8 +103,6 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-
-    border: 1px solid red;
 }
 .encounterButton{
     background-color: #fff8e0;
