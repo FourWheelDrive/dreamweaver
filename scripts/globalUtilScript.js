@@ -147,16 +147,10 @@ class Game {
         this.gameState = "movement";
         /*
         game.gameState values:
-        100 - title
-        101 - end, ending
-        102 - end, death
-
-        10 - Movement Phase
-        11 - Encounter Phase
-        12 - Inventory Phase
-        13 - Shop Phase
-        20 - Dialogue Phase
-        0 - End of turn. Final updates to flags and Masquerade. Could handle deaths.
+        movement
+        encounter
+        inventory
+        shop
         */
 
         this.currentRoom = 1;

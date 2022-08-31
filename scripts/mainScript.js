@@ -52,11 +52,12 @@ function initializeGame() {
 
     //init player
     var player = new Player(10, "@");
+    var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 0));
     player.getInitialPosition(mapWidth, mapHeight);
     showPlayer(player);
 
     //Input handler.
-    document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player), false);
+    document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player, enemy), false);
     //Hover listener.
     setHoverListener(mapArray);
 }

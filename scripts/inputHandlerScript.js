@@ -1,4 +1,4 @@
-async function keyDownHandler(mapArray, player, e) {
+async function keyDownHandler(mapArray, player, enemy, e) {
     //Window navigation keys.
     //NOTE: needs to be restricted depending on gamestate!
     if ((e.code == "ArrowLeft" || e.code == "ArrowRight") && !e.repeat) {
@@ -13,6 +13,19 @@ async function keyDownHandler(mapArray, player, e) {
     //NOTE: needs to be restricted depending on gamestate!
     if ((e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") && game.gameState == "movement") {
         playerMovementHandler(e, mapArray, player);
+    }
+    //Encounter keys and keybinds.
+    if(game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")){
+        switch(e.code){
+            case "KeyU":
+                break;
+            case "KeyI":
+                break;
+            case "KeyJ":
+                break;
+            case "KeyK":
+                break;
+        }
     }
 }
 
