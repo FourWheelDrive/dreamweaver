@@ -98,7 +98,7 @@ async function keyDownHandler(e) {
             //Begin encounters on locations, if they're new.
             if (newCell.classList.contains("gameSpace__specialLocations") && (!newCellEntity.alreadyVisited || newCellEntity.reVisitable)) { //change size of special locations on walked on.
                 //Change the map symbol for the tile.
-                if (currentCellEntity.type == "minor encounter" || currentCellEntity.type == "major encounter" || currentCellEntity.type == "boss encounter"){
+                if (currentCellEntity.type == "minor encounter" || currentCellEntity.type == "major encounter" || currentCellEntity.type == "boss encounter") {
                     currentCellEntity.updateSymbol();
                     currentCell.innerHTML = currentCellEntity.symbol;
                 }
@@ -111,7 +111,7 @@ async function keyDownHandler(e) {
                     //new tile encounter.
                     await beginEncounter(newCellEntity);
                 }
-            } else if (game.movesSinceLastRandomEncounter >= 5){
+            } else if (game.movesSinceLastRandomEncounter >= 5) {
                 //Random chance for encounters on untread path tiles.
                 let tempChance = playerRandInt(1, game.randomEncounterChance, "floor"); //Maybe add other events too?
                 console.log(tempChance)
@@ -216,7 +216,7 @@ async function keyDownHandler(e) {
 
                         //reset pos
                         inventoryPosition = 0;
-                        if(player.inventory.length > 0){
+                        if (player.inventory.length > 0) {
                             let firstButton = document.getElementById(`inventory button ${inventoryPosition}`);
                             //firstButton.innerHTML = `> ${firstButton.innerHTML} <`;
                             firstButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
@@ -284,7 +284,7 @@ async function keyDownHandler(e) {
 
                             //reset position.
                             shopPosition = 0;
-                            if(game.shopInventory.length > 0){
+                            if (game.shopInventory.length > 0) {
                                 let firstButton = document.getElementById(`shop button ${shopPosition}`);
                                 //firstButton.innerHTML = `> ${firstButton.innerHTML} <`;
                                 firstButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });

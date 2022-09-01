@@ -15,18 +15,26 @@ async function keyDownHandler(mapArray, player, enemy, e) {
         playerMovementHandler(e, mapArray, player);
     }
     //Encounter keys and keybinds.
-    if(game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")){
-        switch(e.code){
+    if (game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
+        switch (e.code) {
             case "KeyU":
+                document.getElementById("gamePage__gameSpace__encounter__menu__button1").click();
                 break;
             case "KeyI":
+                document.getElementById("gamePage__gameSpace__encounter__menu__button2").click();
                 break;
             case "KeyJ":
+                document.getElementById("gamePage__gameSpace__encounter__menu__button3").click();
                 break;
             case "KeyK":
+                document.getElementById("gamePage__gameSpace__encounter__menu__button4").click();
                 break;
         }
     }
+    /*
+    setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
+    procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
+    */
 }
 
 async function windowNavButtonHandler(e) {
@@ -61,7 +69,7 @@ async function windowNavButtonHandler(e) {
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
                 document.getElementById("gamePage__gameSpace__map").style.display = "flex";
-                if(game.gameState != "encounter"){
+                if (game.gameState != "encounter") {
                     game.gameState = "movement";
                 }
                 break;
@@ -132,10 +140,34 @@ async function playerMovementHandler(e, mapArray, player) {
     }
 
     //Move the player.
-    if(newCell != null && newCellEntity instanceof WallCell == false){
+    if (newCell != null && newCellEntity instanceof WallCell == false) {
         clearPlayer(player, mapArray);
         player.mapPosition = [nextCellPos[0], nextCellPos[1]];
         showCellsInVision(5, player.mapPosition[0], player.mapPosition[1], mapArray);
         showPlayer(player);
+    }
+}
+
+async function playerAttackHandler(e, player, enemy) {
+
+}
+
+function attackButtonCooldownAnimation(buttonId, time) {
+    let button = document.getElementById(buttonId);
+    let timer = button.querySelector(".encounterButton__progress");
+
+    if (!button.disabled && game.gameState == "encounter") {
+        //Cooldown the button while animation takes place.
+        button.disabled = true;
+        setTimeout(function () { button.disabled = false; }, time * 1000);
+
+        //Animation!
+        timer.style.transition = "none"; //no animation.
+        timer.style.width = "100%";
+        flushCSS(timer);
+
+        timer.style.transition = `width ${time}s linear` //animation again
+        timer.style.width = "0%";
+        flushCSS(timer);
     }
 }
