@@ -105,6 +105,7 @@
     justify-content: center;
 }
 .encounterButton{
+    position: relative;
     background-color: #fff8e0;
     border: 1px solid black;
 

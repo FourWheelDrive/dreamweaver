@@ -75,6 +75,8 @@ async function windowNavButtonHandler(e) {
                 break;
             case "encounter":
                 document.getElementById("gamePage__gameSpace__encounter").style.display = "grid";
+                //NOTE: remove after testing!!
+                game.gameState = "encounter";
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
@@ -148,8 +150,8 @@ async function playerMovementHandler(e, mapArray, player) {
     }
 }
 
-async function playerAttackHandler(e, player, enemy) {
-
+async function playerAttackHandler(player, enemy, e) {
+    attackButtonCooldownAnimation(e.currentTarget.id, 3);
 }
 
 function attackButtonCooldownAnimation(buttonId, time) {
@@ -170,4 +172,7 @@ function attackButtonCooldownAnimation(buttonId, time) {
         timer.style.width = "0%";
         flushCSS(timer);
     }
+}
+function flushCSS(element) { //flushes css to no transition.
+    element.offsetHeight;
 }

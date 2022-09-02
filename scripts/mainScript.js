@@ -58,6 +58,11 @@ function initializeGame() {
 
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player, enemy), false);
+    //Add listeners to attack buttons.
+    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
+    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
+    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
+    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
     //Hover listener.
     setHoverListener(mapArray);
 }
