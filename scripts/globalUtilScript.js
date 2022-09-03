@@ -61,15 +61,19 @@ class Entity {
 
         //Canvas stuff.
         this.actionLine = this.status;                  //action: attacking, parrying
-        this.statusLine = `Health: ${this.health}`;     //statusLine: health.
         this.buffLine = this.buffEffect;
         this.debuffLine = this.debuffEffect;
     }
 
-    changeHealth(difference){
+    changeHealth(difference, target){
         this.health = this.health - difference;
-        this.statusLine = `Health: ${this.health}`;
-        //NOTE: also needs to update display on the thing.
+        //depending on who got hit, change the health display.
+        if(target instanceof Player){
+            document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = this.health;
+        }
+        if(target instanceof Enemy){
+            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = this.health;
+        }
     }
 }
 
@@ -89,6 +93,7 @@ class Player extends Entity {
         document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
     }
     addNewAttack(newAttack) {
+        //NOTE: needs new case for 4+ attacks to go to replace.
         this.attacks.push(newAttack);
     }
     getInitialPosition(mapWidth, mapHeight) {
@@ -128,12 +133,27 @@ class Attack {
         this.status = "idle";
     }
     //Call this when enemy or player procs attack.
+    //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
     attackProcced(caller, target){
+        //NOTE: also needs to apply effects.
+        //case 1: player's attack.
+        if(caller instanceof Player){
 
+        }
+        //case 2: enemy's attack.
+        if(caller instanceof Enemy){
+            target.changeHealth(this.baseDamage, target);
+        }
+        this.goOnCooldown(caller); //cool down.
     }
     //After attack is procced, call cooldown.
     goOnCooldown(caller){
-
+        //NOTE: cooldown pseudocode.
+        //Make a cooldownData object for this attack.
+        //Append to cooldownHandler.
+        //watch video for further instructions. (wait until cd done, undisable attack?)
+        //      proposition: after cd done, remove this from cooldownHandler. 
+        //      Check for attack in cdHandler to see if it can be procced or not.
     }
 }
 
@@ -246,6 +266,7 @@ class PathCell extends Cell {
         super(positionX, positionY);
     }
     //NOTE: randomEncounters can be called from PathCell only!
+    //NOTE: for encounter procs, initialize all of the encounter window too! (Health display, enemy.)
     randomEncounterCheck() {
 
     }

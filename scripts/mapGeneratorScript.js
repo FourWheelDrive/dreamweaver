@@ -126,7 +126,6 @@ function pushMapToDOM(mapArray) { //pass in generation vars
             para.setAttribute("class", "mapCell");
 
             //Switch all elements' symbols to the obscured symbol in fog.
-            //NOTE: change the following cellEntity.symbol to "," when fog of war comes.
             let textNode = document.createTextNode(".");
 
             //append child to each element

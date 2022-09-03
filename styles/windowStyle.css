@@ -1,18 +1,20 @@
 /*Windows! Maybe put these in a different file.*/
 /*Map window. =================================*/
-#gamePage__gameSpace__map{
+#gamePage__gameSpace__map {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
-.mapRow{
+
+.mapRow {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 }
-.mapCell{
+
+.mapCell {
     font-family: monospace;
     font-size: 15px;
     line-height: 90%;
@@ -28,21 +30,24 @@
 }
 
 /*Encounter window. ===========================*/
-#gamePage__gameSpace__encounter{
+#gamePage__gameSpace__encounter {
     display: none;
     grid-template-areas: "menuTitle header"
-    "menu canvas";
+        "menu canvas";
     grid-template-columns: 1fr 3fr;
     grid-template-rows: 2fr 9fr;
 }
-#gamePage__gameSpace__encounter__header{
+
+#gamePage__gameSpace__encounter__header {
     grid-area: header;
 }
-#gamePage__gameSpace__encounter__menuTitle{
+
+#gamePage__gameSpace__encounter__menuTitle {
     grid-area: menuTitle;
     text-decoration: underline;
 }
-#gamePage__gameSpace__encounter__canvas{
+
+#gamePage__gameSpace__encounter__canvas {
     margin: auto;
     padding: 0px;
     grid-area: canvas;
@@ -51,52 +56,64 @@
     height: 100%;
 
     display: grid;
-    grid-template-areas: "player player null enemy enemy"
-    "pstatus pstatus null estatus estatus"
-    "pbuff pdebuff output ebuff edebuff";
-    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-areas: "phealth phealth null ehealth ehealth"
+        "player player null enemy enemy"
+        "pstatus pstatus null estatus estatus"
+        "pbuff pdebuff output ebuff edebuff";
+    grid-template-rows: 2fr 1fr 2fr 2fr;
     grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
 
     border: 1px solid black;
 }
-#gamePage__gameSpace__encounter__canvas__player{
+
+#gamePage__gameSpace__encounter__canvas__playerHealth {
+    grid-area: phealth;
+}
+#gamePage__gameSpace__encounter__canvas__player {
     grid-area: player;
     margin-bottom: 0;
 }
-#gamePage__gameSpace__encounter__canvas__pbuff{
+#gamePage__gameSpace__encounter__canvas__pbuff {
     grid-area: pbuff;
 }
-#gamePage__gameSpace__encounter__canvas__pdebuff{
+#gamePage__gameSpace__encounter__canvas__pdebuff {
     grid-area: pdebuff;
 }
-#gamePage__gameSpace__encounter__canvas__output{
+#gamePage__gameSpace__encounter__canvas__playerStatus {
+    grid-area: pstatus;
+}
+
+#gamePage__gameSpace__encounter__canvas__output {
     grid-area: output;
 }
-#gamePage__gameSpace__encounter__canvas__enemy{
+
+#gamePage__gameSpace__encounter__canvas__enemyHealth {
+    grid-area: ehealth;
+}
+#gamePage__gameSpace__encounter__canvas__enemy {
     grid-area: enemy;
     margin-bottom: 0;
 }
-#gamePage__gameSpace__encounter__canvas__ebuff{
+#gamePage__gameSpace__encounter__canvas__ebuff {
     grid-area: ebuff;
 }
-#gamePage__gameSpace__encounter__canvas__edebuff{
+#gamePage__gameSpace__encounter__canvas__edebuff {
     grid-area: edebuff;
 }
-#gamePage__gameSpace__encounter__canvas__playerStatus{
-    grid-area: pstatus;
-}
-#gamePage__gameSpace__encounter__canvas__enemyStatus{
+#gamePage__gameSpace__encounter__canvas__enemyStatus {
     grid-area: estatus;
 }
-.buffStatusDisplay{
+
+.buffStatusDisplay {
     border: 1px solid black;
     margin: 10%;
 }
-.debuffStatusDisplay{
+.debuffStatusDisplay {
     border: 1px dotted black;
     margin: 10%;
 }
-#gamePage__gameSpace__encounter__menu{
+
+#gamePage__gameSpace__encounter__menu {
     margin: 0px;
     grid-area: menu;
 
@@ -104,7 +121,7 @@
     flex-wrap: wrap;
     justify-content: center;
 }
-.encounterButton{
+.encounterButton {
     position: relative;
     background-color: #fff8e0;
     border: 1px solid black;
@@ -129,13 +146,15 @@
     background: #d6cbab;
     transition: width 1s;
 }
-.encounterButton__text{
+.encounterButton__text {
     position: relative;
 }
 
-#gamePage__gameSpace__inventory{
+/*Inventory Window. ================================*/
+#gamePage__gameSpace__inventory {
     display: none;
 }
-#gamePage__gameSpace__shop{
+
+#gamePage__gameSpace__shop {
     display: none;
 }
