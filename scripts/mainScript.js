@@ -56,6 +56,10 @@ function initializeGame() {
     player.getInitialPosition(mapWidth, mapHeight);
     showPlayer(player);
 
+    //init cooldown modules.
+    var cooldownHandler = new CooldownHandler();
+    cooldownHandler.initCooldowns();
+
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player, enemy), false);
     //Add listeners to attack buttons.

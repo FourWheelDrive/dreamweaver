@@ -65,13 +65,13 @@ class Entity {
         this.debuffLine = this.debuffEffect;
     }
 
-    changeHealth(difference, target){
+    changeHealth(difference, target) {
         this.health = this.health - difference;
         //depending on who got hit, change the health display.
-        if(target instanceof Player){
+        if (target instanceof Player) {
             document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = this.health;
         }
-        if(target instanceof Enemy){
+        if (target instanceof Enemy) {
             document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = this.health;
         }
     }
@@ -102,7 +102,7 @@ class Player extends Entity {
 }
 
 class Enemy extends Entity {
-    constructor(health, canvasSymbol, attack){
+    constructor(health, canvasSymbol, attack) {
         super(health, canvasSymbol);
         this.attacks = attack;
     }
@@ -112,6 +112,8 @@ class Enemy extends Entity {
 class Attack {
     constructor(name, damage, cooldown, channelling, effect = "none", effectDuration = "0") {
         this.name = name;
+        this.id = game.nextAttackObjectID;              //identifies the object. Could be same type.
+        game.nextAttackObjectID = game.nextAttackObjectID + 1;
 
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
@@ -134,20 +136,20 @@ class Attack {
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
-    attackProcced(caller, target){
+    attackProcced(caller, target) {
         //NOTE: also needs to apply effects.
         //case 1: player's attack.
-        if(caller instanceof Player){
+        if (caller instanceof Player) {
 
         }
         //case 2: enemy's attack.
-        if(caller instanceof Enemy){
+        if (caller instanceof Enemy) {
             target.changeHealth(this.baseDamage, target);
         }
         this.goOnCooldown(caller); //cool down.
     }
     //After attack is procced, call cooldown.
-    goOnCooldown(caller){
+    goOnCooldown(caller) {
         //NOTE: cooldown pseudocode.
         //Make a cooldownData object for this attack.
         //Append to cooldownHandler.
@@ -178,6 +180,7 @@ class Game {
         this.encounterCounter = 0;                          //tracks number of battles. Might be more useful if track moves since last battle?
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
 
+        this.nextAttackObjectID = 1;                        //increments as attacks are created.
 
         //flags.
         this.attacksLocked = true;
@@ -243,14 +246,14 @@ class Cell {
         }
     }
     //func called by other cell types. Returns symbols depending on caller and room.
-    cellSymbolGenerator(type, room){
+    cellSymbolGenerator(type, room) {
         var symbolsList;
-        if(type == "path"){
+        if (type == "path") {
             return ";";
         }
-        switch(room){
+        switch (room) {
             case 1:
-                switch(type){
+                switch (type) {
                     case "minorLocation":
                         symbolsList = ["B", "F", "A"];
                         return symbolsList[randInt(symbolsList.length - 1)];
@@ -282,27 +285,73 @@ class WallCell extends Cell {
         this.symbol = "#";
     }
 }
-class MinorEncounterCell extends Cell{
-    constructor(positionX, positionY){
+class MinorEncounterCell extends Cell {
+    constructor(positionX, positionY) {
         super(positionX, positionY);
     }
-    initializeCell(){
+    initializeCell() {
         this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
-    firstVisit(){ //Start encounter.
+    firstVisit() { //Start encounter.
 
     }
 }
 
 //=====================================================COOLDOWN classes
-class CooldownHandler{
+//Contains array of cooldownData. Has a clock that decrements cooldowns each tick.
+class CooldownHandler {
+    constructor() {
+        this.cooldowns = []; //an array of cooldownDatas.
+        this.lastUpdate = Date.now();
+        this.clockInterval;
+    }
+    initCooldowns() {//sets up clockInterval and calls processCooldowns each tick.
+        var deltaTime;
+        this.clockInterval = setInterval(() => {
+            deltaTime = this.tick();
+            this.processCooldowns(deltaTime);
+        }, 0);
+    }
+    tick() {//Subtract last update from current time to find time since last tick.
+        var currentTime = Date.now();
+        var deltaTime = currentTime - this.lastUpdate;
+        this.lastUpdate = currentTime;
+        return deltaTime;
+    }
+    processCooldowns(deltaTime){ //Decrements cooldowns, and deletes them from cooldown list if needed.
+        for (var i = 0; i < this.cooldowns.length; i++) {
+            if (this.cooldowns[i].decrementCooldown(deltaTime)) {//will be true if remainingtime == 0.
+                this.cooldowns.splice(i, 1);
+            }
+        }
+    }
 
+    checkForId(id) { //check if attack is on cooldown (in array).
+        for (var i = 0; i < this.cooldowns.length; i++) {
+            if (this.cooldowns.id == id) {
+                return true;
+            }
+            return false;
+        }
+    }
+    addCooldown(attack) {
+        //NOTE: multiply baseCooldown by masquerade.
+        this.cooldowns.push(new CooldownDate(attack.id, attack.baseCooldown));
+    }
 }
-class CooldownData{
-    
+//Contains data about cooldown things. Decrements its own remainingTime.
+class CooldownData {
+    constructor(id, duration) {
+        this.id = id;
+        this.remainingTime = duration;
+    }
+    //returns whether or not the cooldown is 0.
+    decrementCooldown(deltaTime) {
+        this.remainingTime = Math.max(this.remainingTime - deltaTime, 0);
+        return (this.remainingTime == 0);
+    }
 }
-
 
 //==============================================================Global functions
 function randInt(max) { //Random function, maximum inclusive.

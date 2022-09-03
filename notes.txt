@@ -47,3 +47,6 @@ Some ideas about attack effects.
 
 some attacks are not attacks at all, but pure buffs or debuffs.
 0 basedamage, 0 channelling
+
+Credits:
+Dapper Dino for his cooldown system.
