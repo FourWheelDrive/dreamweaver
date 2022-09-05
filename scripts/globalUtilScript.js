@@ -66,13 +66,19 @@ class Entity {
     }
 
     changeHealth(difference, target) {
-        target.health = target.health - difference;
-        //depending on who got hit, change the health display.
-        if (target instanceof Player) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
-        }
-        if (target instanceof Enemy) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
+        if (target.status != "parrying") {
+            target.health = target.health - difference;
+            //depending on who got hit, change the health display.
+            if (target instanceof Player) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
+            }
+            if (target instanceof Enemy) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
+            }
+            return false;
+        } else {
+            //if the player is parrying, return failed attack.
+            return true;
         }
     }
     changeStatus(newStatus, caller) {
@@ -168,6 +174,7 @@ class Attack {
 
         //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
         var tempAppliedStatus;
+        //Step 1: Apply changes to game and Entities.
         switch (this.effect) {
             case "none": //standard damaging attack.
                 //Timeout with sleep().
@@ -177,9 +184,8 @@ class Attack {
                     await sleep(this.baseChannelling * 1000);
                 }
                 tempAppliedStatus = "attacking";
-                caller.changeStatus(tempAppliedStatus, caller);
+                var attackParried = caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
                 target.changeHealth(this.baseDamage, target);
-                await sleep(300); //just for reaction's sake.
                 break;
             case "parry":
                 if (this.baseChannelling != 0) {
@@ -191,10 +197,45 @@ class Attack {
                 await sleep(this.baseEffectDuration * 1000);
                 break;
             case "heal":
+                if (this.baseChannelling != 0) {
+                    caller.changeStatus("channelling", caller);
+                    await sleep(this.baseChannelling * 1000);
+                }
+                tempAppliedStatus = "healing";
+                caller.changeStatus(tempAppliedStatus, caller);
+                target.changeHealth(this.baseDamage, caller); //health applied to self.
                 break;
         }
+        //step 2: Display
+        switch (this.effect) {
+            case "none":
+                if (caller instanceof Player) {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You hit the enemy for ${this.baseDamage} damage!`
+                }
+                if (caller instanceof Enemy) {
+                    if (attackParried) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `The enemy hit you for ${this.baseDamage} damage!`
+                    } else if (!attackParried) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You parried the enemy attack.`
+                    }
+                }
+
+                //just for reaction's sake, show attack status.
+                await sleep(300);
+                break;
+            case "heal":
+                //Output n stuff for the player.
+                if (caller instanceof Player) {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You recovered ${-1*this.baseDamage} health.`
+                }
+                if (caller instanceof Enemy) {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `The enemy recovered ${-1*this.baseDamage} health.`
+                }
+                break;
+        }
+        //Step 3: Reset canvas.
         //after action, check if the move hasn't been interrupted and reset status.
-        if(caller.status == tempAppliedStatus){
+        if (caller.status == tempAppliedStatus) {
             caller.changeStatus("", caller);
         }
     }
