@@ -44,7 +44,7 @@ function clearPlayer(player, mapArray) {
     }
 }
 
-function initializeGame() {
+async function initializeGame() {
     //create map for new room.
     var mapWidth = 31, mapHeight = 31;
     var maxTunnels = 80, maxLength = 10;
@@ -52,7 +52,7 @@ function initializeGame() {
 
     //init player
     var player = new Player(10, "@");
-    var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 0));
+    var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 1)); //enemy attacks should always channel.
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
     player.addNewAttack(new Attack("Test Attack", 1, 2, 0));
@@ -76,6 +76,10 @@ function initializeGame() {
     document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
     //Hover listener.
     setHoverListener(mapArray);
+
+    await sleep(3000);
+    enemy.encounterBegins(player, enemy, cooldownHandler);
+    //console.log("Fight starts!")
 }
 
 /*List of attack templates.

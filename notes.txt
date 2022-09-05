@@ -41,6 +41,8 @@ To-Do:
     - check if need var to track moves since last battle.
 - OKAY what the shit, the cooldown system isn't even working. We don't need it, because the button just gets setTimeout(disabled)ed.
     - Do we need the cooldown system?
+    - yeah, we might. Long-multi battle cooldowns might still need to be reset, unless i can find a way to fix that.
+        - Make healing moves hard to come by. They should sacrifice a lot of sustainability.
 
 
 Some ideas about attack effects.

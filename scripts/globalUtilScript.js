@@ -81,7 +81,10 @@ class Entity {
             return true;
         }
     }
-    changeStatus(newStatus, caller) {
+    changeStatus(newStatus, caller, id = -1) {
+        if (newStatus == "channelling" && caller instanceof Player) { //for channelled attacks, update the global channelled attack id.
+            game.channelledID = id;
+        }
         caller.status = newStatus;
         //depending on caller, update statusLine.
         if (caller instanceof Player) {
@@ -136,7 +139,29 @@ class Player extends Entity {
 class Enemy extends Entity {
     constructor(health, canvasSymbol, attack) {
         super(health, canvasSymbol);
-        this.attacks = attack;
+        this.attack = attack;
+        this.attackInterval;
+    }
+
+    //also initializes the encounter screen.
+    async encounterBegins(player, enemy, cooldownHandler) {
+        //initialize screen
+        document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
+
+        await sleep(1000); //1 second grace.
+
+        this.attackInterval = setInterval(async () => {
+            this.attack.attackProcced(enemy, player, cooldownHandler);
+        }, this.attack.baseCooldown * 1000);
+    }
+    //reset the encounter screen.
+    encounterEnds() {
+        clearInterval(this.attackInterval);
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
     }
 }
 
@@ -164,7 +189,7 @@ class Attack {
         Attacking       - Attack hits, do damage.
         Cooldown        - Cooldown begins after proc. Can't be procced in this time.
         */
-        this.status = "idle";
+        this.status = "idle"; //use in cooldown system.
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
@@ -174,62 +199,58 @@ class Attack {
 
         //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
         var tempAppliedStatus;
-        //Step 1: Apply changes to game and Entities.
+        var attackParried;
+        //Step 0: await channelling.
+        //Timeout with sleep().
+        //NOTE: It's possible I could await a setTimeout here.
+        if (this.baseChannelling != 0) {
+            caller.changeStatus("channelling", caller, this.id);
+            await sleep(this.baseChannelling * 1000);
+        }
+        //Step 1: Apply changes to game and Entities. After channelling, attack, and then (step 2) update display.
         switch (this.effect) {
             case "none": //standard damaging attack.
-                //Timeout with sleep().
-                //NOTE: It's possible I could await a setTimeout here.
-                if (this.baseChannelling != 0) {
-                    caller.changeStatus("channelling", caller);
-                    await sleep(this.baseChannelling * 1000);
+                //always check if the channeling has been interrupted.
+                //if the player is channelling AND the channelled id is current attack.
+                if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
+                    tempAppliedStatus = "attacking";
+                    caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
+                    attackParried = target.changeHealth(this.baseDamage, target);
+
+                    //Step 2: update display.
+                    if (caller instanceof Player) {
+                        this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
+                    }
+                    if (caller instanceof Enemy) {
+                        if (!attackParried) {
+                            this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
+                        } else if (attackParried) {
+                            this.canvasOutput(`You parried the enemy attack.`);
+                        }
+                    }
+                    //just for reaction's sake, show attack status.
+                    await sleep(300);
                 }
-                tempAppliedStatus = "attacking";
-                var attackParried = caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
-                target.changeHealth(this.baseDamage, target);
                 break;
             case "parry":
-                if (this.baseChannelling != 0) {
-                    caller.changeStatus("channelling", caller);
-                    await sleep(this.baseChannelling * 1000);
-                }
                 tempAppliedStatus = "parrying";
                 caller.changeStatus(tempAppliedStatus, caller);
                 await sleep(this.baseEffectDuration * 1000);
                 break;
             case "heal":
-                if (this.baseChannelling != 0) {
-                    caller.changeStatus("channelling", caller);
-                    await sleep(this.baseChannelling * 1000);
-                }
-                tempAppliedStatus = "healing";
-                caller.changeStatus(tempAppliedStatus, caller);
-                target.changeHealth(this.baseDamage, caller); //health applied to self.
-                break;
-        }
-        //step 2: Display
-        switch (this.effect) {
-            case "none":
-                if (caller instanceof Player) {
-                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You hit the enemy for ${this.baseDamage} damage!`
-                }
-                if (caller instanceof Enemy) {
-                    if (attackParried) {
-                        document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `The enemy hit you for ${this.baseDamage} damage!`
-                    } else if (!attackParried) {
-                        document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You parried the enemy attack.`
-                    }
-                }
+                //always check if the channeling has been interrupted.
+                if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
+                    tempAppliedStatus = "healing";
+                    caller.changeStatus(tempAppliedStatus, caller);
+                    target.changeHealth(this.baseDamage, caller); //health applied to self.
 
-                //just for reaction's sake, show attack status.
-                await sleep(300);
-                break;
-            case "heal":
-                //Output n stuff for the player.
-                if (caller instanceof Player) {
-                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `You recovered ${-1*this.baseDamage} health.`
-                }
-                if (caller instanceof Enemy) {
-                    document.getElementById("gamePage__gameSpace__encounter__canvas__output").innerHTML = `The enemy recovered ${-1*this.baseDamage} health.`
+                    //Step 2: update display
+                    if (caller instanceof Player) {
+                        this.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
+                    }
+                    if (caller instanceof Enemy) {
+                        this.canvasOutput(`The enemy recovered ${-1 * this.baseDamage} health.`);
+                    }
                 }
                 break;
         }
@@ -237,6 +258,20 @@ class Attack {
         //after action, check if the move hasn't been interrupted and reset status.
         if (caller.status == tempAppliedStatus) {
             caller.changeStatus("", caller);
+        }
+    }
+    canvasOutput(newMessage) {
+        var outputs = [document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1"),
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2"),
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3")];
+
+        for (var i = outputs.length - 1; i > -1; i--) {
+            if (i > 0) {
+                outputs[i].innerHTML = outputs[i - 1].innerHTML;
+            }
+            if (i == 0) {
+                outputs[i].innerHTML = newMessage;
+            }
         }
     }
 }
@@ -263,6 +298,7 @@ class Game {
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
 
         this.nextAttackObjectID = 1;                        //increments as attacks are created.
+        this.channelledID;
 
         //flags.
         this.attacksLocked = true;
