@@ -75,6 +75,16 @@ class Entity {
             document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
         }
     }
+    changeStatus(newStatus, caller) {
+        caller.status = newStatus;
+        //depending on caller, update statusLine.
+        if (caller instanceof Player) {
+            document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = caller.status;
+        }
+        if (caller instanceof Enemy) {
+            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = caller.status;
+        }
+    }
 }
 
 class Player extends Entity {
@@ -140,7 +150,7 @@ class Attack {
         - Stun: for a certain number of attacks, attack does not land.
         */
         this.effect = effect;
-        this.effectDuration = effectDuration;
+        this.baseEffectDuration = effectDuration;
 
         /*Attacks have four phases:
         Idle            - ready to be procced
@@ -152,36 +162,41 @@ class Attack {
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
-    attackProcced(caller, target, cooldownHandler) {
+    async attackProcced(caller, target, cooldownHandler) {
         //NOTE: also needs to apply effects.
-        //no need to check if on cooldown. button gets disabled.
-        this.goOnCooldown(caller); //cool down FIRST.
-        //case 1: player's attack.
-        if (caller instanceof Player) {
-            caller.status = "chanelling";
-            var attackTimeout = setTimeout(target.changeHealth, this.baseChannelling * 1000, this.baseDamage, target);
-            //NOTE: apply effects here too.
-            caller.status = "";
-        }
-        //case 2: enemy's attack.
-        if (caller instanceof Enemy) {
-            //NOTE: baseChannelling, baseDamage need to be multiplied.
-            //NOTE: Figure out a consolidated place to put these multipliers.
-            caller.status = "chanelling";
-            var attackTimeout = setTimeout(target.changeHealth, this.baseChannelling * 1000, this.baseDamage, target);
-            //NOTE: apply effects here too.
-            caller.status = "";
-        }
-    }
-    //After attack is procced, call cooldown.
-    goOnCooldown(caller) {
-        //NOTE: cooldown pseudocode.
-        //Make a cooldownData object for this attack.
-        //Append to cooldownHandler.
-        //watch video for further instructions. (wait until cd done, undisable attack?)
-        //      proposition: after cd done, remove this from cooldownHandler. 
-        //      Check for attack in cdHandler to see if it can be procced or not.
+        //no need to check if on cooldown. button gets disabled with animation.
 
+        //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
+        var tempAppliedStatus;
+        switch (this.effect) {
+            case "none": //standard damaging attack.
+                //Timeout with sleep().
+                //NOTE: It's possible I could await a setTimeout here.
+                if (this.baseChannelling != 0) {
+                    caller.changeStatus("channelling", caller);
+                    await sleep(this.baseChannelling * 1000);
+                }
+                tempAppliedStatus = "attacking";
+                caller.changeStatus(tempAppliedStatus, caller);
+                target.changeHealth(this.baseDamage, target);
+                await sleep(300); //just for reaction's sake.
+                break;
+            case "parry":
+                if (this.baseChannelling != 0) {
+                    caller.changeStatus("channelling", caller);
+                    await sleep(this.baseChannelling * 1000);
+                }
+                tempAppliedStatus = "parrying";
+                caller.changeStatus(tempAppliedStatus, caller);
+                await sleep(this.baseEffectDuration * 1000);
+                break;
+            case "heal":
+                break;
+        }
+        //after action, check if the move hasn't been interrupted and reset status.
+        if(caller.status == tempAppliedStatus){
+            caller.changeStatus("", caller);
+        }
     }
 }
 
@@ -324,7 +339,7 @@ class MinorEncounterCell extends Cell {
     }
 }
 
-//=====================================================COOLDOWN classes
+//==========NOT CURRENTLY IN USE.==================COOLDOWN classes
 //Contains array of cooldownData. Has a clock that decrements cooldowns each tick.
 class CooldownHandler {
     constructor() {
@@ -383,7 +398,7 @@ class CooldownData {
 function randInt(max) { //Random function, maximum inclusive.
     return Math.floor(Math.random() * (max + 1));
 }
-function sleep(ms) {
+async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function calcPythagDistance(coordSetOne, coordSetCenter) {

@@ -54,9 +54,10 @@ function initializeGame() {
     var player = new Player(10, "@");
     var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 0));
 
-    player.addNewAttack(new Attack("Test Attack", 1, 2, 0, "none", 0));
+    //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
+    player.addNewAttack(new Attack("Test Attack", 1, 2, 0));
     player.addNewAttack(new Attack("Test Parry", 0, 2, 0, "parry", 1));
-    player.addNewAttack(new Attack("Test H. Attack", 2, 4, 0, "none", 0));
+    player.addNewAttack(new Attack("Test H. Attack", 2, 4, 2));
     player.addNewAttack(new Attack("Test Heal", -1, 3, 1, "heal", 0));
 
     player.getInitialPosition(mapWidth, mapHeight);

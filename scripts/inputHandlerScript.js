@@ -175,14 +175,12 @@ async function playerAttackHandler(player, enemy, cooldownHandler, e) {
     attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
 }
 
+//plays animation. Also disables button: cooldown
 function attackButtonCooldownAnimation(buttonId, time) {
     let button = document.getElementById(buttonId);
     let timer = button.querySelector(".encounterButton__progress");
 
     if (!button.disabled && game.gameState == "encounter") {
-        //Cooldown the button while animation takes place.
-        button.disabled = true;
-        setTimeout(function () { button.disabled = false; }, time * 1000);
 
         //Animation!
         timer.style.transition = "none"; //no animation.
@@ -193,6 +191,9 @@ function attackButtonCooldownAnimation(buttonId, time) {
         timer.style.width = "0%";
         flushCSS(timer);
     }
+    //Cooldown the button while animation takes place.
+    button.disabled = true;
+    setTimeout(function () { button.disabled = false; }, time * 1000);
 }
 function flushCSS(element) { //flushes css to no transition.
     element.offsetHeight;
