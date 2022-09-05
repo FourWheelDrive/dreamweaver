@@ -53,6 +53,12 @@ function initializeGame() {
     //init player
     var player = new Player(10, "@");
     var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 0));
+
+    player.addNewAttack(new Attack("Test Attack", 1, 2, 0, "none", 0));
+    player.addNewAttack(new Attack("Test Parry", 0, 2, 0, "parry", 1));
+    player.addNewAttack(new Attack("Test H. Attack", 2, 4, 0, "none", 0));
+    player.addNewAttack(new Attack("Test Heal", -1, 3, 1, "heal", 0));
+
     player.getInitialPosition(mapWidth, mapHeight);
     showPlayer(player);
 
@@ -63,10 +69,10 @@ function initializeGame() {
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player, enemy), false);
     //Add listeners to attack buttons.
-    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
-    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
-    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
-    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, player, enemy));
+    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
     //Hover listener.
     setHoverListener(mapArray);
 }

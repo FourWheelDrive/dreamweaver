@@ -31,13 +31,16 @@ General planning:
 Notes:
 - //TAG: TEST OUTPUT
 Search for this ^ for all console.log debugging.
-
+- //TAG: EXTENSION
+Seatch for this ^ for all questions that can be used to learn later.
 
 To-Do:
 - See class CELL for some ideas about cell.name!
 - Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.
 - Check which vars in class GAME actually matter. Also name them better.
     - check if need var to track moves since last battle.
+- OKAY what the shit, the cooldown system isn't even working. We don't need it, because the button just gets setTimeout(disabled)ed.
+    - Do we need the cooldown system?
 
 
 Some ideas about attack effects.

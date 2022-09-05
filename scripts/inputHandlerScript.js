@@ -150,8 +150,29 @@ async function playerMovementHandler(e, mapArray, player) {
     }
 }
 
-async function playerAttackHandler(player, enemy, e) {
-    attackButtonCooldownAnimation(e.currentTarget.id, 3);
+async function playerAttackHandler(player, enemy, cooldownHandler, e) {
+    var tempCooldown;
+    //NOTE: baseCooldown needs masq multiplier.
+    //based on the attack procced, do stuff.
+    switch (e.target.id) {
+        case "gamePage__gameSpace__encounter__menu__button1":
+            player.attacks[0].attackProcced(player, enemy, cooldownHandler);
+            tempCooldown = player.attacks[0].baseCooldown;
+            break;
+        case "gamePage__gameSpace__encounter__menu__button2":
+            player.attacks[1].attackProcced(player, enemy, cooldownHandler);
+            tempCooldown = player.attacks[1].baseCooldown;
+            break;
+        case "gamePage__gameSpace__encounter__menu__button3":
+            player.attacks[2].attackProcced(player, enemy, cooldownHandler);
+            tempCooldown = player.attacks[2].baseCooldown;
+            break;
+        case "gamePage__gameSpace__encounter__menu__button4":
+            player.attacks[3].attackProcced(player, enemy, cooldownHandler);
+            tempCooldown = player.attacks[3].baseCooldown;
+            break;
+    }
+    attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
 }
 
 function attackButtonCooldownAnimation(buttonId, time) {

@@ -66,13 +66,13 @@ class Entity {
     }
 
     changeHealth(difference, target) {
-        this.health = this.health - difference;
+        target.health = target.health - difference;
         //depending on who got hit, change the health display.
         if (target instanceof Player) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = this.health;
+            document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
         }
         if (target instanceof Enemy) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = this.health;
+            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
         }
     }
 }
@@ -94,7 +94,23 @@ class Player extends Entity {
     }
     addNewAttack(newAttack) {
         //NOTE: needs new case for 4+ attacks to go to replace.
+        //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
         this.attacks.push(newAttack);
+        //Update the button displays.
+        switch (this.attacks.length) {
+            case 1:
+                document.getElementById("gamePage__gameSpace__encounter__menu__button1__text").textContent = `${newAttack.name}`;
+                break;
+            case 2:
+                document.getElementById("gamePage__gameSpace__encounter__menu__button2__text").textContent = `${newAttack.name}`;
+                break;
+            case 3:
+                document.getElementById("gamePage__gameSpace__encounter__menu__button3__text").textContent = `${newAttack.name}`;
+                break;
+            case 4:
+                document.getElementById("gamePage__gameSpace__encounter__menu__button4__text").textContent = `${newAttack.name}`;
+                break;
+        }
     }
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
@@ -136,17 +152,26 @@ class Attack {
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
-    attackProcced(caller, target) {
+    attackProcced(caller, target, cooldownHandler) {
         //NOTE: also needs to apply effects.
+        //no need to check if on cooldown. button gets disabled.
+        this.goOnCooldown(caller); //cool down FIRST.
         //case 1: player's attack.
         if (caller instanceof Player) {
-
+            caller.status = "chanelling";
+            var attackTimeout = setTimeout(target.changeHealth, this.baseChannelling * 1000, this.baseDamage, target);
+            //NOTE: apply effects here too.
+            caller.status = "";
         }
         //case 2: enemy's attack.
         if (caller instanceof Enemy) {
-            target.changeHealth(this.baseDamage, target);
+            //NOTE: baseChannelling, baseDamage need to be multiplied.
+            //NOTE: Figure out a consolidated place to put these multipliers.
+            caller.status = "chanelling";
+            var attackTimeout = setTimeout(target.changeHealth, this.baseChannelling * 1000, this.baseDamage, target);
+            //NOTE: apply effects here too.
+            caller.status = "";
         }
-        this.goOnCooldown(caller); //cool down.
     }
     //After attack is procced, call cooldown.
     goOnCooldown(caller) {
@@ -156,6 +181,7 @@ class Attack {
         //watch video for further instructions. (wait until cd done, undisable attack?)
         //      proposition: after cd done, remove this from cooldownHandler. 
         //      Check for attack in cdHandler to see if it can be procced or not.
+
     }
 }
 
@@ -308,7 +334,7 @@ class CooldownHandler {
     }
     initCooldowns() {//sets up clockInterval and calls processCooldowns each tick.
         var deltaTime;
-        this.clockInterval = setInterval(() => {
+        this.clockInterval = setInterval(() => { //<< TAG: EXTENSION: Why does arrow notation allow setInterval scope to work here?
             deltaTime = this.tick();
             this.processCooldowns(deltaTime);
         }, 0);
@@ -319,7 +345,7 @@ class CooldownHandler {
         this.lastUpdate = currentTime;
         return deltaTime;
     }
-    processCooldowns(deltaTime){ //Decrements cooldowns, and deletes them from cooldown list if needed.
+    processCooldowns(deltaTime) { //Decrements cooldowns, and deletes them from cooldown list if needed.
         for (var i = 0; i < this.cooldowns.length; i++) {
             if (this.cooldowns[i].decrementCooldown(deltaTime)) {//will be true if remainingtime == 0.
                 this.cooldowns.splice(i, 1);
