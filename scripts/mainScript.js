@@ -1,5 +1,7 @@
 const windowDirectory = ["map", "encounter", "inventory", "shop"];
 var currentWindowIndex = 0;
+var player;
+var enemy;
 
 //Display position listeners.
 function setHoverListener(mapArray) {
@@ -26,14 +28,14 @@ function setHoverListener(mapArray) {
 }
 
 //Draw and clear player.
-function showPlayer(player) {
+function showPlayer() {
 
     var currentCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
     currentCell.innerHTML = player.canvasSymbol;
     currentCell.style.fontWeight = "900";
     currentCell.style.opacity = "1";
 }
-function clearPlayer(player, mapArray) {
+function clearPlayer(mapArray) {
     var previousCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
     var cellEntity = mapArray[player.mapPosition[0]][player.mapPosition[1]];
     previousCell.innerHTML = cellEntity.symbol;
@@ -51,8 +53,8 @@ async function initializeGame() {
     var mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
 
     //init player
-    var player = new Player(10, "@");
-    var enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 1)); //enemy attacks should always channel.
+    player = new Player(10, "@");
+    enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 1)); //enemy attacks should always channel.
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
     player.addNewAttack(new Attack("Test Attack", 1, 2, 0));
@@ -61,25 +63,21 @@ async function initializeGame() {
     player.addNewAttack(new Attack("Test Heal", -1, 3, 1, "heal", 0));
 
     player.getInitialPosition(mapWidth, mapHeight);
-    showPlayer(player);
+    showPlayer();
 
     //init cooldown modules.
     var cooldownHandler = new CooldownHandler();
     cooldownHandler.initCooldowns();
 
     //Input handler.
-    document.addEventListener("keydown", keyDownHandler.bind(null, mapArray, player, enemy), false);
+    document.addEventListener("keydown", keyDownHandler.bind(null, mapArray), false);
     //Add listeners to attack buttons.
-    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, player, enemy, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
     //Hover listener.
     setHoverListener(mapArray);
-
-    await sleep(3000);
-    enemy.encounterBegins(player, enemy, cooldownHandler);
-    //console.log("Fight starts!")
 }
 
 /*List of attack templates.

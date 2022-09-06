@@ -1,4 +1,4 @@
-async function keyDownHandler(mapArray, player, enemy, e) {
+async function keyDownHandler(mapArray, e) {
     //Window navigation keys.
     //NOTE: needs to be restricted depending on gamestate!
     if ((e.code == "ArrowLeft" || e.code == "ArrowRight") && !e.repeat) {
@@ -12,7 +12,7 @@ async function keyDownHandler(mapArray, player, enemy, e) {
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
     if ((e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") && game.gameState == "movement") {
-        playerMovementHandler(e, mapArray, player);
+        playerMovementHandler(e, mapArray, player, enemy);
     }
     //Encounter keys and keybinds.
     if (game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
@@ -75,8 +75,6 @@ async function windowNavButtonHandler(e) {
                 break;
             case "encounter":
                 document.getElementById("gamePage__gameSpace__encounter").style.display = "grid";
-                //NOTE: remove after testing!!
-                game.gameState = "encounter";
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
@@ -102,7 +100,7 @@ async function windowNavButtonHandler(e) {
     }
 }
 
-async function playerMovementHandler(e, mapArray, player) {
+async function playerMovementHandler(e, mapArray) {
     let boardRows = document.getElementById("gamePage__gameSpace__map").children;
     //very cool directions array! Append each element instead of having 4 switch statements.
     //[left] [right] [up] [down]
@@ -143,36 +141,42 @@ async function playerMovementHandler(e, mapArray, player) {
 
     //Move the player.
     if (newCell != null && newCellEntity instanceof WallCell == false) {
-        clearPlayer(player, mapArray);
+        clearPlayer(mapArray);
         player.mapPosition = [nextCellPos[0], nextCellPos[1]];
         showCellsInVision(5, player.mapPosition[0], player.mapPosition[1], mapArray);
-        showPlayer(player);
+        showPlayer();
+    }
+    //Check if the next cell is an encounter cell.
+    if (newCellEntity instanceof MinorEncounterCell){
+        newCellEntity.firstVisit();
     }
 }
 
-async function playerAttackHandler(player, enemy, cooldownHandler, e) {
+async function playerAttackHandler(cooldownHandler, e) {
     var tempCooldown;
     //NOTE: baseCooldown needs masq multiplier.
     //based on the attack procced, do stuff.
-    switch (e.target.id) {
-        case "gamePage__gameSpace__encounter__menu__button1":
-            player.attacks[0].attackProcced(player, enemy, cooldownHandler);
-            tempCooldown = player.attacks[0].baseCooldown;
-            break;
-        case "gamePage__gameSpace__encounter__menu__button2":
-            player.attacks[1].attackProcced(player, enemy, cooldownHandler);
-            tempCooldown = player.attacks[1].baseCooldown;
-            break;
-        case "gamePage__gameSpace__encounter__menu__button3":
-            player.attacks[2].attackProcced(player, enemy, cooldownHandler);
-            tempCooldown = player.attacks[2].baseCooldown;
-            break;
-        case "gamePage__gameSpace__encounter__menu__button4":
-            player.attacks[3].attackProcced(player, enemy, cooldownHandler);
-            tempCooldown = player.attacks[3].baseCooldown;
-            break;
+    if (game.gameState == "encounter") {
+        switch (e.target.id) {
+            case "gamePage__gameSpace__encounter__menu__button1":
+                player.attacks[0].attackProcced(player, enemy, cooldownHandler);
+                tempCooldown = player.attacks[0].baseCooldown;
+                break;
+            case "gamePage__gameSpace__encounter__menu__button2":
+                player.attacks[1].attackProcced(player, enemy, cooldownHandler);
+                tempCooldown = player.attacks[1].baseCooldown;
+                break;
+            case "gamePage__gameSpace__encounter__menu__button3":
+                player.attacks[2].attackProcced(player, enemy, cooldownHandler);
+                tempCooldown = player.attacks[2].baseCooldown;
+                break;
+            case "gamePage__gameSpace__encounter__menu__button4":
+                player.attacks[3].attackProcced(player, enemy, cooldownHandler);
+                tempCooldown = player.attacks[3].baseCooldown;
+                break;
+        }
+        attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
     }
-    attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
 }
 
 //plays animation. Also disables button: cooldown

@@ -144,24 +144,12 @@ class Enemy extends Entity {
     }
 
     //also initializes the encounter screen.
-    async encounterBegins(player, enemy, cooldownHandler) {
-        //initialize screen
-        document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
-        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
-
-        await sleep(1000); //1 second grace.
-
+    async beginAttackSequence(cooldownHandler) {
         this.attackInterval = setInterval(async () => {
-            this.attack.attackProcced(enemy, player, cooldownHandler);
+            if (game.gameState == "encounter") {
+                this.attack.attackProcced(enemy, player, cooldownHandler);
+            }
         }, this.attack.baseCooldown * 1000);
-    }
-    //reset the encounter screen.
-    encounterEnds() {
-        clearInterval(this.attackInterval);
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
-        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
     }
 }
 
@@ -319,6 +307,35 @@ class Game {
         //shop inventory.
         this.shopInventory = [];
     }
+    async encounterBegins() {
+        //get a new enemy.
+        //NOTE: changes depending on room, as well as cell.
+        enemy = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1));
+        //initialize screen
+        document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
+        this.gameState = "encounter";
+
+        //actually big brain this one, automatically switch to encounter screen.
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
+
+        await sleep(1000); //1 second grace.
+        enemy.beginAttackSequence();
+    }
+    //reset things.
+    //NOTE: needs to check whether player or enemy died to increase Masq or give rewards.
+    encounterEnds() {
+        clearInterval(enemy.attackInterval);
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
+
+        //TAG: TESTING 
+        this.gameState = "movement";
+    }
 }
 
 //=====================================================CELL-based classes
@@ -382,6 +399,13 @@ class Cell {
         }
     }
 }
+class WallCell extends Cell {
+    constructor(positionX, positionY) {
+        super(positionX, positionY);
+        this.name = "";
+        this.symbol = "#";
+    }
+}
 class PathCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
@@ -396,13 +420,7 @@ class PathCell extends Cell {
         this.symbol = super.cellSymbolGenerator("path", game.currentRoom);
     }
 }
-class WallCell extends Cell {
-    constructor(positionX, positionY) {
-        super(positionX, positionY);
-        this.name = "";
-        this.symbol = "#";
-    }
-}
+
 class MinorEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
@@ -412,9 +430,11 @@ class MinorEncounterCell extends Cell {
         this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
     firstVisit() { //Start encounter.
-
+        game.encounterBegins();
     }
 }
+
+
 
 //==========NOT CURRENTLY IN USE.==================COOLDOWN classes
 //Contains array of cooldownData. Has a clock that decrements cooldowns each tick.
