@@ -195,29 +195,33 @@ class Attack {
             caller.changeStatus("channelling", caller, this.id);
             await sleep(this.baseChannelling * 1000);
         }
-        //Step 1: Apply changes to game and Entities. After channelling, attack, and then (step 2) update display.
+
+        //Step 1: Apply changes to game and Entities. After channelling, attack
+        //Step 2: Update display elements
         switch (this.effect) {
             case "none": //standard damaging attack.
                 //always check if the channeling has been interrupted.
+
                 //if the player is channelling AND the channelled id is current attack.
-                if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
+                console.log(game.channelledID)
+                if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                    tempAppliedStatus = "attacking";
+                    target.changeHealth(this.baseDamage, target);
+                    //Step 2: update display.
+                    this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
+                    //just for reaction's sake, show attack status.
+                    await sleep(300);
+                }
+
+                if (caller instanceof Enemy) {
                     tempAppliedStatus = "attacking";
                     caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
                     attackParried = target.changeHealth(this.baseDamage, target);
-
-                    //Step 2: update display.
-                    if (caller instanceof Player) {
-                        this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
+                    if (!attackParried) {
+                        this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
+                    } else if (attackParried) {
+                        this.canvasOutput(`You parried the enemy attack.`);
                     }
-                    if (caller instanceof Enemy) {
-                        if (!attackParried) {
-                            this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
-                        } else if (attackParried) {
-                            this.canvasOutput(`You parried the enemy attack.`);
-                        }
-                    }
-                    //just for reaction's sake, show attack status.
-                    await sleep(300);
                 }
                 break;
             case "parry":

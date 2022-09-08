@@ -11,7 +11,7 @@ async function keyDownHandler(mapArray, e) {
     }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
-    if ((e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") && game.gameState == "movement") {
+    if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
         playerMovementHandler(e, mapArray, player, enemy);
     }
     //Encounter keys and keybinds.
@@ -78,7 +78,6 @@ async function windowNavButtonHandler(e) {
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
-                game.gameState = "inventory";
                 break;
             case "shop":
                 document.getElementById("gamePage__gameSpace__shop").style.display = "block";
