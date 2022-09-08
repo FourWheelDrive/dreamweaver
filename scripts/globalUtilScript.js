@@ -68,6 +68,13 @@ class Entity {
     changeHealth(difference, target) {
         if (target.status != "parrying") {
             target.health = target.health - difference;
+
+            //TAG: FLAG CHECK
+            //Check if encounter ends. If target health <= 0.
+            if(target.health <= 0){
+                game.encounterEnds();
+            }
+
             //depending on who got hit, change the health display.
             if (target instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
@@ -276,12 +283,21 @@ Contents [class GAME]:
 class Game {
     constructor() {
         this.gameState = "movement";
+        this.windowState = "movement";
         /*
-        game.gameState values:
-        movement
-        encounter
-        inventory
-        shop
+        CHANGES TO GAME.GAMESTATE.
+        game.gameState tracks what the game is doing right now.
+        - Movement Phase
+        - Encounter Phase
+        - Camp Phase (end of room)
+
+        window.windowState tracks which screen the player is on.
+        - Map
+        - Fight
+        - Inventory
+        - Shop
+
+        Use these in conjunction to flag which events are and aren't allowed to fire.
         */
 
         this.currentRoom = 1;
@@ -330,6 +346,7 @@ class Game {
     }
     //reset things.
     //NOTE: needs to check whether player or enemy died to increase Masq or give rewards.
+    //NOTE: also needs to show rewards dialogue.
     encounterEnds() {
         clearInterval(enemy.attackInterval);
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
@@ -337,8 +354,12 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
 
-        //TAG: TESTING 
+        //TAG: TESTING
         this.gameState = "movement";
+        //auto switch back to the map.
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
     }
 }
 
