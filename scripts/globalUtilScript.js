@@ -71,7 +71,7 @@ class Entity {
 
             //TAG: FLAG CHECK
             //Check if encounter ends. If target health <= 0.
-            if(target.health <= 0){
+            if (target.health <= 0) {
                 game.encounterEnds();
             }
 
@@ -210,24 +210,26 @@ class Attack {
                 //always check if the channeling has been interrupted.
 
                 //if the player is channelling AND the channelled id is current attack.
-                console.log(game.channelledID)
-                if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
-                    tempAppliedStatus = "attacking";
-                    target.changeHealth(this.baseDamage, target);
-                    //Step 2: update display.
-                    this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
-                    //just for reaction's sake, show attack status.
-                    await sleep(300);
-                }
+                //Blanket check if encounter is still ongoing and if player is not in inventory.
+                if (game.gameState == "encounter" && game.windowState == "fight") {
+                    if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                        tempAppliedStatus = "attacking";
+                        target.changeHealth(this.baseDamage, target);
+                        //Step 2: update display.
+                        this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
+                        //just for reaction's sake, show attack status.
+                        await sleep(300);
+                    }
 
-                if (caller instanceof Enemy) {
-                    tempAppliedStatus = "attacking";
-                    caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
-                    attackParried = target.changeHealth(this.baseDamage, target);
-                    if (!attackParried) {
-                        this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
-                    } else if (attackParried) {
-                        this.canvasOutput(`You parried the enemy attack.`);
+                    if (caller instanceof Enemy) {
+                        tempAppliedStatus = "attacking";
+                        caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
+                        attackParried = target.changeHealth(this.baseDamage, target);
+                        if (!attackParried) {
+                            this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
+                        } else if (attackParried) {
+                            this.canvasOutput(`You parried the enemy attack.`);
+                        }
                     }
                 }
                 break;
@@ -283,7 +285,7 @@ Contents [class GAME]:
 class Game {
     constructor() {
         this.gameState = "movement";
-        this.windowState = "movement";
+        this.windowState = "map";
         /*
         CHANGES TO GAME.GAMESTATE.
         game.gameState tracks what the game is doing right now.
@@ -292,10 +294,10 @@ class Game {
         - Camp Phase (end of room)
 
         window.windowState tracks which screen the player is on.
-        - Map
-        - Fight
-        - Inventory
-        - Shop
+        - map
+        - fight
+        - inventory
+        - shop
 
         Use these in conjunction to flag which events are and aren't allowed to fire.
         */

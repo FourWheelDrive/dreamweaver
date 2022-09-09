@@ -69,18 +69,19 @@ async function windowNavButtonHandler(e) {
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
                 document.getElementById("gamePage__gameSpace__map").style.display = "flex";
-                if (game.gameState != "encounter") {
-                    game.gameState = "movement";
-                }
+                game.windowState = "map";
                 break;
             case "encounter":
                 document.getElementById("gamePage__gameSpace__encounter").style.display = "grid";
+                game.windowState = "fight";
                 break;
             case "inventory":
                 document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
+                game.windowState = "inventory";
                 break;
             case "shop":
                 document.getElementById("gamePage__gameSpace__shop").style.display = "block";
+                game.windowState = "shop";
                 break;
         }
     }
@@ -146,35 +147,38 @@ async function playerMovementHandler(e, mapArray) {
         showPlayer();
     }
     //Check if the next cell is an encounter cell.
-    if (newCellEntity instanceof MinorEncounterCell){
+    if (newCellEntity instanceof MinorEncounterCell) {
         newCellEntity.firstVisit();
     }
 }
 
 async function playerAttackHandler(cooldownHandler, e) {
-    var tempCooldown;
-    //NOTE: baseCooldown needs masq multiplier.
-    //based on the attack procced, do stuff.
-    if (game.gameState == "encounter") {
-        switch (e.target.id) {
-            case "gamePage__gameSpace__encounter__menu__button1":
-                player.attacks[0].attackProcced(player, enemy, cooldownHandler);
-                tempCooldown = player.attacks[0].baseCooldown;
-                break;
-            case "gamePage__gameSpace__encounter__menu__button2":
-                player.attacks[1].attackProcced(player, enemy, cooldownHandler);
-                tempCooldown = player.attacks[1].baseCooldown;
-                break;
-            case "gamePage__gameSpace__encounter__menu__button3":
-                player.attacks[2].attackProcced(player, enemy, cooldownHandler);
-                tempCooldown = player.attacks[2].baseCooldown;
-                break;
-            case "gamePage__gameSpace__encounter__menu__button4":
-                player.attacks[3].attackProcced(player, enemy, cooldownHandler);
-                tempCooldown = player.attacks[3].baseCooldown;
-                break;
+    //player must be viewing the battle. No attacks can be made from other screens.
+    if (game.windowState == "fight") {
+        var tempCooldown;
+        //NOTE: baseCooldown needs masq multiplier.
+        //based on the attack procced, do stuff.
+        if (game.gameState == "encounter") {
+            switch (e.target.id) {
+                case "gamePage__gameSpace__encounter__menu__button1":
+                    player.attacks[0].attackProcced(player, enemy, cooldownHandler);
+                    tempCooldown = player.attacks[0].baseCooldown;
+                    break;
+                case "gamePage__gameSpace__encounter__menu__button2":
+                    player.attacks[1].attackProcced(player, enemy, cooldownHandler);
+                    tempCooldown = player.attacks[1].baseCooldown;
+                    break;
+                case "gamePage__gameSpace__encounter__menu__button3":
+                    player.attacks[2].attackProcced(player, enemy, cooldownHandler);
+                    tempCooldown = player.attacks[2].baseCooldown;
+                    break;
+                case "gamePage__gameSpace__encounter__menu__button4":
+                    player.attacks[3].attackProcced(player, enemy, cooldownHandler);
+                    tempCooldown = player.attacks[3].baseCooldown;
+                    break;
+            }
+            attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
         }
-        attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
     }
 }
 
