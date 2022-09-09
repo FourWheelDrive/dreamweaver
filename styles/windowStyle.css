@@ -187,6 +187,31 @@
     grid-area: hold2;
 }
 
+/*Results Screen, shares EncounterWindow with Canvas. =================================*/
+#gamePage__gameSpace__encounter__result{
+    display: none;
+    grid-area: canvas;
+
+    border: 1px solid black;
+}
+#gamePage__gameSpace__encounter__result__returnButton{
+    position: relative;
+    background-color: #fff8e0;
+    border: 1px solid black;
+
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 400;
+
+    width: 40%;
+    aspect-ratio: 2/1;
+    margin: auto;
+    margin-top: 5%;
+}
+.resultButtonTest{
+    
+}
+
 /*Inventory Window. ================================*/
 #gamePage__gameSpace__inventory {
     display: none;

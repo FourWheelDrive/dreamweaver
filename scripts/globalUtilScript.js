@@ -141,6 +141,10 @@ class Player extends Entity {
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
+    addWishes(difference){
+        this.wishes = this.wishes + difference;
+        document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+    }
 }
 
 class Enemy extends Entity {
@@ -297,6 +301,8 @@ class Game {
         window.windowState tracks which screen the player is on.
         - map
         - fight
+        - result (win fight, no attacks can be procced)
+        - death (not yet made, on player death.)
         - inventory
         - shop
 
@@ -333,7 +339,7 @@ class Game {
     async encounterBegins() {
         //get a new enemy.
         //NOTE: changes depending on room, as well as cell.
-        enemy = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1));
+        enemy = new Enemy(1, "!", new Attack("basic attack", 1, 2, 1));
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
@@ -358,12 +364,27 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
 
         //NOTE: player loss needs to be completed.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
         if (player.health <= 0) { //player loses, trigger masquerade.
-
+            //Either just blank screen here, or make a new window like the results window.
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
             //NOTE: rewards screen will instead be displayed here. await sleep for now.
-            await sleep(1000);
+            document.getElementById("gamePage__gameSpace__encounter__result").style.display = "grid";
+            game.windowState = "results";
+
+            //Wait until player clicks button to go back.
+            await new Promise(resolve => {
+                document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) =>{
+                    resolve();
+                }, {once: true}); //once: true removes the listener after clicked once.
+                //any key press will remove both eventlisteners.
+                document.addEventListener("keydown", (e) =>{
+                    document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
+                }, {once: true}); //once: true removes the listener after clicked once.
+            })
+            //add money.
+            player.addWishes(1);
         }
 
         this.gameState = "movement";
@@ -371,6 +392,10 @@ class Game {
         do {
             document.getElementById("gamePage__header__left").click();
         } while (document.getElementById("gamePage__gameSpace__map").style.display != "flex")
+
+        //reset encounter screen.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+        document.getElementById("gamePage__gameSpace__encounter__result").style.display = "none";
     }
 }
 
