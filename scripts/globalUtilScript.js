@@ -214,6 +214,7 @@ class Attack {
                 if (game.gameState == "encounter" && game.windowState == "fight") {
                     if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
                         tempAppliedStatus = "attacking";
+                        caller.changeStatus(tempAppliedStatus, caller);
                         target.changeHealth(this.baseDamage, target);
                         //Step 2: update display.
                         this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
@@ -223,8 +224,8 @@ class Attack {
 
                     if (caller instanceof Enemy) {
                         tempAppliedStatus = "attacking";
-                        caller.changeStatus(tempAppliedStatus, caller); //check if the player is parrying or not.
-                        attackParried = target.changeHealth(this.baseDamage, target);
+                        caller.changeStatus(tempAppliedStatus, caller); 
+                        attackParried = target.changeHealth(this.baseDamage, target);//check if the player is parrying or not.
                         if (!attackParried) {
                             this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
                         } else if (attackParried) {
@@ -350,7 +351,6 @@ class Game {
     //NOTE: needs to check whether player or enemy died to increase Masq or give rewards.
     //NOTE: also needs to show rewards dialogue.
     async encounterEnds() {
-        console.log("yeah")
         clearInterval(enemy.attackInterval);
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
