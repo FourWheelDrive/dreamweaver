@@ -32,20 +32,26 @@ Notes:
 - //TAG: TEST OUTPUT
 Search for this ^ for all console.log debugging.
 - //TAG: EXTENSION
-Seatch for this ^ for all questions that can be used to learn later.
+Search for this ^ for all questions that can be used to learn later.
+- //NOTE:
+Search for general notes.
+- //TAG: TO-Do
+Search for this for things to do.
 
 To-Do:
 - See class CELL for some ideas about cell.name!
 - Check which vars in class GAME actually matter. Also name them better.
     - check if need var to track moves since last battle.
 - Enemy and attacks need extra parameters! Messages for encounter and death, descriptions.
+- footer health display has to be updated at the end of encounters.
+- recomment NOTEs.
 
 Shelved To-Do:
 - Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.
 - OKAY what the shit, the cooldown system isn't even working. We don't need it, because the button just gets setTimeout(disabled)ed.
     - Do we need the cooldown system?
     - yeah, we might. Long-multi battle cooldowns might still need to be reset, unless i can find a way to fix that.
-        - Make healing moves hard to come by. They should sacrifice a lot of sustainability.
+        - Make healing moves hard to come by. They should sacrifice a lot for sustainability.
 
 Some ideas about attack effects.
 - Stun
@@ -54,6 +60,3 @@ Some ideas about attack effects.
 
 some attacks are not attacks at all, but pure buffs or debuffs.
 0 basedamage, 0 channelling
-
-Credits:
-Dapper Dino for his cooldown system.

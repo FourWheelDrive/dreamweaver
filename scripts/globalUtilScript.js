@@ -339,7 +339,7 @@ class Game {
     async encounterBegins() {
         //get a new enemy.
         //NOTE: changes depending on room, as well as cell.
-        enemy = new Enemy(1, "!", new Attack("basic attack", 1, 2, 1));
+        enemy = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1));
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
