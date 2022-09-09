@@ -59,29 +59,48 @@ async function windowNavButtonHandler(e) {
     //If the button pressed was to change window, then do this after iterating window index.
     //NOTE: Checks might be made here later for gameState if window switches are valid.
     if (buttonId == "gamePage__header__left" || buttonId == "gamePage__header__right") {
+        var mapWindow = document.getElementById("gamePage__gameSpace__map");
+        var fightWindow = document.getElementById("gamePage__gameSpace__encounter");
+        var inventoryWindow = document.getElementById("gamePage__gameSpace__inventory");
+        var shopWindow = document.getElementById("gamePage__gameSpace__shop");
         //first set all to display none, then display new one.
-        document.getElementById("gamePage__gameSpace__map").style.display = "none";
-        document.getElementById("gamePage__gameSpace__encounter").style.display = "none";
-        document.getElementById("gamePage__gameSpace__inventory").style.display = "none";
-        document.getElementById("gamePage__gameSpace__shop").style.display = "none";
+        //Set all opacity to 1. Will change depending on phase.
+        mapWindow.style.display = "none";
+        fightWindow.style.display = "none";
+        inventoryWindow.style.display = "none";
+        shopWindow.style.display = "none";
+
+        mapWindow.style.opacity = "1";
+        fightWindow.style.opacity = "1";
+        inventoryWindow.style.opacity = "1";
+        shopWindow.style.opacity = "1";
 
         //Show new window.
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
-                document.getElementById("gamePage__gameSpace__map").style.display = "flex";
+                mapWindow.style.display = "flex";
                 game.windowState = "map";
+                if (game.gameState != "movement") { //only valid when moving.
+                    mapWindow.style.opacity = "0.5";
+                }
                 break;
             case "encounter":
-                document.getElementById("gamePage__gameSpace__encounter").style.display = "grid";
+                fightWindow.style.display = "grid";
                 game.windowState = "fight";
+                if (game.gameState != "encounter") { //only valid when fighting.
+                    fightWindow.style.opacity = "0.5";
+                }
                 break;
             case "inventory":
-                document.getElementById("gamePage__gameSpace__inventory").style.display = "block";
+                inventoryWindow.style.display = "block";
                 game.windowState = "inventory";
                 break;
             case "shop":
-                document.getElementById("gamePage__gameSpace__shop").style.display = "block";
+                shopWindow.style.display = "block";
                 game.windowState = "shop";
+                if(game.gameState != "shop"){ //only valid when end of room.
+                    shopWindow.style.opacity = "0.5";
+                }
                 break;
         }
     }

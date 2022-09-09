@@ -291,7 +291,7 @@ class Game {
         game.gameState tracks what the game is doing right now.
         - Movement Phase
         - Encounter Phase
-        - Camp Phase (end of room)
+        - Shop Phase
 
         window.windowState tracks which screen the player is on.
         - map
@@ -349,19 +349,28 @@ class Game {
     //reset things.
     //NOTE: needs to check whether player or enemy died to increase Masq or give rewards.
     //NOTE: also needs to show rewards dialogue.
-    encounterEnds() {
+    async encounterEnds() {
+        console.log("yeah")
         clearInterval(enemy.attackInterval);
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
 
-        //TAG: TESTING
+        //NOTE: player loss needs to be completed.
+        if (player.health <= 0) { //player loses, trigger masquerade.
+
+        }
+        if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
+            //NOTE: rewards screen will instead be displayed here. await sleep for now.
+            await sleep(1000);
+        }
+
         this.gameState = "movement";
         //auto switch back to the map.
         do {
             document.getElementById("gamePage__header__left").click();
-        } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
+        } while (document.getElementById("gamePage__gameSpace__map").style.display != "flex")
     }
 }
 
