@@ -339,7 +339,7 @@ class Game {
     async encounterBegins() {
         //get a new enemy.
         //NOTE: changes depending on room, as well as cell.
-        enemy = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1));
+        enemy = new Enemy(1, "!", new Attack("basic attack", 1, 2, 1));
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
@@ -350,7 +350,6 @@ class Game {
             document.getElementById("gamePage__header__left").click();
         } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
 
-        await sleep(1000); //1 second grace.
         enemy.beginAttackSequence();
     }
     //reset things.
@@ -358,6 +357,8 @@ class Game {
     //NOTE: also needs to show rewards dialogue.
     async encounterEnds() {
         clearInterval(enemy.attackInterval);
+        enemy.attackInterval = null;
+
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";

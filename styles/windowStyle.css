@@ -75,21 +75,25 @@
     max-height: 1em;
     min-height: 1em;
 }
+
 #gamePage__gameSpace__encounter__canvas__player {
     grid-area: player;
     margin-bottom: 0;
 }
+
 #gamePage__gameSpace__encounter__canvas__pbuff {
     grid-area: pbuff;
 }
+
 #gamePage__gameSpace__encounter__canvas__pdebuff {
     grid-area: pdebuff;
 }
+
 #gamePage__gameSpace__encounter__canvas__playerStatus {
     grid-area: pstatus;
 }
 
-#gamePage__gameSpace__encounter__canvas__outputBox{
+#gamePage__gameSpace__encounter__canvas__outputBox {
     grid-area: output;
     display: flex;
     flex-direction: column;
@@ -99,7 +103,8 @@
 
     position: relative;
 }
-.canvasOutput{
+
+.canvasOutput {
     padding: 0;
     margin: 0;
     height: 33%;
@@ -107,10 +112,12 @@
 
     font-size: 15px;
 }
-#gamePage__gameSpace__encounter__canvas__outputBox__output2{
+
+#gamePage__gameSpace__encounter__canvas__outputBox__output2 {
     opacity: 0.7;
 }
-#gamePage__gameSpace__encounter__canvas__outputBox__output3{
+
+#gamePage__gameSpace__encounter__canvas__outputBox__output3 {
     opacity: 0.4;
 }
 
@@ -120,16 +127,20 @@
     max-height: 1em;
     min-height: 1em;
 }
+
 #gamePage__gameSpace__encounter__canvas__enemy {
     grid-area: enemy;
     margin-bottom: 0;
 }
+
 #gamePage__gameSpace__encounter__canvas__ebuff {
     grid-area: ebuff;
 }
+
 #gamePage__gameSpace__encounter__canvas__edebuff {
     grid-area: edebuff;
 }
+
 #gamePage__gameSpace__encounter__canvas__enemyStatus {
     grid-area: estatus;
 }
@@ -138,6 +149,7 @@
     border: 1px solid black;
     margin: 10%;
 }
+
 .debuffStatusDisplay {
     border: 1px dotted black;
     margin: 10%;
@@ -151,6 +163,7 @@
     flex-wrap: wrap;
     justify-content: center;
 }
+
 .encounterButton {
     position: relative;
     background-color: #fff8e0;
@@ -165,6 +178,7 @@
     margin: auto;
     margin-top: 5%;
 }
+
 .encounterButton__progress {
     /*Button cooldown timer!*/
     position: absolute;
@@ -176,25 +190,28 @@
     background: #d6cbab;
     transition: width 1s;
 }
+
 .encounterButton__text {
     position: relative;
 }
 
-#gamePage__gameSpace__encounter__canvas__holder1{
+#gamePage__gameSpace__encounter__canvas__holder1 {
     grid-area: hold1;
 }
-#gamePage__gameSpace__encounter__canvas__holder2{
+
+#gamePage__gameSpace__encounter__canvas__holder2 {
     grid-area: hold2;
 }
 
 /*Results Screen, shares EncounterWindow with Canvas. =================================*/
-#gamePage__gameSpace__encounter__result{
+#gamePage__gameSpace__encounter__result {
     display: none;
     grid-area: canvas;
 
     border: 1px solid black;
 }
-#gamePage__gameSpace__encounter__result__returnButton{
+
+#gamePage__gameSpace__encounter__result__returnButton {
     position: relative;
     background-color: #fff8e0;
     border: 1px solid black;
@@ -204,12 +221,19 @@
     font-weight: 400;
 
     width: 40%;
-    aspect-ratio: 2/1;
     margin: auto;
     margin-top: 5%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
-.resultButtonTest{
-    
+
+.resultButtonTest {
+    text-align: center;
+    margin: 1px;
+    padding: 0px;
 }
 
 /*Inventory Window. ================================*/
