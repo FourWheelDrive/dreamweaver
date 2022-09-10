@@ -78,10 +78,10 @@ class Entity {
             //depending on who got hit, change the health display.
             if (target instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
-                document.getElementById("gamePage__footer__health").innerHTML = target.health;
+                document.getElementById("gamePage__footer__health").innerHTML = `Health: ${target.health}`;
             }
             if (target instanceof Enemy) {
-                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = `Health: ${target.health}`;
+                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
             }
             return false;
         } else {
