@@ -209,6 +209,9 @@
     grid-area: canvas;
 
     border: 1px solid black;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 #gamePage__gameSpace__encounter__result__returnButton {

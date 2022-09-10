@@ -54,7 +54,7 @@ async function initializeGame() {
 
     //init player
     player = new Player(10, "@");
-    enemy = new Enemy(5, "!", new Attack("basic attack", 1, 2, 1)); //enemy attacks should always channel.
+    enemy = null;
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
     player.addNewAttack(new Attack("Test Attack", 1, 2, 0));

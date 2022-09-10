@@ -141,17 +141,21 @@ class Player extends Entity {
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
-    addWishes(difference){
+    addWishes(difference) {
         this.wishes = this.wishes + difference;
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
     }
 }
 
 class Enemy extends Entity {
-    constructor(health, canvasSymbol, attack) {
+    constructor(health, canvasSymbol, attack, contactDialogue = [], defeatDialogue = []) {
         super(health, canvasSymbol);
         this.attack = attack;
         this.attackInterval;
+
+        //for dialogues, pass in arrays! We'll cycle through the array in the output.
+        this.contactDialogue = contactDialogue;
+        this.defeatDialogue = defeatDialogue;
     }
 
     //also initializes the encounter screen.
@@ -221,19 +225,19 @@ class Attack {
                         caller.changeStatus(tempAppliedStatus, caller);
                         target.changeHealth(this.baseDamage, target);
                         //Step 2: update display.
-                        this.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
+                        game.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
                         //just for reaction's sake, show attack status.
                         await sleep(300);
                     }
 
                     if (caller instanceof Enemy) {
                         tempAppliedStatus = "attacking";
-                        caller.changeStatus(tempAppliedStatus, caller); 
+                        caller.changeStatus(tempAppliedStatus, caller);
                         attackParried = target.changeHealth(this.baseDamage, target);//check if the player is parrying or not.
                         if (!attackParried) {
-                            this.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
+                            game.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
                         } else if (attackParried) {
-                            this.canvasOutput(`You parried the enemy attack.`);
+                            game.canvasOutput(`You parried the enemy attack.`);
                         }
                     }
                 }
@@ -252,10 +256,10 @@ class Attack {
 
                     //Step 2: update display
                     if (caller instanceof Player) {
-                        this.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
+                        game.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
                     }
                     if (caller instanceof Enemy) {
-                        this.canvasOutput(`The enemy recovered ${-1 * this.baseDamage} health.`);
+                        game.canvasOutput(`The enemy recovered ${-1 * this.baseDamage} health.`);
                     }
                 }
                 break;
@@ -264,20 +268,6 @@ class Attack {
         //after action, check if the move hasn't been interrupted and reset status.
         if (caller.status == tempAppliedStatus) {
             caller.changeStatus("", caller);
-        }
-    }
-    canvasOutput(newMessage) {
-        var outputs = [document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1"),
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2"),
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3")];
-
-        for (var i = outputs.length - 1; i > -1; i--) {
-            if (i > 0) {
-                outputs[i].innerHTML = outputs[i - 1].innerHTML;
-            }
-            if (i == 0) {
-                outputs[i].innerHTML = newMessage;
-            }
         }
     }
 }
@@ -336,56 +326,94 @@ class Game {
         //shop inventory.
         this.shopInventory = [];
     }
+    canvasOutput(newMessage) {
+        var outputs = [document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1"),
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2"),
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3")];
+
+        for (var i = outputs.length - 1; i > -1; i--) {
+            if (i > 0) {
+                outputs[i].innerHTML = outputs[i - 1].innerHTML;
+            }
+            if (i == 0) {
+                outputs[i].innerHTML = newMessage;
+            }
+        }
+    }
+
     async encounterBegins() {
         //get a new enemy.
         //NOTE: changes depending on room, as well as cell.
-        enemy = new Enemy(1, "!", new Attack("basic attack", 1, 2, 1));
+        enemy = entityDatabase.generateEnemy();
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
-        this.gameState = "encounter";
 
         //actually big brain this one, automatically switch to encounter screen.
+        this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
             document.getElementById("gamePage__header__left").click();
         } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
 
+        //play the opening sequence. Freeze movement.
+        this.gameState = "tempTransition";
+        for (var i = 0; i < enemy.contactDialogue.length; i++) {
+            await sleep(1000);
+            this.canvasOutput(enemy.contactDialogue[i]);
+        }
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = enemy.canvasSymbol;
+        await sleep(1000);
+
+        //Start the fight.
+        this.gameState = "encounter";
         enemy.beginAttackSequence();
     }
     //reset things.
-    //NOTE: needs to check whether player or enemy died to increase Masq or give rewards.
     //NOTE: also needs to show rewards dialogue.
     async encounterEnds() {
         clearInterval(enemy.attackInterval);
         enemy.attackInterval = null;
 
+        //reset canvas.
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
+
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = "";
+
+        document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
+
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+
 
         //NOTE: player loss needs to be completed.
-        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
         if (player.health <= 0) { //player loses, trigger masquerade.
             //Either just blank screen here, or make a new window like the results window.
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
-            //NOTE: rewards screen will instead be displayed here. await sleep for now.
-            document.getElementById("gamePage__gameSpace__encounter__result").style.display = "grid";
             game.windowState = "results";
+            //NOTE: wish calculation algs go here.
+            let newWishes = 1;
+
+            document.getElementById("gamePage__gameSpace__encounter__result").style.display = "flex";
+            //NOTE: could expand later to display more lines of dialogue.
+            document.getElementById("gamePage__gameSpace__encounter__result__message").innerHTML = enemy.defeatDialogue[0];
+            document.getElementById("gamePage__gameSpace__encounter__result__wishesGranted").innerHTML = `You got ${newWishes} Wishes!`
 
             //Wait until player clicks button to go back.
             await new Promise(resolve => {
-                document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) =>{
+                document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) => {
                     resolve();
-                }, {once: true}); //once: true removes the listener after clicked once.
+                }, { once: true }); //once: true removes the listener after clicked once.
                 //any key press will remove both eventlisteners.
-                document.addEventListener("keydown", (e) =>{
+                document.addEventListener("keydown", (e) => {
                     document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
-                }, {once: true}); //once: true removes the listener after clicked once.
+                }, { once: true }); //once: true removes the listener after clicked once.
             })
             //add money.
-            player.addWishes(1);
+            player.addWishes(newWishes);
         }
 
         this.gameState = "movement";
@@ -397,6 +425,26 @@ class Game {
         //reset encounter screen.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
         document.getElementById("gamePage__gameSpace__encounter__result").style.display = "none";
+    }
+}
+
+//=====================================================ENTITYDATABASE class
+/*
+Contents [class ENTITYDATABASE]:
+
+*/
+class EntityDatabase {
+    constructor() { }
+    generateEnemy(tier = 1, type = 1) {
+        var tempEnemyEntity;
+        tempEnemyEntity = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1), ["He's just standing there, menacingly.",
+            "You walk up to him.", "Menacingly."], ["Heheheha! You've won."]);
+
+        return tempEnemyEntity;
+    }
+    //NOTE: bosses will have their own Entity subclass.
+    generateBossEnemy() {
+
     }
 }
 
@@ -570,3 +618,4 @@ function calcPythagDistance(coordSetOne, coordSetCenter) {
 
 //===============================================================Global Variables
 var game = new Game();
+var entityDatabase = new EntityDatabase();

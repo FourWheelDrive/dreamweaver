@@ -45,6 +45,7 @@ To-Do:
 - Enemy and attacks need extra parameters! Messages for encounter and death, descriptions.
 - footer health display has to be updated at the end of encounters.
 - recomment NOTEs.
+- enemy symbol in canvas needs to be updated!
 
 Shelved To-Do:
 - Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.
