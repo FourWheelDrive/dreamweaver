@@ -171,7 +171,7 @@ async function playerMovementHandler(e, mapArray) {
     }
 }
 
-async function playerAttackHandler(cooldownHandler, e) {
+async function playerAttackHandler(e) {
     //player must be viewing the battle. No attacks can be made from other screens.
     if (game.windowState == "fight") {
         var tempCooldown;
@@ -180,19 +180,23 @@ async function playerAttackHandler(cooldownHandler, e) {
         if (game.gameState == "encounter") {
             switch (e.target.id) {
                 case "gamePage__gameSpace__encounter__menu__button1":
-                    player.attacks[0].attackProcced(player, enemy, cooldownHandler);
+                case"gamePage__gameSpace__encounter__menu__button1__text":
+                    player.attacks[0].attackProcced(player, enemy);
                     tempCooldown = player.attacks[0].baseCooldown;
                     break;
                 case "gamePage__gameSpace__encounter__menu__button2":
-                    player.attacks[1].attackProcced(player, enemy, cooldownHandler);
+                case "gamePage__gameSpace__encounter__menu__button2__text":
+                    player.attacks[1].attackProcced(player, enemy);
                     tempCooldown = player.attacks[1].baseCooldown;
                     break;
                 case "gamePage__gameSpace__encounter__menu__button3":
-                    player.attacks[2].attackProcced(player, enemy, cooldownHandler);
+                case "gamePage__gameSpace__encounter__menu__button3__text":
+                    player.attacks[2].attackProcced(player, enemy);
                     tempCooldown = player.attacks[2].baseCooldown;
                     break;
                 case "gamePage__gameSpace__encounter__menu__button4":
-                    player.attacks[3].attackProcced(player, enemy, cooldownHandler);
+                case "gamePage__gameSpace__encounter__menu__button4__text":
+                    player.attacks[3].attackProcced(player, enemy);
                     tempCooldown = player.attacks[3].baseCooldown;
                     break;
             }

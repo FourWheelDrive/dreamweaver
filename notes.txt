@@ -43,9 +43,12 @@ To-Do:
 - Check which vars in class GAME actually matter. Also name them better.
     - check if need var to track moves since last battle.
 - Enemy and attacks need extra parameters! Messages for encounter and death, descriptions.
-- footer health display has to be updated at the end of encounters.
+- footer health display has to be updated when player gets hit.
 - recomment NOTEs.
 - enemy symbol in canvas needs to be updated!
+
+BUGFIXES:
+- FIXED Clicking on combat buttons does not work. Most for test attack. Very weird.
 
 Shelved To-Do:
 - Maybe globalUtilityScript is actually a main.js thing. Move class GAME to main.js, to start.

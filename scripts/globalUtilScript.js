@@ -78,9 +78,10 @@ class Entity {
             //depending on who got hit, change the health display.
             if (target instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
+                document.getElementById("gamePage__footer__health").innerHTML = target.health;
             }
             if (target instanceof Enemy) {
-                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
+                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = `Health: ${target.health}`;
             }
             return false;
         } else {
@@ -196,7 +197,7 @@ class Attack {
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
-    async attackProcced(caller, target, cooldownHandler) {
+    async attackProcced(caller, target) {
         //NOTE: also needs to apply effects.
         //no need to check if on cooldown. button gets disabled with animation.
 

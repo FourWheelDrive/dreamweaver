@@ -72,10 +72,10 @@ async function initializeGame() {
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray), false);
     //Add listeners to attack buttons.
-    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler.bind(null, cooldownHandler), false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler, false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler, false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler, false);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler, false);
     //Hover listener.
     setHoverListener(mapArray);
 }
