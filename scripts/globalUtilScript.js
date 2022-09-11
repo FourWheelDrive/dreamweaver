@@ -131,11 +131,11 @@ class Player extends Entity {
 
         //Update the button displays.
         for (var i = 0; i < this.attacks.length; i++) {
-                if (this.attacks[i] == null) {
-                    document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = "";
-                } else {
-                    document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = `${this.attacks[i].name}`;
-                }
+            if (this.attacks[i] == null) {
+                document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = "";
+            } else {
+                document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = `${this.attacks[i].name}`;
+            }
         }
     }
     getInitialPosition(mapWidth, mapHeight) {
@@ -538,13 +538,18 @@ class PathCell extends Cell {
 class MinorEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
+
+        this.firstVisitFired = false;
     }
     initializeCell() {
         this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
     firstVisit() { //Start encounter.
-        game.encounterBegins();
+        if (this.firstVisitFired == false) {
+            game.encounterBegins();
+            this.firstVisitFired = true;
+        }
     }
 }
 
