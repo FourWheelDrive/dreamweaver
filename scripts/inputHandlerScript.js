@@ -98,7 +98,7 @@ async function windowNavButtonHandler(e) {
             case "shop":
                 shopWindow.style.display = "block";
                 game.windowState = "shop";
-                if(game.gameState != "shop"){ //only valid when end of room.
+                if (game.gameState != "shop") { //only valid when end of room.
                     shopWindow.style.opacity = "0.5";
                 }
                 break;
@@ -180,24 +180,32 @@ async function playerAttackHandler(e) {
         if (game.gameState == "encounter") {
             switch (e.target.id) {
                 case "gamePage__gameSpace__encounter__menu__button1":
-                case"gamePage__gameSpace__encounter__menu__button1__text":
-                    player.attacks[0].attackProcced(player, enemy);
-                    tempCooldown = player.attacks[0].baseCooldown;
+                case "gamePage__gameSpace__encounter__menu__button1__text":
+                    if (player.attacks[0] != null) {
+                        player.attacks[0].attackProcced(player, enemy);
+                        tempCooldown = player.attacks[0].baseCooldown;
+                    }
                     break;
                 case "gamePage__gameSpace__encounter__menu__button2":
                 case "gamePage__gameSpace__encounter__menu__button2__text":
-                    player.attacks[1].attackProcced(player, enemy);
-                    tempCooldown = player.attacks[1].baseCooldown;
+                    if (player.attacks[1] != null) {
+                        player.attacks[1].attackProcced(player, enemy);
+                        tempCooldown = player.attacks[1].baseCooldown;
+                    }
                     break;
                 case "gamePage__gameSpace__encounter__menu__button3":
                 case "gamePage__gameSpace__encounter__menu__button3__text":
-                    player.attacks[2].attackProcced(player, enemy);
-                    tempCooldown = player.attacks[2].baseCooldown;
+                    if (player.attacks[2] != null) {
+                        player.attacks[2].attackProcced(player, enemy);
+                        tempCooldown = player.attacks[2].baseCooldown;
+                    }
                     break;
                 case "gamePage__gameSpace__encounter__menu__button4":
                 case "gamePage__gameSpace__encounter__menu__button4__text":
-                    player.attacks[3].attackProcced(player, enemy);
-                    tempCooldown = player.attacks[3].baseCooldown;
+                    if (player.attacks[3] != null) {
+                        player.attacks[3].attackProcced(player, enemy);
+                        tempCooldown = player.attacks[3].baseCooldown;
+                    }
                     break;
             }
             attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);

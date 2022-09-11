@@ -74,11 +74,15 @@ class Entity {
             if (target.health <= 0) {
                 game.encounterEnds();
             }
+            //Check if healed past maxHealth.
+            if (target instanceof Player && target.health > target.maxHealth) {
+                target.health = target.maxHealth;
+            }
 
             //depending on who got hit, change the health display.
             if (target instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
-                document.getElementById("gamePage__footer__health").innerHTML = `Health: ${target.health}`;
+                document.getElementById("gamePage__footer__health").innerHTML = `Health: ${target.health}/${target.maxHealth}`;
             }
             if (target instanceof Enemy) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
@@ -105,9 +109,10 @@ class Entity {
 }
 
 class Player extends Entity {
-    constructor(health, canvasSymbol) {
-        super(health, canvasSymbol);
-        this.attacks = [];                              //Array of attack objects.
+    constructor(maxHealth, canvasSymbol) {
+        super(maxHealth, canvasSymbol);
+        this.maxHealth = maxHealth;                     //health and maxHealth are set to the same, initially.
+        this.attacks = [null, null, null, null];        //Array of attack objects.
         this.inventory = [];                            //Array of item objects.
         this.masquerade = 0;
         this.wishes = 0;
@@ -115,28 +120,22 @@ class Player extends Entity {
         this.mapPosition = [];
 
         //set up header.
-        document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}`;
+        document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}/${this.maxHealth}`;
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
         document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
     }
-    addNewAttack(newAttack) {
+    addNewAttack(newAttack, position) {
         //NOTE: needs new case for 4+ attacks to go to replace.
         //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
-        this.attacks.push(newAttack);
+        this.attacks[position] = newAttack;
+
         //Update the button displays.
-        switch (this.attacks.length) {
-            case 1:
-                document.getElementById("gamePage__gameSpace__encounter__menu__button1__text").textContent = `${newAttack.name}`;
-                break;
-            case 2:
-                document.getElementById("gamePage__gameSpace__encounter__menu__button2__text").textContent = `${newAttack.name}`;
-                break;
-            case 3:
-                document.getElementById("gamePage__gameSpace__encounter__menu__button3__text").textContent = `${newAttack.name}`;
-                break;
-            case 4:
-                document.getElementById("gamePage__gameSpace__encounter__menu__button4__text").textContent = `${newAttack.name}`;
-                break;
+        for (var i = 0; i < this.attacks.length; i++) {
+                if (this.attacks[i] == null) {
+                    document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = "";
+                } else {
+                    document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = `${this.attacks[i].name}`;
+                }
         }
     }
     getInitialPosition(mapWidth, mapHeight) {
@@ -257,7 +256,11 @@ class Attack {
 
                     //Step 2: update display
                     if (caller instanceof Player) {
-                        game.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
+                        if (caller.health >= caller.maxHealth) {
+                            game.canvasOutput(`You are at max health!`);
+                        } else {
+                            game.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
+                        }
                     }
                     if (caller instanceof Enemy) {
                         game.canvasOutput(`The enemy recovered ${-1 * this.baseDamage} health.`);
