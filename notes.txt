@@ -44,7 +44,7 @@ To-Do:
     - check if need var to track moves since last battle.
 - Enemy and attacks need extra parameters! Messages for encounter and death, descriptions.
 - recomment NOTEs.
-- Player should have a maxHealth stat. Can't heal past this health.
+- Remember to rename everything when the story is written! Not giving away the theme too early.
 
 BUGFIXES:
 - [FIXED] Clicking on combat buttons does not work. Most for test attack. Very weird.

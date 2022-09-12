@@ -92,11 +92,11 @@ async function windowNavButtonHandler(e) {
                 }
                 break;
             case "inventory":
-                inventoryWindow.style.display = "block";
+                inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
                 break;
             case "shop":
-                shopWindow.style.display = "block";
+                shopWindow.style.display = "grid";
                 game.windowState = "shop";
                 if (game.gameState != "shop") { //only valid when end of room.
                     shopWindow.style.opacity = "0.5";

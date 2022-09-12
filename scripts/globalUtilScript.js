@@ -113,7 +113,7 @@ class Player extends Entity {
         super(maxHealth, canvasSymbol);
         this.maxHealth = maxHealth;                     //health and maxHealth are set to the same, initially.
         this.attacks = [null, null, null, null];        //Array of attack objects.
-        this.inventory = [];                            //Array of item objects.
+        this.inventory = [];          //Array of item objects.
         this.masquerade = 0;
         this.wishes = 0;
 
@@ -124,9 +124,14 @@ class Player extends Entity {
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
         document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
     }
+    addToInventory(newObject){
+        this.inventory.push(newObject);
+    }
     addNewAttack(newAttack, position) {
         //NOTE: needs new case for 4+ attacks to go to replace.
         //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
+       
+        //NOTE: IF THE ATTACK IS ALREADY EQUIPPED, CHANGE LAST POSITION (this.attacks) TO NULL.
         this.attacks[position] = newAttack;
 
         //Update the button displays.
@@ -138,6 +143,7 @@ class Player extends Entity {
             }
         }
     }
+
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
@@ -438,7 +444,10 @@ Contents [class ENTITYDATABASE]:
 
 */
 class EntityDatabase {
-    constructor() { }
+    constructor() {
+        this.minorEnemies = []; //NOTE: will also require enemies to have either an ID or a tier of some sort. Some way to say "i want random of this type."
+                                //unless i just make different arrays for different types of enemies? hmmmm.
+    }
     generateEnemy(tier = 1, type = 1) {
         var tempEnemyEntity;
         tempEnemyEntity = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1), ["He's just standing there, menacingly.",
@@ -553,9 +562,29 @@ class MinorEncounterCell extends Cell {
     }
 }
 
+//==============================================================Global functions
+function randInt(max) { //Random function, maximum inclusive.
+    return Math.floor(Math.random() * (max + 1));
+}
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function calcPythagDistance(coordSetOne, coordSetCenter) {
+    var differenceX = (coordSetOne[0] - coordSetCenter[0]);
+    var differenceY = (coordSetOne[1] - coordSetCenter[1]);
+
+    var distanceFromCenter = Math.sqrt((differenceX) ** 2 + (differenceY) ** 2);
+    return distanceFromCenter;
+}
+
+//===============================================================Global Variables
+var game = new Game();
+var entityDatabase = new EntityDatabase();
 
 
-//==========NOT CURRENTLY IN USE.==================COOLDOWN classes
+
+
+//==========NOT CURRENTLY IN USE.=========================================================================COOLDOWN classes
 //Contains array of cooldownData. Has a clock that decrements cooldowns each tick.
 class CooldownHandler {
     constructor() {
@@ -609,22 +638,3 @@ class CooldownData {
         return (this.remainingTime == 0);
     }
 }
-
-//==============================================================Global functions
-function randInt(max) { //Random function, maximum inclusive.
-    return Math.floor(Math.random() * (max + 1));
-}
-async function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-function calcPythagDistance(coordSetOne, coordSetCenter) {
-    var differenceX = (coordSetOne[0] - coordSetCenter[0]);
-    var differenceY = (coordSetOne[1] - coordSetCenter[1]);
-
-    var distanceFromCenter = Math.sqrt((differenceX) ** 2 + (differenceY) ** 2);
-    return distanceFromCenter;
-}
-
-//===============================================================Global Variables
-var game = new Game();
-var entityDatabase = new EntityDatabase();
