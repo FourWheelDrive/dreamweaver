@@ -107,13 +107,16 @@ class Entity {
         }
     }
 }
-
 class Player extends Entity {
     constructor(maxHealth, canvasSymbol) {
         super(maxHealth, canvasSymbol);
         this.maxHealth = maxHealth;                     //health and maxHealth are set to the same, initially.
         this.attacks = [null, null, null, null];        //Array of attack objects.
+
         this.inventory = [];          //Array of item objects.
+        this.inventoryButtonDataArray = []; //Array of class InventoryButtonData.
+        this.inventoryPointerPosition = 0;
+
         this.masquerade = 0;
         this.wishes = 0;
 
@@ -132,7 +135,13 @@ class Player extends Entity {
         //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
        
         //NOTE: IF THE ATTACK IS ALREADY EQUIPPED, CHANGE LAST POSITION (this.attacks) TO NULL.
+        //unequip last attack.
+        let previousAttack = this.attacks[position];
+        if(previousAttack != null){
+            previousAttack.equipped = false;
+        }
         this.attacks[position] = newAttack;
+        newAttack.equipped = true;
 
         //Update the button displays.
         for (var i = 0; i < this.attacks.length; i++) {
@@ -184,6 +193,8 @@ class Attack {
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
         this.baseChannelling = channelling;
+
+        this.equipped = false;                          //identifies whether or not, from inventory, attack is equipped.
 
         /*Currently only one effect exists.
         - None: none.
@@ -281,7 +292,16 @@ class Attack {
         }
     }
 }
+class Item {
 
+}
+
+class InventoryButtonData {//Contains data for inventory item display buttons.
+    constructor(object, buttonID){
+        this.object = object;
+        this.buttonID = buttonID;
+    }
+}
 //=====================================================GAME class
 /*
 Contents [class GAME]:

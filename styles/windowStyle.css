@@ -251,9 +251,6 @@
     grid-template-columns: 1fr 3fr;
     grid-template-rows: 2fr 9fr fit-content(0);
 }
-#gamePage__gameSpace__inventory>*{
-    border: 1px solid red;
-}
 
 #gamePage__gameSpace__inventory__menuTitle {
     grid-area: menuTitle;
@@ -294,13 +291,20 @@
 
     padding: auto; 
     width: 100%;
-    height: 40vh;
+    height: 30vh;
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
     overflow: scroll;
+}
+.inventoryListSection{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
 }
 ::-webkit-scrollbar {
     width: 0px;
@@ -358,7 +362,6 @@
 #gamePage__gameSpace__inventory__statDisplay__damage {grid-area: damage;}
 #gamePage__gameSpace__inventory__statDisplay__channelling {grid-area: channelling;}
 #gamePage__gameSpace__inventory__statDisplay__cooldown {grid-area: cooldown;}
-
 /*Shop Window. ================================*/
 #gamePage__gameSpace__shop {
     display: none;

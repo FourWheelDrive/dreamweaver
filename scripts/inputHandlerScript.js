@@ -9,6 +9,20 @@ async function keyDownHandler(mapArray, e) {
             document.getElementById("gamePage__header__right").click();
         }
     }
+    //Inventory naviation keys.
+    if (game.windowState == "inventory" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
+        switch (e.code) {
+            case "ArrowUp":
+                inventoryPointerPosition = inventoryPointerPosition - 1;
+                if(inventoryPointerPosition < 0){
+                    inventoryPointerPosition = player.inventory.length-1; //not actually true, but same length as button list.
+                }
+                break;
+            case "ArrowDown":
+                inventoryPointerPosition = inventoryPointerPosition + 1;
+                break;
+        }
+    }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
     if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {

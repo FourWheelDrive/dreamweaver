@@ -47,31 +47,17 @@ function clearPlayer(mapArray) {
 }
 
 //inventory screen initialize.
+//global inventory var.
 function initializeInventoryWindow() {
-    var menu = document.getElementById("gamePage__gameSpace__inventory__itemList");
+    var section1Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section1");
+    var section2Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section2");
+    var section3Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section3");
     //First, clear the menu of everything.
     /*while(menu.firstChild){
         menu.removeChild(menu.lastChild);
     }*/
 
-    let marker1 = document.getElementById("gamePage__gameSpace__inventory__itemList__marker1");
-    let marker2 = document.getElementById("gamePage__gameSpace__inventory__itemList__marker2");
-    let marker3 = document.getElementById("gamePage__gameSpace__inventory__itemList__marker3");
     //Add attacks from player.attacks[].
-    for (var i = 0; i < player.attacks.length; i++) {
-        var button = document.createElement("button");
-        //add button element for each non-null attack.
-        if (player.attacks[i] != null) {
-            if (i == 0) {
-                button.innerHTML = `> ${player.attacks[i].name} <`;
-            } else {
-                button.innerHTML = player.attacks[i].name;
-            }
-            button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section1Button-${i}`);
-            button.setAttribute("class", `inventoryMenuButton`);
-            menu.insertBefore(button, marker2);
-        }
-    }
     //Add attacks from player.inventory[].
     //Add items from player.inventory[].
     for (var i = 0; i < player.inventory.length; i++) {
@@ -80,23 +66,38 @@ function initializeInventoryWindow() {
         //check if this is an attack. Depending on class, it will be appended to different sections.
         switch (player.inventory[i].constructor.name) {
             case "Attack":
-                type = "Attack";
-                button.innerHTML = player.inventory[i].name;
-                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section2Button-${i}`);
+                //switch again: equipped and unequipped attacks.
+                switch (player.inventory[i].equipped) {
+                    case true:
+                        type = "Equipped Attack";
+                        button.innerHTML = player.inventory[i].name;
+                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section1__Button${i}`);
+                        break;
+                    case false:
+                        type = "Attack";
+                        button.innerHTML = player.inventory[i].name;
+                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section2__Button${i}`);
+                        break;
+                }
                 break;
             case "Item":
                 type = "Item";
-                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section3Button-${i}`);
+                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section3__Button${i}`);
                 break;
         }
         button.setAttribute("class", `inventoryMenuButton`);
 
         //append depending on type.
-        if (type == "Attack") {
-            menu.insertBefore(button, marker3);
+        if (type == "Equipped Attack") {
+            section1Menu.appendChild(button);
+        } else if (type == "Attack") {
+            section2Menu.appendChild(button);
         } else if (type == "Item") {
-            menu.appendchild(button);
+            section3Menu.appendChild(button);
         }
+        //Append this button to data class and then to player.inventoryButtonDataArray.
+        let tempButtonData = new InventoryButtonData(player.inventory[i], button.id);
+        player.inventoryButtonDataArray.push(tempButtonData);
     }
 }
 
@@ -111,8 +112,10 @@ async function initializeGame() {
     enemy = null;
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
-    player.addNewAttack(new Attack("Test Attack", 1, 2, 0), 0);
-    player.addNewAttack(new Attack("Test Parry", 0, 2, 0, "parry", 1), 1);
+    player.addToInventory(new Attack("Test Attack", 1, 2, 0));
+    player.addToInventory(new Attack("Test Parry", 0, 2, 0, "parry", 1));
+    player.addNewAttack(player.inventory[0], 0);
+    player.addNewAttack(player.inventory[1], 1);
     //player.addNewAttack(new Attack("Test H. Attack", 2, 4, 2), 2);
     //player.addNewAttack(new Attack("Test Heal", -1, 3, 1, "heal", 0), 3);
 
@@ -140,7 +143,7 @@ async function initializeGame() {
     //player.addToInventory(new Attack("Test Heal", -1, 3, 1, "heal", 0));
     initializeInventoryWindow();
 }
-
+ 
 /*List of attack templates.
 new Attack("basic attack", 1, 2, 0);
 new Attack("parry", 0, 0, 0, "parry", 3);
