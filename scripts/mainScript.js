@@ -49,13 +49,33 @@ function clearPlayer(mapArray) {
 //inventory screen initialize.
 //global inventory var.
 function initializeInventoryWindow() {
+    var menu = document.getElementById("gamePage__gameSpace__inventory__itemList");
+
     var section1Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section1");
     var section2Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section2");
     var section3Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section3");
-    //First, clear the menu of everything.
-    /*while(menu.firstChild){
-        menu.removeChild(menu.lastChild);
-    }*/
+
+    var buttons;
+    //clear all inventory buttons.
+    //NOTE: see if this can be done better. Pretty sure this is just... bad. How does this work?
+    for (var j = 0; j < 3; j++) {
+        switch (j) {
+            case 0:
+                buttons = section1Menu.getElementsByTagName('button');
+                break;
+            case 1:
+                buttons = section2Menu.getElementsByTagName("button");
+                break;
+            case 2:
+                buttons = section3Menu.getElementsByTagName("button");
+                break;
+        }
+        //Make a static array. buttons is HTMLcollection, and changes as things are .remove()'d.
+        let tempArray = Array.from(buttons);
+        for (var k = 0; k < tempArray.length; k++) {
+            tempArray[k].remove();
+        }
+    }
 
     //Add attacks from player.attacks[].
     //Add attacks from player.inventory[].
@@ -63,7 +83,7 @@ function initializeInventoryWindow() {
     for (var i = 0; i < player.inventory.length; i++) {
         var button = document.createElement("button");
         var type;
-        //check if this is an attack. Depending on class, it will be appended to different sections.
+        //check if this is an attack. Depending on class, it will be appended to different sections.W
         switch (player.inventory[i].constructor.name) {
             case "Attack":
                 //switch again: equipped and unequipped attacks.
@@ -71,18 +91,18 @@ function initializeInventoryWindow() {
                     case true:
                         type = "Equipped Attack";
                         button.innerHTML = player.inventory[i].name;
-                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section1__Button${i}`);
+                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
                         break;
                     case false:
                         type = "Attack";
                         button.innerHTML = player.inventory[i].name;
-                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section2__Button${i}`);
+                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
                         break;
                 }
                 break;
             case "Item":
                 type = "Item";
-                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__section3__Button${i}`);
+                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
                 break;
         }
         button.setAttribute("class", `inventoryMenuButton`);
@@ -95,9 +115,10 @@ function initializeInventoryWindow() {
         } else if (type == "Item") {
             section3Menu.appendChild(button);
         }
+
         //Append this button to data class and then to player.inventoryButtonDataArray.
         let tempButtonData = new InventoryButtonData(player.inventory[i], button.id);
-        player.inventoryButtonDataArray.push(tempButtonData);
+        player.inventoryDataArray.push(tempButtonData);
     }
 }
 
@@ -143,7 +164,7 @@ async function initializeGame() {
     //player.addToInventory(new Attack("Test Heal", -1, 3, 1, "heal", 0));
     initializeInventoryWindow();
 }
- 
+
 /*List of attack templates.
 new Attack("basic attack", 1, 2, 0);
 new Attack("parry", 0, 0, 0, "parry", 3);

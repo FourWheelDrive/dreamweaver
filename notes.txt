@@ -46,6 +46,22 @@ To-Do:
 - recomment NOTEs.
 - Remember to rename everything when the story is written! Not giving away the theme too early.
 
+
+Inventory requires!
+Navigation
+Display updates
+Loadout changes
+
+Next:
+- Also requires attack descriptions.
+Items!
+- Unique enemies and room procs.
+- Shop system and boss system.
+- Player death & Masquerade mechanic.
+- Buffs and Debuff mechanics.
+
+
+
 BUGFIXES:
 - [FIXED] Clicking on combat buttons does not work. Most for test attack. Very weird.
 

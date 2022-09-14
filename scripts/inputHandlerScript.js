@@ -106,6 +106,7 @@ async function windowNavButtonHandler(e) {
                 }
                 break;
             case "inventory":
+                initializeInventoryWindow(); //update the inventory.
                 inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
                 break;

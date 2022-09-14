@@ -114,7 +114,7 @@ class Player extends Entity {
         this.attacks = [null, null, null, null];        //Array of attack objects.
 
         this.inventory = [];          //Array of item objects.
-        this.inventoryButtonDataArray = []; //Array of class InventoryButtonData.
+        this.inventoryDataArray = []; //Array of class InventoryButtonData.
         this.inventoryPointerPosition = 0;
 
         this.masquerade = 0;
