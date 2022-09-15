@@ -11,17 +11,25 @@ async function keyDownHandler(mapArray, e) {
     }
     //Inventory naviation keys.
     if (game.windowState == "inventory" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
+        var previousPointerPosition = player.inventoryPointerPosition;
+        var len = player.inventory.length;
+
+        //Change pointer position. Then call moveInventoryMarker to update buttons.
         switch (e.code) {
             case "ArrowUp":
-                inventoryPointerPosition = inventoryPointerPosition - 1;
-                if(inventoryPointerPosition < 0){
-                    inventoryPointerPosition = player.inventory.length-1; //not actually true, but same length as button list.
+                player.inventoryPointerPosition = player.inventoryPointerPosition - 1;
+                if(player.inventoryPointerPosition < 0){
+                    player.inventoryPointerPosition = len-1;
                 }
                 break;
             case "ArrowDown":
-                inventoryPointerPosition = inventoryPointerPosition + 1;
+                player.inventoryPointerPosition = player.inventoryPointerPosition + 1;
+                if(player.inventoryPointerPosition > len-1){
+                    player.inventoryPointerPosition = 0;
+                }
                 break;
         }
+        moveInventoryMarker(previousPointerPosition);
     }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
@@ -49,12 +57,17 @@ async function keyDownHandler(mapArray, e) {
     setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
     procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
     */
+   //NOTE: just for testing.
+   if(e.code == "Enter"){
+    player.addToInventory(new Attack("heheheha", 1, 1, 0, "none", 0));
+   }
 }
 
 async function windowNavButtonHandler(e) {
     e = e || window.event; //different event handlers.
     var buttonId = e.currentTarget.id;
 
+    //update window indices.
     switch (buttonId) {
         case "gamePage__header__left":
             currentWindowIndex = currentWindowIndex - 1;
@@ -107,6 +120,9 @@ async function windowNavButtonHandler(e) {
                 break;
             case "inventory":
                 initializeInventoryWindow(); //update the inventory.
+                moveInventoryMarker(); //also needs to place marker.
+                player.inventoryPointerPosition = 0;
+
                 inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
                 break;
@@ -225,6 +241,29 @@ async function playerAttackHandler(e) {
             }
             attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
         }
+    }
+}
+
+function moveInventoryMarker(previousPointerPosition = null){
+    let display = document.getElementById("gamePage__gameSpace__inventory__itemList");
+    //if previousPointer exists, then remove marker from last position.
+    if(previousPointerPosition != null){
+        let oldButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${previousPointerPosition}`);
+        oldButton.innerHTML = oldButton.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
+    }
+    //update new button with marker ><
+    let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
+    newButton.innerHTML = `> ${newButton.innerHTML} <`;
+
+    //automatically scrolls!
+    if(player.inventoryPointerPosition == 0){
+        document.getElementById("gamePage__gameSpace__inventory__itemList__section1__marker").scrollIntoView({ behaviour: "smooth", block: "nearest"});
+        //display.scrollTop = 0;
+    } else if (player.inventoryPointerPosition == player.inventory.length - 1){
+        document.getElementById("gamePage__gameSpace__inventory__itemList__bottomMarker").scrollIntoView({ behaviour: "smooth", block: "nearest"});
+        //display.scrollTop = display.scrollHeight;
+    } else {
+        newButton.scrollIntoView({ behaviour: "smooth", block: "nearest"});
     }
 }
 

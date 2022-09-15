@@ -55,6 +55,11 @@ function initializeInventoryWindow() {
     var section2Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section2");
     var section3Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section3");
 
+    var equipButton1 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button1");
+    var equipButton2 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button2");
+    var equipButton3 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button3");
+    var equipButton4 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button4");
+
     var buttons;
     //clear all inventory buttons.
     //NOTE: see if this can be done better. Pretty sure this is just... bad. How does this work?
@@ -156,13 +161,6 @@ async function initializeGame() {
     document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler, false);
     //Hover listener.
     setHoverListener(mapArray);
-
-    //player.addToInventory(new Attack("Test H. Attack", 2, 4, 2));
-    //player.addToInventory(new Attack("Test H. Attack", 2, 4, 2));
-    //player.addToInventory(new Attack("Test H. Attack", 2, 4, 2));
-    //player.addToInventory(new Attack("Test H. Attack", 2, 4, 2));
-    //player.addToInventory(new Attack("Test Heal", -1, 3, 1, "heal", 0));
-    initializeInventoryWindow();
 }
 
 /*List of attack templates.

@@ -143,12 +143,14 @@ class Player extends Entity {
         this.attacks[position] = newAttack;
         newAttack.equipped = true;
 
-        //Update the button displays.
+        //Update the button displays-- both for encounters and for inventory!
         for (var i = 0; i < this.attacks.length; i++) {
             if (this.attacks[i] == null) {
                 document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = "";
+                document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = "";
             } else {
                 document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = `${this.attacks[i].name}`;
+                document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = `${this.attacks[i].name}`;
             }
         }
     }
