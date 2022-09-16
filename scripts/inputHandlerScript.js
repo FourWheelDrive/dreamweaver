@@ -119,9 +119,9 @@ async function windowNavButtonHandler(e) {
                 }
                 break;
             case "inventory":
+                player.inventoryPointerPosition = 0;
                 initializeInventoryWindow(); //update the inventory.
                 moveInventoryMarker(); //also needs to place marker.
-                player.inventoryPointerPosition = 0;
 
                 inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
