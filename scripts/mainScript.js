@@ -122,8 +122,7 @@ function initializeInventoryWindow() {
         }
 
         //Append this button to data class and then to player.inventoryButtonDataArray.
-        let tempButtonData = new InventoryButtonData(player.inventory[i], button.id);
-        player.inventoryDataArray.push(tempButtonData);
+        player.inventoryButtonData.push(i);
     }
 }
 
@@ -138,12 +137,11 @@ async function initializeGame() {
     enemy = null;
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
-    player.addToInventory(new Attack("Test Attack", 1, 2, 0));
-    player.addToInventory(new Attack("Test Parry", 0, 2, 0, "parry", 1));
+    player.addToInventory(entityDatabase.generateAttackByName("Light Attack"));
+    player.addToInventory(entityDatabase.generateAttackByName("Heavy Attack"));
+    player.addToInventory(entityDatabase.generateAttackByName("Basic Parry"));
+    player.addToInventory(entityDatabase.generateAttackByName("Test Heal"));
     player.addNewAttack(player.inventory[0], 0);
-    player.addNewAttack(player.inventory[1], 1);
-    //player.addNewAttack(new Attack("Test H. Attack", 2, 4, 2), 2);
-    //player.addNewAttack(new Attack("Test Heal", -1, 3, 1, "heal", 0), 3);
 
     player.getInitialPosition(mapWidth, mapHeight);
     showPlayer();
@@ -162,9 +160,3 @@ async function initializeGame() {
     //Hover listener.
     setHoverListener(mapArray);
 }
-
-/*List of attack templates.
-new Attack("basic attack", 1, 2, 0);
-new Attack("parry", 0, 0, 0, "parry", 3);
-new Attack("heavy attack", 3, 4, 1);
-*/

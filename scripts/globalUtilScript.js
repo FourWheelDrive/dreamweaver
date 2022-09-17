@@ -114,7 +114,7 @@ class Player extends Entity {
         this.attacks = [null, null, null, null];        //Array of attack objects.
 
         this.inventory = [];          //Array of item objects.
-        this.inventoryDataArray = []; //Array of class InventoryButtonData.
+        this.inventoryButtonData = []; //Array of relative indices of display buttons. Index here corresponds to id of button, value is .inventory index.
         this.inventoryPointerPosition = 0;
 
         this.masquerade = 0;
@@ -129,6 +129,15 @@ class Player extends Entity {
     }
     addToInventory(newObject){
         this.inventory.push(newObject);
+    }
+    //when identifying inventory object from button id, search is necessary.
+    getInventoryCounterpart(id){
+        for(var i = 0; i < player.inventoryButtonData.length; i++){
+            if(player.inventoryButtonData[i] == id){
+                return player.inventory[i];
+            }
+        }
+        return -1;
     }
     addNewAttack(newAttack, position) {
         //NOTE: needs new case for 4+ attacks to go to replace.
@@ -186,17 +195,19 @@ class Enemy extends Entity {
 }
 
 //=====================================================Combat utility classes
+//Might need to add a tier system! Or maybe just keep it all the same? Player can build combos or change multipliers?
 class Attack {
-    constructor(name, damage, cooldown, channelling, effect = "none", effectDuration = "0") {
+    constructor(name, damage, cooldown, channelling, description, effect = "none", effectDuration = "0") {
+        //data stats
         this.name = name;
-        this.id = game.nextAttackObjectID;              //identifies the object. Could be same type.
+        this.id = game.nextAttackObjectID;              //identifies the object. Could differentiate between the same type.
         game.nextAttackObjectID = game.nextAttackObjectID + 1;
-
+        this.equipped = false;                          //identifies whether or not, from inventory, attack is equipped.
+        this.description = description;
+        //combat stats
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
         this.baseChannelling = channelling;
-
-        this.equipped = false;                          //identifies whether or not, from inventory, attack is equipped.
 
         /*Currently only one effect exists.
         - None: none.
@@ -295,19 +306,15 @@ class Attack {
     }
 }
 class Item {
-
+/*
+requires
+this.equipped
+*/
 }
 
-class InventoryButtonData {//Contains data for inventory item display buttons.
-    constructor(object, buttonID){
-        this.object = object;
-        this.buttonID = buttonID;
-    }
-}
 //=====================================================GAME class
 /*
 Contents [class GAME]:
-
 */
 class Game {
     constructor() {
@@ -457,29 +464,6 @@ class Game {
         //reset encounter screen.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
         document.getElementById("gamePage__gameSpace__encounter__result").style.display = "none";
-    }
-}
-
-//=====================================================ENTITYDATABASE class
-/*
-Contents [class ENTITYDATABASE]:
-
-*/
-class EntityDatabase {
-    constructor() {
-        this.minorEnemies = []; //NOTE: will also require enemies to have either an ID or a tier of some sort. Some way to say "i want random of this type."
-                                //unless i just make different arrays for different types of enemies? hmmmm.
-    }
-    generateEnemy(tier = 1, type = 1) {
-        var tempEnemyEntity;
-        tempEnemyEntity = new Enemy(11, "!", new Attack("basic attack", 1, 2, 1), ["He's just standing there, menacingly.",
-            "You walk up to him.", "Menacingly."], ["Heheheha! You've won."]);
-
-        return tempEnemyEntity;
-    }
-    //NOTE: bosses will have their own Entity subclass.
-    generateBossEnemy() {
-
     }
 }
 

@@ -290,19 +290,25 @@
     position: relative;
 
     padding: auto; 
-    width: 100%;
+    width: 70%;
     height: 30vh;
+    margin: auto;
 
     display: flex;
     flex-direction: column;
     align-items: center;
 
     overflow: scroll;
+
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
 }
 .inventoryListSection{
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 0;
+    margin: auto;
 
     width: 100%;
 }
@@ -333,13 +339,13 @@
     margin-bottom: 0;
     padding: 0;
     padding-top: 2%;
-    border-top: 1px solid black;
+    /*border-top: 1px solid black;*/
 
     display: grid;
     grid-template-areas: "type effect"
         "description description"
         "damage channelling"
-        "cooldown null";
+        "cooldown equipped";
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr;
 }
@@ -362,6 +368,7 @@
 #gamePage__gameSpace__inventory__statDisplay__damage {grid-area: damage;}
 #gamePage__gameSpace__inventory__statDisplay__channelling {grid-area: channelling;}
 #gamePage__gameSpace__inventory__statDisplay__cooldown {grid-area: cooldown;}
+#gamePage__gameSpace__inventory__statDisplay__equipped {grid-area: equipped;}
 /*Shop Window. ================================*/
 #gamePage__gameSpace__shop {
     display: none;

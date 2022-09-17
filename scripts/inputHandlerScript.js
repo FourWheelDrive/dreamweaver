@@ -18,13 +18,13 @@ async function keyDownHandler(mapArray, e) {
         switch (e.code) {
             case "ArrowUp":
                 player.inventoryPointerPosition = player.inventoryPointerPosition - 1;
-                if(player.inventoryPointerPosition < 0){
-                    player.inventoryPointerPosition = len-1;
+                if (player.inventoryPointerPosition < 0) {
+                    player.inventoryPointerPosition = len - 1;
                 }
                 break;
             case "ArrowDown":
                 player.inventoryPointerPosition = player.inventoryPointerPosition + 1;
-                if(player.inventoryPointerPosition > len-1){
+                if (player.inventoryPointerPosition > len - 1) {
                     player.inventoryPointerPosition = 0;
                 }
                 break;
@@ -35,6 +35,10 @@ async function keyDownHandler(mapArray, e) {
     //NOTE: needs to be restricted depending on gamestate!
     if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
         playerMovementHandler(e, mapArray, player, enemy);
+    }
+    //Assignment keys
+    if (game.windowState == "inventory" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
+
     }
     //Encounter keys and keybinds.
     if (game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
@@ -57,10 +61,10 @@ async function keyDownHandler(mapArray, e) {
     setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
     procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
     */
-   //NOTE: just for testing.
-   if(e.code == "Enter"){
-    player.addToInventory(new Attack("heheheha", 1, 1, 0, "none", 0));
-   }
+    //NOTE: just for testing.
+    if (e.code == "Enter") {
+        player.addToInventory(new Attack("heheheha", 1, 1, 0, "none", 0));
+    }
 }
 
 async function windowNavButtonHandler(e) {
@@ -150,6 +154,7 @@ async function windowNavButtonHandler(e) {
     }
 }
 
+//Movement and Attack keys. =================================================================================================||
 async function playerMovementHandler(e, mapArray) {
     let boardRows = document.getElementById("gamePage__gameSpace__map").children;
     //very cool directions array! Append each element instead of having 4 switch statements.
@@ -201,7 +206,6 @@ async function playerMovementHandler(e, mapArray) {
         newCellEntity.firstVisit();
     }
 }
-
 async function playerAttackHandler(e) {
     //player must be viewing the battle. No attacks can be made from other screens.
     if (game.windowState == "fight") {
@@ -243,30 +247,6 @@ async function playerAttackHandler(e) {
         }
     }
 }
-
-function moveInventoryMarker(previousPointerPosition = null){
-    let display = document.getElementById("gamePage__gameSpace__inventory__itemList");
-    //if previousPointer exists, then remove marker from last position.
-    if(previousPointerPosition != null){
-        let oldButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${previousPointerPosition}`);
-        oldButton.innerHTML = oldButton.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
-    }
-    //update new button with marker ><
-    let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
-    newButton.innerHTML = `> ${newButton.innerHTML} <`;
-
-    //automatically scrolls!
-    if(player.inventoryPointerPosition == 0){
-        document.getElementById("gamePage__gameSpace__inventory__itemList__section1__marker").scrollIntoView({ behaviour: "smooth", block: "nearest"});
-        //display.scrollTop = 0;
-    } else if (player.inventoryPointerPosition == player.inventory.length - 1){
-        document.getElementById("gamePage__gameSpace__inventory__itemList__bottomMarker").scrollIntoView({ behaviour: "smooth", block: "nearest"});
-        //display.scrollTop = display.scrollHeight;
-    } else {
-        newButton.scrollIntoView({ behaviour: "smooth", block: "nearest"});
-    }
-}
-
 //plays animation. Also disables button: cooldown
 function attackButtonCooldownAnimation(buttonId, time) {
     let button = document.getElementById(buttonId);
@@ -290,3 +270,49 @@ function attackButtonCooldownAnimation(buttonId, time) {
 function flushCSS(element) { //flushes css to no transition.
     element.offsetHeight;
 }
+
+//Inventory updates and actions. ============================================================================================||
+//when player moves pointer, update display, scroll, and update stat panel.
+function moveInventoryMarker(previousPointerPosition = null) {
+    let display = document.getElementById("gamePage__gameSpace__inventory__itemList");
+    //------if previousPointer exists, then remove marker from last position.------
+    if (previousPointerPosition != null) {
+        let oldButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${previousPointerPosition}`);
+        oldButton.innerHTML = oldButton.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
+    }
+    //------update new button with marker ><------
+    let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
+    newButton.innerHTML = `> ${newButton.innerHTML} <`;
+
+    //------automatically scrolls!------
+    if (player.inventoryPointerPosition == 0) {
+        document.getElementById("gamePage__gameSpace__inventory__itemList__section1__marker").scrollIntoView({ behaviour: "smooth", block: "nearest" });
+        //display.scrollTop = 0;
+    } else if (player.inventoryPointerPosition == player.inventory.length - 1) {
+        document.getElementById("gamePage__gameSpace__inventory__itemList__bottomMarker").scrollIntoView({ behaviour: "smooth", block: "nearest" });
+        //display.scrollTop = display.scrollHeight;
+    } else {
+        newButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
+    }
+    //------Update attributes panel!------
+    //NOTE: this should probably apply modifiers instead of base values later.
+    let invObj = player.getInventoryCounterpart(player.inventoryPointerPosition);
+    let type = invObj.constructor.name.toUpperCase();
+    document.getElementById("gamePage__gameSpace__inventory__statDisplay__type").innerHTML = type;
+    document.getElementById("gamePage__gameSpace__inventory__statDisplay__equipped").innerHTML = `Equipped: ${invObj.equipped}`;
+    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = ;
+    if(invObj.effect != "none"){
+    document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effect} - [${invObj.baseEffectDuration}s]`;
+    } else {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`;
+    }
+    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML =;
+    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__description")
+
+    document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: ${invObj.baseDamage}`;
+}
+//NOTE: finish.
+function changeLoadout(kitPosition) {
+
+}
+
