@@ -1,4 +1,22 @@
 async function keyDownHandler(mapArray, e) {
+    //help key.
+    if (e.code == "KeyZ") {
+        let tutorial = document.getElementById("main__title__tutorial");
+        //gotta remove the thing every time.
+        //NOTE: might have to use a similar structure to ensure compatibility for encounter end dialogues!
+        function hideTutorial(){
+            tutorial.style.display = "none";
+            document.removeEventListener("click", hideTutorial);
+            document.removeEventListener("keydown", hideTutorial);
+        }
+
+        if (tutorial.style.display == "none" || tutorial.style.display == "") {
+            tutorial.style.display = "block";
+
+            document.addEventListener("click", hideTutorial, { once: true })
+            document.addEventListener("keydown", hideTutorial, { once: true })
+        }
+    }
     //Window navigation keys.
     //NOTE: needs to be restricted depending on gamestate!
     if ((e.code == "ArrowLeft" || e.code == "ArrowRight") && !e.repeat) {
@@ -123,7 +141,7 @@ async function windowNavButtonHandler(e) {
                 initializeInventoryWindow(); //update the inventory.
 
                 //disable loadout switches during fights.
-                if (game.gameState == "encounter" || game.gameState == "tempTransition"){
+                if (game.gameState == "encounter" || game.gameState == "tempTransition") {
                     document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "0.5";
                 } else {
                     document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "1.0";
@@ -275,7 +293,7 @@ function flushCSS(element) { //flushes css to no transition.
 
 //Inventory updates and actions. ============================================================================================||
 //handles clicks instead of arrow keys. calls moveInventoryMarker().
-function inventoryButtonClickHandler(e){
+function inventoryButtonClickHandler(e) {
     let temp = player.inventoryPointerPosition;
     player.inventoryPointerPosition = e.target.id.slice(-1);
     moveInventoryMarker(temp);
@@ -290,7 +308,7 @@ function moveInventoryMarker(previousPointerPosition = null) {
     }
     //------update new button with marker ><------
     let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
-    
+
     newButton.innerHTML = `> ${newButton.innerHTML} <`;
 
     //------automatically scrolls!------
@@ -336,41 +354,43 @@ function updateStatDisplay() {
     }
 }
 //Depending on pointerPosition, switch out attacks and then update inventory display.
-function inventoryDoubleClickHandler(e){
+function inventoryDoubleClickHandler(e) {
     //change equip buttons to have bold borders.
     document.querySelectorAll(".inventoryEquipButton").forEach(element => {
-        element.style.border = "3px solid black";})
+        element.style.border = "3px solid black";
+    })
     //add document event listener for a click that fires once.
     document.addEventListener("click", clicked => {
         //switch borders back
         document.querySelectorAll(".inventoryEquipButton").forEach(element => {
-            element.style.border = "1px solid black";})
+            element.style.border = "1px solid black";
+        })
         //check element.
-        if(clicked.target.id.includes("gamePage__gameSpace__inventory__equipMenu__button")){
+        if (clicked.target.id.includes("gamePage__gameSpace__inventory__equipMenu__button")) {
             //i would call changeLoadout here, but it's not going to work. clicked and keyDown are different events.
-            let position = parseInt(clicked.target.id.slice(-1))-1;
+            let position = parseInt(clicked.target.id.slice(-1)) - 1;
             let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
             player.addNewAttack(attack, position);
         }
-    },{once: true})
+    }, { once: true })
 }
 function changeLoadout(e) {
     let position;
     let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
-        switch(e.code){
-            case "KeyU":
-                position = 0;
-                break;
-            case "KeyI":
-                position = 1;
-                break;
-            case "KeyJ":
-                position = 2;
-                break;
-            case "KeyK":
-                position = 3;
-                break;
-        }
+    switch (e.code) {
+        case "KeyU":
+            position = 0;
+            break;
+        case "KeyI":
+            position = 1;
+            break;
+        case "KeyJ":
+            position = 2;
+            break;
+        case "KeyK":
+            position = 3;
+            break;
+    }
     player.addNewAttack(attack, position);
 }
 

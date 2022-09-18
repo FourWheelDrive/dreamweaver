@@ -24,7 +24,6 @@ class EntityDatabase {
         }
     }
 
-
     //we can use 2 functions. generateEnemyByID or ByTier.
     generateEnemy(tier = 1, type = 1) {
         var tempEnemyEntity;

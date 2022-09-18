@@ -120,7 +120,43 @@ h1 {
 
     margin: 3%;
     border-left: 1px solid black;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+
+    padding: 5%;
 }
+#gamePage__outputBar__box1{opacity: 1.0}
+#gamePage__outputBar__box2{opacity: 0.8}
+#gamePage__outputBar__box3{opacity: 0.6}
+#gamePage__outputBar__box4{opacity: 0.4}
+#gamePage__outputBar__box5{opacity: 0.2}
 
 
-/*Display elements for each window in different files? I'm not sure.*/
+/*Exists outside of this grid. Tutorial for help.*/
+#main__title__tutorial{
+    display: none;
+    position: absolute;
+    z-index: 100;
+    background-color: #fff8e0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 30vw;
+    height: 70vh;
+
+    border: 1px solid black;
+
+    overflow: scroll;
+}
+::-webkit-scrollbar {
+    width: 0px;
+}
+.tutorialText{
+    padding-left: 2%;
+    text-align: left;
+    white-space: pre-wrap;
+}

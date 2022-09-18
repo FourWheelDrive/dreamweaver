@@ -46,6 +46,24 @@ function clearPlayer(mapArray) {
     }
 }
 
+//Output function
+function pushMainOutput(message) {
+    var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),
+    document.getElementById("gamePage__outputBar__box2"),
+    document.getElementById("gamePage__outputBar__box3"),
+    document.getElementById("gamePage__outputBar__box4"),
+    document.getElementById("gamePage__outputBar__box5")]
+
+    for (var i = outputBoxes.length - 1; i > -1; i--) {
+        if (i > 0) {
+            outputBoxes[i].innerHTML = outputBoxes[i - 1].innerHTML;
+        }
+        if (i == 0) {
+            outputBoxes[i].innerHTML = message;
+        }
+    }
+}
+
 //inventory screen initialize.
 //global inventory var.
 function initializeInventoryWindow() {
@@ -125,7 +143,7 @@ function initializeInventoryWindow() {
 }
 //change button ids to be in order.
 //This function also appends to player.inventoryButtonData! In the right order this time.
-function assignInventoryButtons(){
+function assignInventoryButtons() {
     let temp = 0;
     var section1 = document.getElementById("gamePage__gameSpace__inventory__itemList__section1").children;
     var section2 = document.getElementById("gamePage__gameSpace__inventory__itemList__section2").children;
@@ -134,24 +152,24 @@ function assignInventoryButtons(){
     player.inventoryButtonData = [];
 
     //loop through each section to assign ids from top, IN ORDER.
-    for(var i = 0; i < section1.length; i++){
-        if(section1[i].tagName == "BUTTON"){
+    for (var i = 0; i < section1.length; i++) {
+        if (section1[i].tagName == "BUTTON") {
             section1[i].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
             //push correct index to buttonData.
             player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section1[i].dataset.objectId));
             temp = temp + 1;
         }
     }
-    for(var j = 0; j < section2.length; j++){
-        if(section2[j].tagName == "BUTTON"){
+    for (var j = 0; j < section2.length; j++) {
+        if (section2[j].tagName == "BUTTON") {
             section2[j].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
             //push correct index to buttonData.
             player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section2[j].dataset.objectId));
             temp = temp + 1;
         }
     }
-    for(var k = 0; k < section3.length; k++){
-        if(section3[k].tagName == "BUTTON"){
+    for (var k = 0; k < section3.length; k++) {
+        if (section3[k].tagName == "BUTTON") {
             section3[k].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
             //push correct index to buttonData.
             player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section3[k].dataset.objectId));
@@ -193,4 +211,8 @@ async function initializeGame() {
     document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler, false);
     //Hover listener.
     setHoverListener(mapArray);
+
+    //temporary tutorial panel.
+    await sleep(1000);
+    pushMainOutput("Press Z for help!")
 }
