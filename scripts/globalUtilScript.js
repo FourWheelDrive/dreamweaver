@@ -114,7 +114,7 @@ class Player extends Entity {
         this.attacks = [null, null, null, null];        //Array of attack objects.
 
         this.inventory = [];          //Array of item objects.
-        this.inventoryButtonData = []; //Array of relative indices of display buttons. Index here corresponds to id of button, value is .inventory index.
+        this.inventoryButtonData = []; //relates buttons to attacks.
         this.inventoryPointerPosition = 0;
 
         this.masquerade = 0;
@@ -127,26 +127,27 @@ class Player extends Entity {
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
         document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
     }
-    addToInventory(newObject){
+    addToInventory(newObject) {
         this.inventory.push(newObject);
-    }
-    //when identifying inventory object from button id, search is necessary.
-    getInventoryCounterpart(id){
-        for(var i = 0; i < player.inventoryButtonData.length; i++){
-            if(player.inventoryButtonData[i] == id){
-                return player.inventory[i];
-            }
-        }
-        return -1;
     }
     addNewAttack(newAttack, position) {
         //NOTE: needs new case for 4+ attacks to go to replace.
         //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
-       
+
         //NOTE: IF THE ATTACK IS ALREADY EQUIPPED, CHANGE LAST POSITION (this.attacks) TO NULL.
+        //if the attack is equipped, remove it.
+        if (newAttack.equipped) {
+            for (var i = 0; i < player.attacks.length; i++) {
+                try {
+                    if (player.attacks[i].id == newAttack.id) {
+                        player.attacks[i] = null;
+                    }
+                } catch (e) { }
+            }
+        }
         //unequip last attack.
         let previousAttack = this.attacks[position];
-        if(previousAttack != null){
+        if (previousAttack != null) {
             previousAttack.equipped = false;
         }
         this.attacks[position] = newAttack;
@@ -162,8 +163,13 @@ class Player extends Entity {
                 document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = `${this.attacks[i].name}`;
             }
         }
-        //update inventory screen.
-        initializeInventoryWindow();
+    }
+    getInventoryCounterpartIndex(id){
+        for(var i= 0; i < player.inventory.length; i++){
+            if(player.inventory[i].id == id){
+                return i;
+            }
+        }
     }
 
     getInitialPosition(mapWidth, mapHeight) {
@@ -202,8 +208,8 @@ class Attack {
     constructor(name, damage, cooldown, channelling, description, effect = "none", effectDuration = "0") {
         //data stats
         this.name = name;
-        this.id = game.nextAttackObjectID;              //identifies the object. Could differentiate between the same type.
-        game.nextAttackObjectID = game.nextAttackObjectID + 1;
+        this.id = game.nextInventoryObjectId;              //identifies the object. Could differentiate between the same type.
+        game.nextInventoryObjectId = game.nextInventoryObjectId + 1;
         this.equipped = false;                          //identifies whether or not, from inventory, attack is equipped.
         this.description = description;
         //combat stats
@@ -308,10 +314,11 @@ class Attack {
     }
 }
 class Item {
-/*
-requires
-this.equipped
-*/
+    /*
+    requires
+    this.equipped
+    this.id, uses nextInventoryObjectId like attacks.
+    */
 }
 
 //=====================================================GAME class
@@ -326,7 +333,7 @@ class Game {
         CHANGES TO GAME.GAMESTATE.
         game.gameState tracks what the game is doing right now.
         - Movement Phase
-        - Encounter Phase
+        - Encounter Phase => tempTransition (for dialogues, but disables attacks)
         - Shop Phase
 
         window.windowState tracks which screen the player is on.
@@ -345,7 +352,7 @@ class Game {
         this.encounterCounter = 0;                          //tracks number of battles. Might be more useful if track moves since last battle?
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
 
-        this.nextAttackObjectID = 1;                        //increments as attacks are created.
+        this.nextInventoryObjectId = 1;                        //increments as attacks and items are created.
         this.channelledID;
 
         //flags.

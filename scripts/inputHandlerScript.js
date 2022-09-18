@@ -36,9 +36,9 @@ async function keyDownHandler(mapArray, e) {
     if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
         playerMovementHandler(e, mapArray, player, enemy);
     }
-    //Assignment keys
-    if (game.windowState == "inventory" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
-
+    //change loadout from inventory.
+    if (game.gameState == "movement" && game.windowState == "inventory" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
+        changeLoadout(e);
     }
     //Encounter keys and keybinds.
     if (game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
@@ -61,10 +61,6 @@ async function keyDownHandler(mapArray, e) {
     setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
     procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
     */
-    //NOTE: just for testing.
-    if (e.code == "Enter") {
-        player.addToInventory(new Attack("heheheha", 1, 1, 0, "a test heheheha!","none", 0));
-    }
 }
 
 async function windowNavButtonHandler(e) {
@@ -118,14 +114,20 @@ async function windowNavButtonHandler(e) {
             case "encounter":
                 fightWindow.style.display = "grid";
                 game.windowState = "fight";
-                if (game.gameState != "encounter") { //only valid when fighting.
+                if (game.gameState != "encounter" && game.gameState != "tempTransition") { //only valid when fighting.
                     fightWindow.style.opacity = "0.5";
                 }
                 break;
             case "inventory":
                 player.inventoryPointerPosition = 0;
                 initializeInventoryWindow(); //update the inventory.
-                moveInventoryMarker(); //also needs to place marker.
+
+                //disable loadout switches during fights.
+                if (game.gameState == "encounter" || game.gameState == "tempTransition"){
+                    document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "0.5";
+                } else {
+                    document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "1.0";
+                }
 
                 inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
@@ -272,6 +274,12 @@ function flushCSS(element) { //flushes css to no transition.
 }
 
 //Inventory updates and actions. ============================================================================================||
+//handles clicks instead of arrow keys. calls moveInventoryMarker().
+function inventoryButtonClickHandler(e){
+    let temp = player.inventoryPointerPosition;
+    player.inventoryPointerPosition = e.target.id.slice(-1);
+    moveInventoryMarker(temp);
+}
 //when player moves pointer, update display, scroll, and update stat panel.
 function moveInventoryMarker(previousPointerPosition = null) {
     let display = document.getElementById("gamePage__gameSpace__inventory__itemList");
@@ -282,6 +290,7 @@ function moveInventoryMarker(previousPointerPosition = null) {
     }
     //------update new button with marker ><------
     let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
+    
     newButton.innerHTML = `> ${newButton.innerHTML} <`;
 
     //------automatically scrolls!------
@@ -299,7 +308,7 @@ function moveInventoryMarker(previousPointerPosition = null) {
 }
 function updateStatDisplay() {
     //NOTE: this should probably apply modifiers instead of base values later.
-    let invObj = player.getInventoryCounterpart(player.inventoryPointerPosition);
+    let invObj = player.inventory[player.inventoryPointerPosition];
     let type = invObj.constructor.name.toUpperCase();
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__type").innerHTML = type;
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__equipped").innerHTML = `Equipped: ${invObj.equipped}`;
@@ -326,8 +335,25 @@ function updateStatDisplay() {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: --`;
     }
 }
-//NOTE: finish.
-function changeLoadout(kitPosition) {
-
+//Depending on pointerPosition, switch out attacks and then update inventory display.
+function changeLoadout(e) {
+    let position;
+    let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
+        switch(e.code){
+            case "KeyU":
+                position = 0;
+                break;
+            case "KeyI":
+                position = 1;
+                break;
+            case "KeyJ":
+                position = 2;
+                break;
+            case "KeyK":
+                position = 3;
+                break;
+        }
+    player.addNewAttack(attack, position);
+    initializeInventoryWindow();
 }
 

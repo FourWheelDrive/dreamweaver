@@ -55,11 +55,6 @@ function initializeInventoryWindow() {
     var section2Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section2");
     var section3Menu = document.getElementById("gamePage__gameSpace__inventory__itemList__section3");
 
-    var equipButton1 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button1");
-    var equipButton2 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button2");
-    var equipButton3 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button3");
-    var equipButton4 = document.getElementById("gamePage__gameSpace__inventory__equipMenu__button4");
-
     var buttons;
     //clear all inventory buttons.
     //NOTE: see if this can be done better. Pretty sure this is just... bad. How does this work?
@@ -81,8 +76,7 @@ function initializeInventoryWindow() {
             tempArray[k].remove();
         }
     }
-    //Clear player button data.
-    player.inventoryButtonData = [];
+    player.inventoryPointerPosition = 0;
 
     //Add attacks from player.attacks[].
     //Add attacks from player.inventory[].
@@ -98,21 +92,22 @@ function initializeInventoryWindow() {
                     case true:
                         type = "Equipped Attack";
                         button.innerHTML = player.inventory[i].name;
-                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
+                        button.dataset.objectId = player.inventory[i].id;
                         break;
                     case false:
                         type = "Attack";
                         button.innerHTML = player.inventory[i].name;
-                        button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
+                        button.dataset.objectId = player.inventory[i].id;
                         break;
                 }
                 break;
             case "Item":
                 type = "Item";
-                button.setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${i}`);
+                button.dataset.objectId = player.inventory[i].id;
                 break;
         }
         button.setAttribute("class", `inventoryMenuButton`);
+        button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
 
         //append depending on type.
         if (type == "Equipped Attack") {
@@ -122,9 +117,45 @@ function initializeInventoryWindow() {
         } else if (type == "Item") {
             section3Menu.appendChild(button);
         }
+    }
+    //assign button ids and initialize inventory marker.
+    assignInventoryButtons();
+    moveInventoryMarker();
+}
+//change button ids to be in order.
+//This function also appends to player.inventoryButtonData! In the right order this time.
+function assignInventoryButtons(){
+    let temp = 0;
+    var section1 = document.getElementById("gamePage__gameSpace__inventory__itemList__section1").children;
+    var section2 = document.getElementById("gamePage__gameSpace__inventory__itemList__section2").children;
+    var section3 = document.getElementById("gamePage__gameSpace__inventory__itemList__section3").children;
+    //reset buttonData.
+    player.inventoryButtonData = [];
 
-        //Append this button to data class and then to player.inventoryButtonDataArray.
-        player.inventoryButtonData.push(i);
+    //loop through each section to assign ids from top, IN ORDER.
+    for(var i = 0; i < section1.length; i++){
+        if(section1[i].tagName == "BUTTON"){
+            section1[i].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
+            //push correct index to buttonData.
+            player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section1[i].dataset.objectId));
+            temp = temp + 1;
+        }
+    }
+    for(var j = 0; j < section2.length; j++){
+        if(section2[j].tagName == "BUTTON"){
+            section2[j].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
+            //push correct index to buttonData.
+            player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section2[j].dataset.objectId));
+            temp = temp + 1;
+        }
+    }
+    for(var k = 0; k < section3.length; k++){
+        if(section3[k].tagName == "BUTTON"){
+            section3[k].setAttribute("id", `gamePage__gameSpace__inventory__itemList__Button${temp}`);
+            //push correct index to buttonData.
+            player.inventoryButtonData.push(player.getInventoryCounterpartIndex(section3[k].dataset.objectId));
+            temp = temp + 1;
+        }
     }
 }
 

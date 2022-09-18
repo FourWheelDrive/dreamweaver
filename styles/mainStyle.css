@@ -22,6 +22,7 @@ h1 {
 /*gameSpace grid for UI display elements*/
 #gamePage{
     width: 80%;
+    height: 90vh;
     aspect-ratio: 11/6;
 
     display: grid;
