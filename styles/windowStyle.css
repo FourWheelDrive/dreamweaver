@@ -342,12 +342,13 @@
     /*border-top: 1px solid black;*/
 
     display: grid;
-    grid-template-areas: "type effect"
+    grid-template-areas: "type null1"
         "description description"
         "damage channelling"
-        "cooldown equipped";
+        "cooldown equipped"
+        "effect null2";
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 }
 .statDisplayText {
     margin: 1%;
@@ -369,6 +370,8 @@
 #gamePage__gameSpace__inventory__statDisplay__channelling {grid-area: channelling;}
 #gamePage__gameSpace__inventory__statDisplay__cooldown {grid-area: cooldown;}
 #gamePage__gameSpace__inventory__statDisplay__equipped {grid-area: equipped;}
+#gamePage__gameSpace__inventory__statDisplay__null1 {grid-area: null1}
+#gamePage__gameSpace__inventory__statDisplay__null2 {grid-area: null2}
 /*Shop Window. ================================*/
 #gamePage__gameSpace__shop {
     display: none;

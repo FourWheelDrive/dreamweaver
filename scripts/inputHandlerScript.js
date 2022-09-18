@@ -63,7 +63,7 @@ async function keyDownHandler(mapArray, e) {
     */
     //NOTE: just for testing.
     if (e.code == "Enter") {
-        player.addToInventory(new Attack("heheheha", 1, 1, 0, "none", 0));
+        player.addToInventory(new Attack("heheheha", 1, 1, 0, "a test heheheha!","none", 0));
     }
 }
 
@@ -295,21 +295,36 @@ function moveInventoryMarker(previousPointerPosition = null) {
         newButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
     }
     //------Update attributes panel!------
+    updateStatDisplay()
+}
+function updateStatDisplay() {
     //NOTE: this should probably apply modifiers instead of base values later.
     let invObj = player.getInventoryCounterpart(player.inventoryPointerPosition);
     let type = invObj.constructor.name.toUpperCase();
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__type").innerHTML = type;
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__equipped").innerHTML = `Equipped: ${invObj.equipped}`;
-    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = ;
-    if(invObj.effect != "none"){
-    document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effect} - [${invObj.baseEffectDuration}s]`;
+    document.getElementById("gamePage__gameSpace__inventory__statDisplay__description").innerHTML = invObj.description;
+
+    if (invObj.baseCooldown != null) {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: ${invObj.baseCooldown}`;
+    } else {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: --`;
+    }
+    if (invObj.effect != "none") {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effect} - [${invObj.baseEffectDuration}s]`;
     } else {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`;
     }
-    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML =;
-    //document.getElementById("gamePage__gameSpace__inventory__statDisplay__description")
-
-    document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: ${invObj.baseDamage}`;
+    if (invObj.baseChannelling != null) {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: ${invObj.baseChannelling}s`;
+    } else {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: --`;
+    }
+    if (invObj.baseDamage != null) {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: ${invObj.baseDamage}`;
+    } else {
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: --`;
+    }
 }
 //NOTE: finish.
 function changeLoadout(kitPosition) {

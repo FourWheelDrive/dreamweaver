@@ -81,6 +81,8 @@ function initializeInventoryWindow() {
             tempArray[k].remove();
         }
     }
+    //Clear player button data.
+    player.inventoryButtonData = [];
 
     //Add attacks from player.attacks[].
     //Add attacks from player.inventory[].

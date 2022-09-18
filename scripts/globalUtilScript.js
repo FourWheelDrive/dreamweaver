@@ -162,6 +162,8 @@ class Player extends Entity {
                 document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = `${this.attacks[i].name}`;
             }
         }
+        //update inventory screen.
+        initializeInventoryWindow();
     }
 
     getInitialPosition(mapWidth, mapHeight) {
