@@ -336,6 +336,24 @@ function updateStatDisplay() {
     }
 }
 //Depending on pointerPosition, switch out attacks and then update inventory display.
+function inventoryDoubleClickHandler(e){
+    //change equip buttons to have bold borders.
+    document.querySelectorAll(".inventoryEquipButton").forEach(element => {
+        element.style.border = "3px solid black";})
+    //add document event listener for a click that fires once.
+    document.addEventListener("click", clicked => {
+        //switch borders back
+        document.querySelectorAll(".inventoryEquipButton").forEach(element => {
+            element.style.border = "1px solid black";})
+        //check element.
+        if(clicked.target.id.includes("gamePage__gameSpace__inventory__equipMenu__button")){
+            //i would call changeLoadout here, but it's not going to work. clicked and keyDown are different events.
+            let position = parseInt(clicked.target.id.slice(-1))-1;
+            let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
+            player.addNewAttack(attack, position);
+        }
+    },{once: true})
+}
 function changeLoadout(e) {
     let position;
     let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
@@ -354,6 +372,5 @@ function changeLoadout(e) {
                 break;
         }
     player.addNewAttack(attack, position);
-    initializeInventoryWindow();
 }
 

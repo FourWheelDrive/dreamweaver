@@ -108,6 +108,7 @@ function initializeInventoryWindow() {
         }
         button.setAttribute("class", `inventoryMenuButton`);
         button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
+        button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
 
         //append depending on type.
         if (type == "Equipped Attack") {
