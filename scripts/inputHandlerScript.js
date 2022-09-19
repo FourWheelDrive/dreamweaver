@@ -1,10 +1,15 @@
 async function keyDownHandler(mapArray, e) {
+    //Prevent default scrolling.
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+    
     //help key.
     if (e.code == "KeyZ") {
         let tutorial = document.getElementById("main__title__tutorial");
         //gotta remove the thing every time.
         //NOTE: might have to use a similar structure to ensure compatibility for encounter end dialogues!
-        function hideTutorial(){
+        function hideTutorial() {
             tutorial.style.display = "none";
             document.removeEventListener("click", hideTutorial);
             document.removeEventListener("keydown", hideTutorial);
@@ -79,6 +84,10 @@ async function keyDownHandler(mapArray, e) {
     setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
     procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
     */
+   //TAG: TEST OUTPUT
+    if (e.code == "Enter") {
+        player.addToInventory(new Attack("test heheha", 1, 1, 0, "test for mask"));
+    }
 }
 
 async function windowNavButtonHandler(e) {
@@ -348,9 +357,9 @@ function updateStatDisplay() {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: --`;
     }
     if (invObj.baseDamage != null) {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: ${invObj.baseDamage}`;
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Damage: ${invObj.damage}`;
     } else {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Base Damage: --`;
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Damage: --`;
     }
 }
 //Depending on pointerPosition, switch out attacks and then update inventory display.

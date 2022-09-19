@@ -29,7 +29,6 @@ function setHoverListener(mapArray) {
 
 //Draw and clear player.
 function showPlayer() {
-
     var currentCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
     currentCell.innerHTML = player.canvasSymbol;
     currentCell.style.fontWeight = "900";
@@ -178,11 +177,12 @@ function assignInventoryButtons() {
     }
 }
 
+var mapArray; //this is global now. It was too hard to keep encapsulated. Required for player masquerade.
+var mapWidth = 31, mapHeight = 31;
 async function initializeGame() {
     //create map for new room.
-    var mapWidth = 31, mapHeight = 31;
     var maxTunnels = 80, maxLength = 10;
-    var mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
+    mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
 
     //init player
     player = new Player(10, "@");

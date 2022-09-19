@@ -42,10 +42,10 @@ To-Do:
 - See class CELL for some ideas about cell.name!
 - Check which vars in class GAME actually matter. Also name them better.
     - check if need var to track moves since last battle.
-- Enemy and attacks need extra parameters! Messages for encounter and death, descriptions.
 - recomment NOTEs.
 - Remember to rename everything when the story is written! Not giving away the theme too early.
-- Look at inventory css again. See if i can get the button menu to be the same size as encounter menu.
+- NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
+- see why player.buttonData is dying.
 
 
 Inventory requires!

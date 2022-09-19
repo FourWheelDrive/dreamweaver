@@ -134,6 +134,16 @@ h1 {
 #gamePage__outputBar__box4{opacity: 0.4}
 #gamePage__outputBar__box5{opacity: 0.2}
 
+/*Death screen, but not loss screen.*/
+#masquerade__lossScreen{
+    height: 100vh;
+    width: 100vw;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
 
 /*Exists outside of this grid. Tutorial for help.*/
 #main__title__tutorial{

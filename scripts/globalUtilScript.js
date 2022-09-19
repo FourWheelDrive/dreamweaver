@@ -117,7 +117,12 @@ class Player extends Entity {
         this.inventoryButtonData = []; //relates buttons to attacks.
         this.inventoryPointerPosition = 0;
 
+        //Masquerade multipliers!
         this.masquerade = 0;
+        //array index 0 for multipliers is base. Thus, masquerade = 0 is base.
+        this.damageMulti = [1, 1, 1.5, 2, 2.5, 3] //math.floor and multiply base damage by these. Scales well for baseDMG 1-3.
+        this.healthMulti = [10, 9, 8, 7, 6, 5];
+
         this.wishes = 0;
 
         this.mapPosition = [];
@@ -127,9 +132,11 @@ class Player extends Entity {
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
         document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
     }
+    //Inventory methods
     addToInventory(newObject) {
         this.inventory.push(newObject);
     }
+    //Loadout switch from inventory
     addNewAttack(newAttack, position) {
         //NOTE: needs new case for 4+ attacks to go to replace.
         //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
@@ -173,13 +180,75 @@ class Player extends Entity {
             }
         }
     }
-
+    //Map methods
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
+    //Wishes.
     addWishes(difference) {
         this.wishes = this.wishes + difference;
         document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+    }
+    //Methods for masquerade.
+    //Updates stats, but ALSO CALLS ANIMATION.
+    async updateMasqueradeStats(operation){ //operation is -1 or 1. -1 is heal, 1 is death.
+        switch(operation){
+            case -1:
+                //healing has different dialogues. only appears on some masks.
+                break;
+            case 1:
+                //update screen and play defeat animation
+                game.gameState = "masquerade"
+                fadeElement("out", document.getElementById("gamePage"), 1);
+
+                this.masquerade = this.masquerade + 1;
+                //check if the player has actually lost.
+                let message;
+                switch (this.masquerade){
+                    case 1:
+                        message = `Defeat stings. <br> 
+                        HP decreased.`
+                        break;
+                    case 2:
+                        message = `Adversity is a harsh mentor. <br>
+                        ATK increased. <br> 
+                        HP decreased.`
+                        break;
+                    case 3:
+                        break;
+                    case 4:
+                        break;
+                    case 5:
+                        break;
+                    case 6: //loss case
+                        return game.loseGame();
+                }
+
+                let masqueradeWindow = document.getElementById("masquerade__lossScreen");
+                masqueradeWindow.innerHTML = message;
+                masqueradeWindow.style.display = "flex";
+                fadeElement("in", masqueradeWindow, 1);
+                await sleep(5000);
+
+                //update attack parameters.
+                for(var i = 0; i < player.inventory.length; i++){
+                    if(player.inventory[i] instanceof Attack){
+                        player.inventory[i].applyMasqueradeMulti();
+                    }
+                }
+                //update health.
+                this.maxHealth = this.healthMulti[this.masquerade];
+                this.changeHealth(-100, this);
+
+                //return to game.
+                clearPlayer(mapArray);
+                this.getInitialPosition(mapWidth, mapHeight); //reset player position
+                showPlayer();
+                fadeElement("out", masqueradeWindow, 1);
+                fadeElement("in", document.getElementById("gamePage"), 1);
+                game.gameState = "movement";
+                break;
+        }
     }
 }
 
@@ -218,13 +287,21 @@ class Attack {
         this.baseDamage = damage;                       //Masquerade multiplier applied to player baseDMG, baseCd. But only for player.
         this.baseCooldown = cooldown;
         this.baseChannelling = channelling;
+        /*Effects
+        - none: none.
+        - parry: Deflect enemy attacks for effectDuration.
+        - heal: apply negative damage to yourself.
 
-        /*Currently only one effect exists.
-        - None: none.
-        - Stun: for a certain number of attacks, attack does not land.
+        - stun: for a certain number of attacks, attack does not land.
         */
         this.effect = effect;
         this.baseEffectDuration = effectDuration;
+
+        //Effectual stats
+        this.damage;
+        this.cooldown;
+        this.channelling;
+        this.effectDuration;
 
         /*Attacks have four phases:
         Idle            - ready to be procced
@@ -233,6 +310,9 @@ class Attack {
         Cooldown        - Cooldown begins after proc. Can't be procced in this time.
         */
         this.status = "idle"; //use in cooldown system.
+
+        //apply modifiers.
+        this.applyMasqueradeMulti();
     }
     //Call this when enemy or player procs attack.
     //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
@@ -314,6 +394,12 @@ class Attack {
             caller.changeStatus("", caller);
         }
     }
+    //when masquerade gets updated, change stats.
+    //Also call this on initialization for new attack objects!
+    applyMasqueradeMulti(){
+        //NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
+        this.damage = Math.floor(this.baseDamage * player.damageMulti[player.masquerade]);
+    }
 }
 class Item {
     /*
@@ -334,9 +420,10 @@ class Game {
         /*
         CHANGES TO GAME.GAMESTATE.
         game.gameState tracks what the game is doing right now.
-        - Movement Phase
-        - Encounter Phase => tempTransition (for dialogues, but disables attacks)
-        - Shop Phase
+        - movement
+        - encounter => tempTransition (for dialogues, but disables attacks)
+        - shop
+        - masquerade => disables everything. Defeat dialogue.
 
         window.windowState tracks which screen the player is on.
         - map
@@ -440,7 +527,7 @@ class Game {
 
         //NOTE: player loss needs to be completed.
         if (player.health <= 0) { //player loses, trigger masquerade.
-            //Either just blank screen here, or make a new window like the results window.
+            player.updateMasqueradeStats(1);
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
             game.windowState = "results";
@@ -476,6 +563,10 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
         document.getElementById("gamePage__gameSpace__encounter__result").style.display = "none";
     }
+
+    //game win or lose.
+    winGame(){}
+    loseGame(){}
 }
 
 //=====================================================CELL-based classes
@@ -593,12 +684,45 @@ function calcPythagDistance(coordSetOne, coordSetCenter) {
     var distanceFromCenter = Math.sqrt((differenceX) ** 2 + (differenceY) ** 2);
     return distanceFromCenter;
 }
+//Fades elements in.
+async function fadeElement(operation, element, time) { //fade elements in/out
+    switch (operation) {
+        case "in":
+            var newOpacity = 0;
+            element.style.opacity = newOpacity;
+            var timer = setInterval(function () {
+                //if animation is done
+                if (element.style.opacity > 1) {
+                    clearInterval(timer);
+                } else {
+                    element.style.opacity = newOpacity;
+                    let ticks = (time*1000)/10;
+                    newOpacity += 1/ticks;
+                }
+            }, 10)
+            await sleep(time*1000);
+            break;
+        case "out":
+            var newOpacity = 1;
+            element.style.opacity = newOpacity;
+            var timer = setInterval(function () {
+                //if animation is done
+                if (element.style.opacity < 0) {
+                    clearInterval(timer);
+                } else {
+                    element.style.opacity = newOpacity;
+                    let ticks = (time*1000)/10;
+                    newOpacity -= 1/ticks;
+                }
+            }, 10)
+            await sleep(time*1000);
+            break;
+    }
+}
 
 //===============================================================Global Variables
 var game = new Game();
 var entityDatabase = new EntityDatabase();
-
-
 
 
 //==========NOT CURRENTLY IN USE.=========================================================================COOLDOWN classes
