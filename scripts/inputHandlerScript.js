@@ -3,7 +3,7 @@ async function keyDownHandler(mapArray, e) {
     if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
         e.preventDefault();
     }
-    
+
     //help key.
     if (e.code == "KeyZ") {
         let tutorial = document.getElementById("main__title__tutorial");
@@ -335,7 +335,7 @@ function moveInventoryMarker(previousPointerPosition = null) {
 }
 function updateStatDisplay() {
     //NOTE: this should probably apply modifiers instead of base values later.
-    let invObj = player.inventory[player.inventoryPointerPosition];
+    let invObj = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
     let type = invObj.constructor.name.toUpperCase();
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__type").innerHTML = type;
     document.getElementById("gamePage__gameSpace__inventory__statDisplay__equipped").innerHTML = `Equipped: ${invObj.equipped}`;

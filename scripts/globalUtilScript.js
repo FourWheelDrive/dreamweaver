@@ -173,9 +173,9 @@ class Player extends Entity {
         //update inventory display.
         initializeInventoryWindow();
     }
-    getInventoryCounterpartIndex(id){
-        for(var i= 0; i < player.inventory.length; i++){
-            if(player.inventory[i].id == id){
+    getInventoryCounterpartIndex(id) {
+        for (var i = 0; i < player.inventory.length; i++) {
+            if (player.inventory[i].id == id) {
                 return i;
             }
         }
@@ -191,8 +191,8 @@ class Player extends Entity {
     }
     //Methods for masquerade.
     //Updates stats, but ALSO CALLS ANIMATION.
-    async updateMasqueradeStats(operation){ //operation is -1 or 1. -1 is heal, 1 is death.
-        switch(operation){
+    async updateMasqueradeStats(operation) { //operation is -1 or 1. -1 is heal, 1 is death.
+        switch (operation) {
             case -1:
                 //healing has different dialogues. only appears on some masks.
                 break;
@@ -203,42 +203,58 @@ class Player extends Entity {
 
                 this.masquerade = this.masquerade + 1;
                 //check if the player has actually lost.
-                let message;
-                switch (this.masquerade){
+                let message1;
+                let message2;
+                switch (this.masquerade) {
                     case 1:
-                        message = `Defeat stings. <br> 
-                        HP decreased.`
+                        message1 = `Defeat stings.`
+                        message2 = `HP decreased.`
                         break;
                     case 2:
-                        message = `Adversity is a harsh mentor. <br>
-                        ATK increased. <br> 
+                        message1 = `Adversity is a harsh mentor.`
+                        message2 = `ATK increased. <br> 
                         HP decreased.`
                         break;
                     case 3:
+                        message1 = `i forgor what to put here`
+                        message2 = `ATK increased. <br> 
+                    HP decreased.`
                         break;
                     case 4:
+                        message1 = `Urge caution. It is dark beyond.`
+                        message2 = `ATK increased. <br> 
+                        HP decreased.`
                         break;
                     case 5:
+                        message1 = `One stares into the abyss.`
+                        message2 = `The abyss stares back. <br>
+                        ATK increased. <br> 
+                        HP decreased.`
                         break;
                     case 6: //loss case
                         return game.loseGame();
                 }
 
                 let masqueradeWindow = document.getElementById("masquerade__lossScreen");
-                masqueradeWindow.innerHTML = message;
+                let maskOutput1 = document.getElementById("masquerade__lossScreen__output1");
+                let maskOutput2 = document.getElementById("masquerade__lossScreen__output2");
+                maskOutput1.innerHTML = message1;
+                maskOutput2.innerHTML = message2;
                 masqueradeWindow.style.display = "flex";
                 fadeElement("in", masqueradeWindow, 1);
                 await sleep(5000);
 
                 //update attack parameters.
-                for(var i = 0; i < player.inventory.length; i++){
-                    if(player.inventory[i] instanceof Attack){
+                for (var i = 0; i < player.inventory.length; i++) {
+                    if (player.inventory[i] instanceof Attack) {
                         player.inventory[i].applyMasqueradeMulti();
                     }
                 }
                 //update health.
                 this.maxHealth = this.healthMulti[this.masquerade];
                 this.changeHealth(-100, this);
+                //update displays.
+                document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
 
                 //return to game.
                 clearPlayer(mapArray);
@@ -396,7 +412,7 @@ class Attack {
     }
     //when masquerade gets updated, change stats.
     //Also call this on initialization for new attack objects!
-    applyMasqueradeMulti(){
+    applyMasqueradeMulti() {
         //NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
         this.damage = Math.floor(this.baseDamage * player.damageMulti[player.masquerade]);
     }
@@ -486,6 +502,9 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
 
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
         //actually big brain this one, automatically switch to encounter screen.
         this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
@@ -565,8 +584,8 @@ class Game {
     }
 
     //game win or lose.
-    winGame(){}
-    loseGame(){}
+    winGame() { }
+    loseGame() { }
 }
 
 //=====================================================CELL-based classes
@@ -696,11 +715,11 @@ async function fadeElement(operation, element, time) { //fade elements in/out
                     clearInterval(timer);
                 } else {
                     element.style.opacity = newOpacity;
-                    let ticks = (time*1000)/10;
-                    newOpacity += 1/ticks;
+                    let ticks = (time * 1000) / 10;
+                    newOpacity += 1 / ticks;
                 }
             }, 10)
-            await sleep(time*1000);
+            await sleep(time * 1000);
             break;
         case "out":
             var newOpacity = 1;
@@ -711,11 +730,11 @@ async function fadeElement(operation, element, time) { //fade elements in/out
                     clearInterval(timer);
                 } else {
                     element.style.opacity = newOpacity;
-                    let ticks = (time*1000)/10;
-                    newOpacity -= 1/ticks;
+                    let ticks = (time * 1000) / 10;
+                    newOpacity -= 1 / ticks;
                 }
             }, 10)
-            await sleep(time*1000);
+            await sleep(time * 1000);
             break;
     }
 }

@@ -144,6 +144,9 @@ h1 {
     justify-content: center;
     align-items: center;
 }
+.masquerade_output{
+    text-align: center;
+}
 
 /*Exists outside of this grid. Tutorial for help.*/
 #main__title__tutorial{

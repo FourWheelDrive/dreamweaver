@@ -45,7 +45,6 @@ To-Do:
 - recomment NOTEs.
 - Remember to rename everything when the story is written! Not giving away the theme too early.
 - NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
-- see why player.buttonData is dying.
 
 
 Inventory requires!
