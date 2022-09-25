@@ -45,6 +45,12 @@ To-Do:
 - recomment NOTEs.
 - Remember to rename everything when the story is written! Not giving away the theme too early.
 - NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
+==========================================
+Next session:
+- finish new cell types
+    - cells should ALL have a .firstVisit() method. They're different for each, but all should have one.
+    - thus inputhandler only has to call .firstVisit().
+- add more enemy types.
 
 
 Inventory requires!

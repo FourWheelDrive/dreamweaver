@@ -139,12 +139,28 @@ h1 {
     height: 100vh;
     width: 100vw;
     
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 .masquerade_output{
+    text-align: center;
+}
+#masquerade__lossScreen__output1{
+    border-bottom: 1px solid black;
+}
+/*Loss screen*/
+#game__over__screen{
+    height: 100vh;
+    width: 100vw;
+    
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.game__over__screen__text{
     text-align: center;
 }
 

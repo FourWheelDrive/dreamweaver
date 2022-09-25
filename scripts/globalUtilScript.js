@@ -497,7 +497,8 @@ class Game {
     async encounterBegins() {
         //get a new enemy.
         //NOTE: changes depending on room, as well as cell.
-        enemy = entityDatabase.generateEnemy();
+        //CURRENT WORK. as we add more cells types, this line must change.
+        enemy = entityDatabase.generateTier1Enemy(1);
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
@@ -585,7 +586,12 @@ class Game {
 
     //game win or lose.
     winGame() { }
-    loseGame() { }
+    loseGame() {
+        this.gameState = "masquerade";
+        fadeElement("out", document.getElementById("gamePage"), 1);
+        document.getElementById("game__over__screen").style.display = "flex";
+        fadeElement("in", document.getElementById("game__over__screen"), 1);
+    }
 }
 
 //=====================================================CELL-based classes
@@ -671,21 +677,47 @@ class PathCell extends Cell {
     }
 }
 
+//plentiful encounters. Single encounters?
 class MinorEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
-
-        this.firstVisitFired = false;
     }
     initializeCell() {
         this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
     firstVisit() { //Start encounter.
-        if (this.firstVisitFired == false) {
+        if (this.visited == false) {
             game.encounterBegins();
-            this.firstVisitFired = true;
+            this.visited = true;
         }
+    }
+}
+//slightly less plentiful. Chain encounters, could reward with more wishes or items!
+class SequenceEncounterCell extends Cell {
+    constructor() {
+
+    }
+    firstVisit() {
+
+    }
+}
+//Story cells. Specific characters appear here, depending on ID.
+class SpecialEncounterCell extends Cell {
+    constructor() {
+
+    }
+    firstVisit() {
+
+    }
+}
+//End of room cells. Sequence enemies, then boss fights.
+class BossEncounterCell extends Cell {
+    constructor() {
+
+    }
+    firstVisit() {
+
     }
 }
 
