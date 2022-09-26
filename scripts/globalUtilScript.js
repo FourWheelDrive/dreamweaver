@@ -73,6 +73,7 @@ class Entity {
             //Check if encounter ends. If target health <= 0.
             if (target.health <= 0) {
                 game.encounterEnds();
+                return;
             }
             //Check if healed past maxHealth.
             if (target instanceof Player && target.health > target.maxHealth) {
@@ -429,6 +430,8 @@ class Item {
 /*
 Contents [class GAME]:
 */
+//var encounterPromiseResolve;
+//var encounterPromiseReject;
 class Game {
     constructor() {
         this.gameState = "movement";
@@ -461,12 +464,8 @@ class Game {
         this.channelledID;
 
         //flags.
-        this.attacksLocked = true;
-        this.movesLocked = false;
-
-        this.inventoryOpen = false;
-        this.shopOpen = false;
-
+        this.encounterPromiseResolve = function(){};
+        this.encounterPromiseReject = function(){};
         this.randomEncounterCooldown = 3;
         this.randomEncounterChance = 0.1;
         //-----------------------------------------------------------------------------
@@ -494,39 +493,72 @@ class Game {
         }
     }
 
-    async encounterBegins() {
-        //get a new enemy.
-        //NOTE: changes depending on room, as well as cell.
-        //CURRENT WORK. as we add more cells types, this line must change.
-        enemy = entityDatabase.generateTier1Enemy(1);
-        //initialize screen
-        document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
-        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
-
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
-        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
+    //Sequence functions: called per room.
+    //Encounter functions: called per individual fight.
+    async sequenceBegins(sequenceLength, tier) {
         //actually big brain this one, automatically switch to encounter screen.
         this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
             document.getElementById("gamePage__header__left").click();
         } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
 
+        //For sequence length, generate new enemies.
+        //
+        for (var i = 0; i < sequenceLength; i++) {
+            //NOTE: generate new enemies here, instead of in encounterBegins(). Use entityDatabase methods.
+            this.encounterBegins();
+            let encounterPromise = await new Promise(function(resolve, reject){
+                game.encounterPromiseResolve = resolve;
+                game.encounterPromiseReject = reject;
+            }).then(
+                function(error){
+                    return;
+                }
+            );
+        }
+
+        //when the enemies are all dead, end sequence.
+        this.sequenceEnds();
+    }
+    async sequenceEnds() {
+        //hide canvas.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+
+        //auto switch back to the map.
+        this.gameState = "movement";
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__map").style.display != "flex")
+
+        //reset encounter screen.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+    }
+    async encounterBegins() {
+        //get a new enemy.
+        //CURRENT WORK. as we add more cells types, this line must change.
+        enemy = entityDatabase.generateTier1Enemy(1);
+        //initialize screen
+        document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
+
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output3").innerHTML = "";
+
         //play the opening sequence. Freeze movement.
         this.gameState = "tempTransition";
         for (var i = 0; i < enemy.contactDialogue.length; i++) {
             await sleep(1000);
-            this.canvasOutput(enemy.contactDialogue[i]);
+            pushMainOutput(enemy.contactDialogue[i]);
         }
+        //enemy shows up!
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = enemy.canvasSymbol;
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = enemy.health;
         await sleep(1000);
 
         //Start the fight.
         this.gameState = "encounter";
         enemy.beginAttackSequence();
     }
-    //reset things.
-    //NOTE: also needs to show rewards dialogue.
     async encounterEnds() {
         clearInterval(enemy.attackInterval);
         enemy.attackInterval = null;
@@ -539,26 +571,33 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = "";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = "";
 
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
 
-        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
-
-
-        //NOTE: player loss needs to be completed.
         if (player.health <= 0) { //player loses, trigger masquerade.
             player.updateMasqueradeStats(1);
+            this.encounterPromiseReject(); //reject the sequence promise.
+            return;
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
-            game.windowState = "results";
             //NOTE: wish calculation algs go here.
             let newWishes = 1;
+            //Display dialogue!
+            for (var i = 0; i < enemy.defeatDialogue.length; i++) {
+                pushMainOutput(enemy.defeatDialogue[i]);
+                await sleep(1500);
+            }
+            pushMainOutput(`You got ${newWishes} Wishes!`);
+            //add money.
+            player.addWishes(newWishes);
+            await sleep(1500);
 
+            this.encounterPromiseResolve();
+
+            //OLD RESULTS SCREEN
+            /*
             document.getElementById("gamePage__gameSpace__encounter__result").style.display = "flex";
-            //NOTE: could expand later to display more lines of dialogue.
-            document.getElementById("gamePage__gameSpace__encounter__result__message").innerHTML = enemy.defeatDialogue[0];
-            document.getElementById("gamePage__gameSpace__encounter__result__wishesGranted").innerHTML = `You got ${newWishes} Wishes!`
-
             //Wait until player clicks button to go back.
             await new Promise(resolve => {
                 document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) => {
@@ -568,20 +607,8 @@ class Game {
                 document.addEventListener("keydown", (e) => {
                     document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
                 }, { once: true }); //once: true removes the listener after clicked once.
-            })
-            //add money.
-            player.addWishes(newWishes);
+            })*/
         }
-
-        this.gameState = "movement";
-        //auto switch back to the map.
-        do {
-            document.getElementById("gamePage__header__left").click();
-        } while (document.getElementById("gamePage__gameSpace__map").style.display != "flex")
-
-        //reset encounter screen.
-        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
-        document.getElementById("gamePage__gameSpace__encounter__result").style.display = "none";
     }
 
     //game win or lose.
@@ -688,17 +715,19 @@ class MinorEncounterCell extends Cell {
     }
     firstVisit() { //Start encounter.
         if (this.visited == false) {
-            game.encounterBegins();
+            game.sequenceBegins(2, 1);
             this.visited = true;
         }
     }
 }
 //slightly less plentiful. Chain encounters, could reward with more wishes or items!
 class SequenceEncounterCell extends Cell {
-    constructor() {
+    constructor(positionX, positionY) {
+        super(positionX, positionY);
 
+        this.sequenceLength = randInt(2) + 1;
     }
-    firstVisit() {
+    async firstVisit() {
 
     }
 }
@@ -713,10 +742,23 @@ class SpecialEncounterCell extends Cell {
 }
 //End of room cells. Sequence enemies, then boss fights.
 class BossEncounterCell extends Cell {
-    constructor() {
-
+    constructor(positionX, positionY) {
+        super(positionX, positionY);
+        //use game.currentRoom to define the room.
     }
     firstVisit() {
+        switch (game.currentRoom) {
+            case 1:
+                this.room1BossBegins();
+                break;
+            case 2:
+                break;
+        }
+    }
+    room1BossBegins() {
+
+    }
+    room2BossBegins() {
 
     }
 }

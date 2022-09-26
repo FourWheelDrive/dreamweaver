@@ -13,7 +13,7 @@ class EntityDatabase {
         switch (id) {
             //NOTE: change to make more thematically appropriate later :)
             case "Light Attack":
-                return new Attack(id, 1, 2, 0, "Strike nimbly.");
+                return new Attack(id, 11, 2, 0, "Strike nimbly.");
             case "Heavy Attack":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
             case "Basic Parry":

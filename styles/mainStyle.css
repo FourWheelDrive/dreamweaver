@@ -133,6 +133,10 @@ h1 {
 #gamePage__outputBar__box3{opacity: 0.6}
 #gamePage__outputBar__box4{opacity: 0.4}
 #gamePage__outputBar__box5{opacity: 0.2}
+.mainOutput{
+    font-weight: 500;
+    text-align: left;
+}
 
 /*Death screen, but not loss screen.*/
 #masquerade__lossScreen{

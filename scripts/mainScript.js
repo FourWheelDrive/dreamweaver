@@ -46,7 +46,7 @@ function clearPlayer(mapArray) {
 }
 
 //Output function
-function pushMainOutput(message) {
+async function pushMainOutput(message) {
     var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),
     document.getElementById("gamePage__outputBar__box2"),
     document.getElementById("gamePage__outputBar__box3"),
@@ -59,6 +59,7 @@ function pushMainOutput(message) {
         }
         if (i == 0) {
             outputBoxes[i].innerHTML = message;
+            fadeElement("in", outputBoxes[i], 1);
         }
     }
 }
