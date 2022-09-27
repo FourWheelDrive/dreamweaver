@@ -52,6 +52,8 @@ Next session:
     - thus inputhandler only has to call .firstVisit().
 - add more enemy types.
 
+- Might need to hide the boss room until a certain condition is satisfied? Then reset boss room's .visited??
+Perhaps.
 
 Inventory requires!
 Navigation

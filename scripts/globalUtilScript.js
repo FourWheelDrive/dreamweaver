@@ -464,8 +464,8 @@ class Game {
         this.channelledID;
 
         //flags.
-        this.encounterPromiseResolve = function(){};
-        this.encounterPromiseReject = function(){};
+        this.encounterPromiseResolve = function () { };
+        this.encounterPromiseReject = function () { };
         this.randomEncounterCooldown = 3;
         this.randomEncounterChance = 0.1;
         //-----------------------------------------------------------------------------
@@ -495,7 +495,7 @@ class Game {
 
     //Sequence functions: called per room.
     //Encounter functions: called per individual fight.
-    async sequenceBegins(sequenceLength, tier) {
+    async sequenceBegins(sequenceLength, tier = 1, boss = false) {
         //actually big brain this one, automatically switch to encounter screen.
         this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
@@ -503,15 +503,18 @@ class Game {
         } while (document.getElementById("gamePage__gameSpace__encounter").style.display != "grid")
 
         //For sequence length, generate new enemies.
-        //
+        // Also generates enemies (different cases for different cells). special case for bosses.
         for (var i = 0; i < sequenceLength; i++) {
+            //Generate a new enemy.
+            //NOTE: update with different cell types.
+            enemy = entityDatabase.generateTier1Enemy(1);
             //NOTE: generate new enemies here, instead of in encounterBegins(). Use entityDatabase methods.
             this.encounterBegins();
-            let encounterPromise = await new Promise(function(resolve, reject){
+            let encounterPromise = await new Promise(function (resolve, reject) {
                 game.encounterPromiseResolve = resolve;
                 game.encounterPromiseReject = reject;
             }).then(
-                function(error){
+                function (error) {
                     return;
                 }
             );
@@ -534,9 +537,6 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
     }
     async encounterBegins() {
-        //get a new enemy.
-        //CURRENT WORK. as we add more cells types, this line must change.
-        enemy = entityDatabase.generateTier1Enemy(1);
         //initialize screen
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = player.health;
 
@@ -715,7 +715,7 @@ class MinorEncounterCell extends Cell {
     }
     firstVisit() { //Start encounter.
         if (this.visited == false) {
-            game.sequenceBegins(2, 1);
+            game.sequenceBegins(1);
             this.visited = true;
         }
     }
@@ -756,7 +756,10 @@ class BossEncounterCell extends Cell {
         }
     }
     room1BossBegins() {
-
+        if (this.visited == false) {
+            
+                this.visited = true;
+        }
     }
     room2BossBegins() {
 

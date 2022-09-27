@@ -1,7 +1,7 @@
 body {
     background-color: #fff8e0;
+    touch-action: manipulation;
 }
-
 /*Text elements. Actually using h1 n stuff now!*/
 p {
     font-family: monospace;
