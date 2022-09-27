@@ -758,7 +758,8 @@ class BossEncounterCell extends Cell {
     room1BossBegins() {
         if (this.visited == false) {
             
-                this.visited = true;
+            game.sequenceBegins(5, "B1", true);
+            this.visited = true;
         }
     }
     room2BossBegins() {

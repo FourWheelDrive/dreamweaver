@@ -26,6 +26,12 @@ class EntityDatabase {
     generateEnemyAttackByName(id) {
 
     }
+    generateBossByName(id){
+        switch(id){
+            case 1:
+                return new Enemy(30, "%", new Attack("Boss1_Attack", 3, 5, 2), ["A great beast intercepts the road.", "The Clairvoyant frowns."], [""]);
+        }
+    }
 
     //we can use 2 functions. generateEnemyByID or ByTier.
     //ℵ ℑ ℜ ¡ ? ¿ 
