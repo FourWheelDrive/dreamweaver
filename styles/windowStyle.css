@@ -327,6 +327,8 @@
     width: 40%;
     aspect-ratio: 10/1;
     margin: 1%;
+
+    cursor: pointer;
 }
 
 #gamePage__gameSpace__inventory__statDisplay {
