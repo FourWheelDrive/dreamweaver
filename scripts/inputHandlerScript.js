@@ -57,7 +57,7 @@ async function keyDownHandler(mapArray, e) {
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
     if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
-        playerMovementHandler(e, mapArray, player, enemy);
+        playerMovementHandler(e.code);
     }
     //change loadout from inventory.
     if (game.gameState == "movement" && game.windowState == "inventory" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
@@ -79,14 +79,6 @@ async function keyDownHandler(mapArray, e) {
                 document.getElementById("gamePage__gameSpace__encounter__menu__button4").click();
                 break;
         }
-    }
-    /*
-    setTimeout(function () { player.atkOnCD = false; }, player.attacks[0].cooldown * 1000);
-    procButtonCooldownTimer(buttonId, player.attacks[0].cooldown); //animation. 
-    */
-   //TAG: TEST OUTPUT
-    if (e.code == "Enter") {
-        player.addToInventory(new Attack("test heheha", 1, 1, 0, "test for mask"));
     }
 }
 
@@ -132,7 +124,7 @@ async function windowNavButtonHandler(e) {
         //Show new window.
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
-                mapWindow.style.display = "flex";
+                mapWindow.style.display = "grid";
                 game.windowState = "map";
                 if (game.gameState != "movement") { //only valid when moving.
                     mapWindow.style.opacity = "0.5";
@@ -184,8 +176,8 @@ async function windowNavButtonHandler(e) {
 }
 
 //Movement and Attack keys. =================================================================================================||
-async function playerMovementHandler(e, mapArray) {
-    let boardRows = document.getElementById("gamePage__gameSpace__map").children;
+async function playerMovementHandler(key) {
+    let boardRows = document.getElementById("gamePage__gameSpace__map__canvas").children;
     //very cool directions array! Append each element instead of having 4 switch statements.
     //[left] [right] [up] [down]
     let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]],
@@ -198,7 +190,7 @@ async function playerMovementHandler(e, mapArray) {
     //Make an array [x][y] of position. .filter removes whitespace from split.
     let currentCellPos = currentCell.id.split(/[\[\]]/).filter(element => element.length >= 1);
     //deltapos depending on key pressed.
-    switch (e.code) {
+    switch (key) {
         case "KeyW":
             newDirection = directions[2];
             break;
@@ -364,7 +356,6 @@ function updateStatDisplay() {
 }
 //Depending on pointerPosition, switch out attacks and then update inventory display.
 function inventoryDoubleClickHandler(e) {
-    alert("hehehehehehehehehe")
     //change equip buttons to have bold borders.
     document.querySelectorAll(".inventoryEquipButton").forEach(element => {
         element.style.border = "3px solid black";

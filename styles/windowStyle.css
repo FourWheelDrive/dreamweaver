@@ -1,10 +1,48 @@
 /*Windows! Maybe put these in a different file.*/
 /*Map window. =================================*/
 #gamePage__gameSpace__map {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    position: relative;
+    display: grid;
+    grid-template-areas: 
+    "....... ....... ....... canvas ....... ....... ......."
+    "....... ....... ....... canvas ....... ....... ......."
+    "....... ....... ....... canvas buttonW buttonW ......."
+    "....... ....... ....... canvas buttonA buttonD ......."
+    "....... ....... ....... canvas buttonS buttonS ......."
+    "....... ....... ....... canvas ....... ....... ......."
+    "....... ....... ....... canvas ....... ....... .......";
+    grid-template-columns: 3em 3em 3em auto 3em 3em 3em;
+    grid-template-rows: auto auto auto auto auto auto auto;
+}
+#gamePage__gameSpace__map__canvas{
+    grid-area: canvas;
+}
+/*Movement buttons for touch or click.*/
+.mapMvmtButton{
+    position: relative;
+    background-color: #fff8e0;
+
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 400;
+
+    border: none;
+    margin: auto;
+    min-width: 2em;
+    max-width: 2em;
+    aspect-ratio: 1/1;
+}
+#gamePage__gameSpace__map__mapMvmtW{
+    grid-area: buttonW;
+}
+#gamePage__gameSpace__map__mapMvmtA{
+    grid-area: buttonA;
+}
+#gamePage__gameSpace__map__mapMvmtS{
+    grid-area: buttonS;
+}
+#gamePage__gameSpace__map__mapMvmtD{
+    grid-area: buttonD;
 }
 
 .mapRow {
@@ -342,11 +380,12 @@
     /*border-top: 1px solid black;*/
 
     display: grid;
-    grid-template-areas: "type null1"
+    grid-template-areas: 
+        "type .................."
         "description description"
-        "damage channelling"
-        "cooldown equipped"
-        "effect null2";
+        "damage      channelling"
+        "cooldown       equipped"
+        "effect ................";
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
 }
@@ -370,8 +409,6 @@
 #gamePage__gameSpace__inventory__statDisplay__channelling {grid-area: channelling;}
 #gamePage__gameSpace__inventory__statDisplay__cooldown {grid-area: cooldown;}
 #gamePage__gameSpace__inventory__statDisplay__equipped {grid-area: equipped;}
-#gamePage__gameSpace__inventory__statDisplay__null1 {grid-area: null1}
-#gamePage__gameSpace__inventory__statDisplay__null2 {grid-area: null2}
 /*Shop Window. ================================*/
 #gamePage__gameSpace__shop {
     display: none;

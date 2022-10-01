@@ -746,6 +746,10 @@ class BossEncounterCell extends Cell {
         super(positionX, positionY);
         //use game.currentRoom to define the room.
     }
+    initializeCell() {
+        this.name = super.cellNameGenerator("bossLocation", game.currentRoom);
+        this.symbol = super.cellSymbolGenerator("bossLocation", game.currentRoom);
+    }
     firstVisit() {
         switch (game.currentRoom) {
             case 1:
@@ -757,7 +761,7 @@ class BossEncounterCell extends Cell {
     }
     room1BossBegins() {
         if (this.visited == false) {
-            
+            enemy = entityDatabase.generateBossByName(1);
             game.sequenceBegins(5, "B1", true);
             this.visited = true;
         }

@@ -2,67 +2,8 @@ const windowDirectory = ["map", "encounter", "inventory", "shop"];
 var currentWindowIndex = 0;
 var player;
 var enemy;
-
-//Display position listeners.
-function setHoverListener(mapArray) {
-    var boardRows = document.getElementById("gamePage__gameSpace__map").children;
-
-    for (var i = 0; i < boardRows.length; i++) { //for each row div:
-        let rowCells = boardRows[i].children;
-        for (var j = 0; j < rowCells.length; j++) { //for each column cell in a row:
-            let cell = rowCells[j];
-            cell.addEventListener("mouseover", function () { //this updates the display according to cell id.
-                let tempString = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1); //get cell coords
-                let position = tempString.toString().split(/[\[\]\,]/);
-                let cellEntity = mapArray[position[0]][position[1]];
-
-                document.getElementById("gamePage__footer__position").innerHTML = tempString;
-                if (cell.innerHTML != ".") {
-                    document.getElementById("gamePage__footer__cellName").innerHTML = cellEntity.name;
-                } else {
-                    document.getElementById("gamePage__footer__cellName").innerHTML = "";
-                }
-            })
-        }
-    }
-}
-
-//Draw and clear player.
-function showPlayer() {
-    var currentCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
-    currentCell.innerHTML = player.canvasSymbol;
-    currentCell.style.fontWeight = "900";
-    currentCell.style.opacity = "1";
-}
-function clearPlayer(mapArray) {
-    var previousCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
-    var cellEntity = mapArray[player.mapPosition[0]][player.mapPosition[1]];
-    previousCell.innerHTML = cellEntity.symbol;
-    //NOTE: this may change as more room types are added.
-    previousCell.style.opacity = "0.5";
-    if (cellEntity instanceof PathCell) {
-        previousCell.style.fontWeight = "400";
-    }
-}
-
-//Output function
-async function pushMainOutput(message) {
-    var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),
-    document.getElementById("gamePage__outputBar__box2"),
-    document.getElementById("gamePage__outputBar__box3"),
-    document.getElementById("gamePage__outputBar__box4"),
-    document.getElementById("gamePage__outputBar__box5")]
-
-    for (var i = outputBoxes.length - 1; i > -1; i--) {
-        if (i > 0) {
-            outputBoxes[i].innerHTML = outputBoxes[i - 1].innerHTML;
-        }
-        if (i == 0) {
-            outputBoxes[i].innerHTML = message;
-            fadeElement("in", outputBoxes[i], 1);
-        }
-    }
-}
+var mapArray; //this is global now. It was too hard to keep encapsulated. Required for player masquerade.
+var mapWidth = 31, mapHeight = 31;
 
 //inventory screen initialize.
 //global inventory var.
@@ -178,8 +119,80 @@ function assignInventoryButtons() {
     }
 }
 
-var mapArray; //this is global now. It was too hard to keep encapsulated. Required for player masquerade.
-var mapWidth = 31, mapHeight = 31;
+//Display position listeners.
+function setHoverListener(mapArray) {
+    var boardRows = document.getElementById("gamePage__gameSpace__map__canvas").children;
+
+    for (var i = 0; i < boardRows.length; i++) { //for each row div:
+        let rowCells = boardRows[i].children;
+        for (var j = 0; j < rowCells.length; j++) { //for each column cell in a row:
+            let cell = rowCells[j];
+            cell.addEventListener("mouseover", function () { //this updates the display according to cell id.
+                let tempString = cell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1); //get cell coords
+                let position = tempString.toString().split(/[\[\]\,]/);
+                let cellEntity = mapArray[position[0]][position[1]];
+
+                document.getElementById("gamePage__footer__position").innerHTML = tempString;
+                if (cell.innerHTML != ".") {
+                    document.getElementById("gamePage__footer__cellName").innerHTML = cellEntity.name;
+                } else {
+                    document.getElementById("gamePage__footer__cellName").innerHTML = "";
+                }
+            })
+        }
+    }
+}
+//Initialize movement button listeners.
+function initMvmtListener(){
+    document.getElementById("gamePage__gameSpace__map__mapMvmtW").addEventListener("click", playerMovementHandler.bind(null, "KeyW"));
+    document.getElementById("gamePage__gameSpace__map__mapMvmtA").addEventListener("click", playerMovementHandler.bind(null, "KeyA"));
+    document.getElementById("gamePage__gameSpace__map__mapMvmtS").addEventListener("click", playerMovementHandler.bind(null, "KeyS"));
+    document.getElementById("gamePage__gameSpace__map__mapMvmtD").addEventListener("click", playerMovementHandler.bind(null, "KeyD"));
+}
+function initAtkListener(){
+    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler);
+    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler);
+}
+
+//Draw and clear player.
+function showPlayer() {
+    var currentCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
+    currentCell.innerHTML = player.canvasSymbol;
+    currentCell.style.fontWeight = "900";
+    currentCell.style.opacity = "1";
+}
+function clearPlayer(mapArray) {
+    var previousCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
+    var cellEntity = mapArray[player.mapPosition[0]][player.mapPosition[1]];
+    previousCell.innerHTML = cellEntity.symbol;
+    //NOTE: this may change as more room types are added.
+    previousCell.style.opacity = "0.5";
+    if (cellEntity instanceof PathCell) {
+        previousCell.style.fontWeight = "400";
+    }
+}
+
+//Output function
+async function pushMainOutput(message) {
+    var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),
+    document.getElementById("gamePage__outputBar__box2"),
+    document.getElementById("gamePage__outputBar__box3"),
+    document.getElementById("gamePage__outputBar__box4"),
+    document.getElementById("gamePage__outputBar__box5")]
+
+    for (var i = outputBoxes.length - 1; i > -1; i--) {
+        if (i > 0) {
+            outputBoxes[i].innerHTML = outputBoxes[i - 1].innerHTML;
+        }
+        if (i == 0) {
+            outputBoxes[i].innerHTML = message;
+            fadeElement("in", outputBoxes[i], 1);
+        }
+    }
+}
+
 async function initializeGame() {
     //create map for new room.
     var maxTunnels = 80, maxLength = 10;
@@ -205,11 +218,9 @@ async function initializeGame() {
 
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray), false);
-    //Add listeners to attack buttons.
-    document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler, false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler, false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler, false);
-    document.getElementById("gamePage__gameSpace__encounter__menu__button4").addEventListener("click", playerAttackHandler, false);
+    //Add listeners to attack and movement buttons.
+    initAtkListener();
+    initMvmtListener();
     //Hover listener.
     setHoverListener(mapArray);
 

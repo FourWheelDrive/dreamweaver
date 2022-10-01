@@ -133,7 +133,7 @@ function pushMapToDOM(mapArray) { //pass in generation vars
             rowDiv.appendChild(para);
         }
         //append rowdiv to document
-        document.getElementById("gamePage__gameSpace__map").appendChild(rowDiv);
+        document.getElementById("gamePage__gameSpace__map__canvas").appendChild(rowDiv);
     }
 }
 
