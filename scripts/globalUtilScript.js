@@ -531,7 +531,7 @@ class Game {
         this.gameState = "movement";
         do {
             document.getElementById("gamePage__header__left").click();
-        } while (document.getElementById("gamePage__gameSpace__map").style.display != "flex")
+        } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
 
         //reset encounter screen.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
