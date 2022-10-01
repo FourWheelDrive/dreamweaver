@@ -78,13 +78,13 @@ function initializeInventoryWindow() {
         */
         
         //Extra cases for mobile.
-        if (/iPhone|iPad|/i.test(navigator.userAgent)) {
-            button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
+        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             button.addEventListener("click", e => {
                 inventoryButtonClickHandler(e);
                 inventoryDoubleClickHandler(e);
             }); //for click stuff.
         } else {
+            console.log("he")
             button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
             button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
         }
