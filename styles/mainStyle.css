@@ -9,6 +9,7 @@ p {
     line-height: 100%;
     letter-spacing: 2px;
     text-align: center;
+    color: black;
 }
 h1 {
     font-family: monospace;
