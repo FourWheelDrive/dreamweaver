@@ -83,7 +83,6 @@ function initializeInventoryWindow() {
                 inventoryButtonClickHandler(e, true);
             }); //for click stuff.
         } else {
-            console.log("he")
             button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
             button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
         }

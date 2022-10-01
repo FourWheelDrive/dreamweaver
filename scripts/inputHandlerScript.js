@@ -299,6 +299,7 @@ function inventoryButtonClickHandler(e, iOS = false) {
     player.inventoryPointerPosition = e.target.id.slice(-1);
     moveInventoryMarker(temp);
     if(iOS){
+        alert("true!")
         inventoryDoubleClickHandler(e);
     }
 }
