@@ -66,9 +66,14 @@ function initializeInventoryWindow() {
                 break;
         }
         button.setAttribute("class", `inventoryMenuButton`);
-        button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
-        button.addEventListener("auxclick", inventoryRightClickHandler); //for equip stuff.
-        button.addEventListener("dblclick", inventoryRightClickHandler); //for equip stuff.
+        //Extra cases for mobile.
+        if (/iPhone|iPad/i.test(navigator.userAgent)) {
+            button.addEventListener("click", inventoryDoubleClickHandler); //for click stuff.
+        } else {
+            button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
+            button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
+        }
+        
 
         //append depending on type.
         if (type == "Equipped Attack") {
@@ -144,13 +149,13 @@ function setHoverListener(mapArray) {
     }
 }
 //Initialize movement button listeners.
-function initMvmtListener(){
+function initMvmtListener() {
     document.getElementById("gamePage__gameSpace__map__mapMvmtW").addEventListener("click", playerMovementHandler.bind(null, "KeyW"));
     document.getElementById("gamePage__gameSpace__map__mapMvmtA").addEventListener("click", playerMovementHandler.bind(null, "KeyA"));
     document.getElementById("gamePage__gameSpace__map__mapMvmtS").addEventListener("click", playerMovementHandler.bind(null, "KeyS"));
     document.getElementById("gamePage__gameSpace__map__mapMvmtD").addEventListener("click", playerMovementHandler.bind(null, "KeyD"));
 }
-function initAtkListener(){
+function initAtkListener() {
     document.getElementById("gamePage__gameSpace__encounter__menu__button1").addEventListener("click", playerAttackHandler);
     document.getElementById("gamePage__gameSpace__encounter__menu__button2").addEventListener("click", playerAttackHandler);
     document.getElementById("gamePage__gameSpace__encounter__menu__button3").addEventListener("click", playerAttackHandler);
