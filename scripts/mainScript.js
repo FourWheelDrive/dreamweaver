@@ -67,8 +67,9 @@ function initializeInventoryWindow() {
         }
         button.setAttribute("class", `inventoryMenuButton`);
         //Extra cases for mobile.
-        if (/iPhone|iPad/i.test(navigator.userAgent)) {
+        if (/iPhone|iPad|/i.test(navigator.userAgent)) {
             button.addEventListener("click", inventoryDoubleClickHandler); //for click stuff.
+            alert("iOS!")
         } else {
             button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
             button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
