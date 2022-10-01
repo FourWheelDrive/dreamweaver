@@ -355,7 +355,7 @@ function updateStatDisplay() {
     }
 }
 //Depending on pointerPosition, switch out attacks and then update inventory display.
-function inventoryDoubleClickHandler(e) {
+function inventoryRightClickHandler(e) {
     //change equip buttons to have bold borders.
     document.querySelectorAll(".inventoryEquipButton").forEach(element => {
         element.style.border = "3px solid black";
