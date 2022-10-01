@@ -294,10 +294,13 @@ function flushCSS(element) { //flushes css to no transition.
 
 //Inventory updates and actions. ============================================================================================||
 //handles clicks instead of arrow keys. calls moveInventoryMarker().
-function inventoryButtonClickHandler(e) {
+function inventoryButtonClickHandler(e, iOS = false) {
     let temp = player.inventoryPointerPosition;
     player.inventoryPointerPosition = e.target.id.slice(-1);
     moveInventoryMarker(temp);
+    if(iOS){
+        inventoryDoubleClickHandler(e);
+    }
 }
 //when player moves pointer, update display, scroll, and update stat panel.
 function moveInventoryMarker(previousPointerPosition = null) {
