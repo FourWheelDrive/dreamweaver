@@ -80,6 +80,7 @@ function initializeInventoryWindow() {
         //Extra cases for mobile.
         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             button.addEventListener("click", e => {
+                alert("got here at least.")
                 inventoryButtonClickHandler(e, true);
             }); //for click stuff.
         } else {
