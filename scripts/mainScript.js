@@ -66,16 +66,29 @@ function initializeInventoryWindow() {
                 break;
         }
         button.setAttribute("class", `inventoryMenuButton`);
+
+        /*
+        button.addEventListener("click", e => {
+            if(e.detail === 1){
+                inventoryButtonClickHandler(e);
+            } else if(e.detail === 2){
+                inventoryDoubleClickHandler(e);
+            }
+        }); //for click stuff.
+        */
+        
         //Extra cases for mobile.
         if (/iPhone|iPad|/i.test(navigator.userAgent)) {
-            button.addEventListener("click", inventoryDoubleClickHandler); //for click stuff.
-            alert("iOS!")
+            button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
+            button.addEventListener("click", e => {
+                inventoryButtonClickHandler(e);
+                inventoryDoubleClickHandler(e);
+            }); //for click stuff.
         } else {
             button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
             button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
         }
         
-
         //append depending on type.
         if (type == "Equipped Attack") {
             section1Menu.appendChild(button);
