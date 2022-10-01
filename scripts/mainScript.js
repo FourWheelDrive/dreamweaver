@@ -77,16 +77,14 @@ function initializeInventoryWindow() {
         }); //for click stuff.
         */
         
-        //Extra cases for mobile.
+        /*Extra cases for mobile.
         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             button.addEventListener("click", e => {
                 alert("got here at least.")
                 inventoryButtonClickHandler(e, true);
             }); //for click stuff.
-        } else {
+        }*/
             button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
-            button.addEventListener("dblclick", inventoryDoubleClickHandler); //for equip stuff.
-        }
         
         //append depending on type.
         if (type == "Equipped Attack") {
