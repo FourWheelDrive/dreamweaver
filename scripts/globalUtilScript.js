@@ -751,6 +751,7 @@ class BossEncounterCell extends Cell {
         this.symbol = super.cellSymbolGenerator("bossLocation", game.currentRoom);
     }
     firstVisit() {
+        //Depending on which room it is, spawn a different boss.
         switch (game.currentRoom) {
             case 1:
                 this.room1BossBegins();
