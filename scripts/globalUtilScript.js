@@ -499,7 +499,7 @@ class Attack {
                 case "parry":
                     tempAppliedStatus = "parrying";
                     caller.changeStatus(tempAppliedStatus, caller);
-                    await sleep(this.effectObject * 1000);
+                    await sleep(this.effectObject.duration * 1000);
                     break;
                 case "heal":
                     //always check if the channeling has been interrupted.
