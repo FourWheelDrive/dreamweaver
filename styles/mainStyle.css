@@ -19,7 +19,7 @@ h1 {
     letter-spacing: 2px;
     text-align: center;
 }
-span{color: black;}
+button{color: black;}
 
 /*gameSpace grid for UI display elements*/
 #gamePage{
