@@ -532,7 +532,7 @@ class Attack {
                         if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
                             tempAppliedStatus = "casting";
                             caller.changeStatus(tempAppliedStatus, caller);
-                            target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.durationType), target);
+                            target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative), target);
                             game.canvasOutput(`Stunned the enemy!`);
                             await sleep(300);
                         }
@@ -542,7 +542,7 @@ class Attack {
 
                             attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
                             if (!attackParried) {
-                                target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.durationType), target);
+                                target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative), target);
                                 game.canvasOutput(`Stunned!`);
                             } else if (attackParried) {
                                 game.canvasOutput(`Avoided the stun.`);
@@ -597,7 +597,7 @@ class StatusEffect {
     }
     //when the affected entity makes an attack, iterate duration.
     iterateDuration() {
-        if (this.attackIterative == true) {
+        if (this.attackIterative) {
             this.remainingDuration = this.remainingDuration - 1;
 
             switch (this.type) {
