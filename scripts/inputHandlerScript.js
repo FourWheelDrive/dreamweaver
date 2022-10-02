@@ -381,11 +381,10 @@ function updateStatDisplay() {
     } else {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: --`;
     }
-    if (invObj.effect != "none") {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effect} - [${invObj.baseEffectDuration}s]`;
-    } else {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`;
-    }
+    try{
+        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effectObject.type.toUpperCase()}, ${invObj.effectObject.effect}[${invObj.effectObject.duration}]
+        <br> ${invObj.effectObject.effectDescription}`;
+    } catch (e){document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`;}
     if (invObj.baseChannelling != null) {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: ${invObj.baseChannelling}s`;
     } else {

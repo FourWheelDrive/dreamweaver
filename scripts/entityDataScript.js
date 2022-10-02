@@ -18,12 +18,13 @@ class EntityDatabase {
             case "Heavy Attack":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
             case "Basic Parry":
-                return new Attack(id, 0, 2, 0, "Guard against peril.", new StatusEffect(player, "parry", 1, "time"));
+                return new Attack(id, 0, 2, 0, "Guard against peril.", new StatusEffect(player, "parry", 1));
             //For testing only.
             case "Test Heal":
                 return new Attack(id, -1, 3, 1, "Mend wounds.", new StatusEffect(player, "heal"));
             case "Test Stun":
-                return new Attack(id, 0, 4, 1, "Stun the foe.", new StatusEffect(player, "stun", 2, "turn"));
+                return new Attack(id, 0, 4, 1, "Stun the foe.", new StatusEffect(player, "stun", 2, true, 
+                "Prevents enemy attacks."));
         }
     }
     generateEnemyAttackByName(id) {

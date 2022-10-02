@@ -400,7 +400,10 @@
     grid-area: type;
     text-decoration: underline;
 }
-#gamePage__gameSpace__inventory__statDisplay__effect {grid-area: effect;}
+#gamePage__gameSpace__inventory__statDisplay__effect {
+    grid-area: effect;
+    height: 2em;
+}
 #gamePage__gameSpace__inventory__statDisplay__description {
     grid-area: description;
     margin: 0.5%;

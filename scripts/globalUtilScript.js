@@ -571,7 +571,7 @@ class Attack {
     }
 }
 class StatusEffect {
-    constructor(parent, effect, duration = null, durationType = null) {
+    constructor(parent, effect, duration = null, attackIterative = false, effectDescription = null) {
         this.parent = parent;
         this.target;
         if (this.parent instanceof Enemy) {
@@ -580,10 +580,11 @@ class StatusEffect {
             this.target = enemy;
         }
         this.duration = duration;
-        this.durationType = durationType;
+        this.attackIterative = attackIterative;
         this.remainingDuration = duration;
 
         this.effect = effect;
+        this.effectDescription = effectDescription; //for display purposes.
         this.type;
         switch (this.effect) {
             //buffs
@@ -596,7 +597,7 @@ class StatusEffect {
     }
     //when the affected entity makes an attack, iterate duration.
     iterateDuration() {
-        if (this.durationType == "turn") {
+        if (this.attackIterative == true) {
             this.remainingDuration = this.remainingDuration - 1;
 
             switch (this.type) {
