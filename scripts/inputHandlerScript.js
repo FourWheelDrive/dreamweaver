@@ -286,7 +286,26 @@ function attackButtonCooldownAnimation(buttonId, time) {
     }
     //Cooldown the button while animation takes place.
     button.disabled = true;
-    setTimeout(function () { button.disabled = false; }, time * 1000);
+    
+    //attach cooldown buttons to handler!
+    switch(buttonId){
+        case "gamePage__gameSpace__encounter__menu__button1":
+            cooldownHandler.attackUCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
+            break;
+        case "gamePage__gameSpace__encounter__menu__button2":
+            cooldownHandler.attackICooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
+            break;
+        case "gamePage__gameSpace__encounter__menu__button3":
+            cooldownHandler.attackJCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
+            break;
+        case "gamePage__gameSpace__encounter__menu__button4":
+            cooldownHandler.attackKCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
+            break;
+        default:
+            console.log("Error! Couldn't attach cooldown to cooldownHandler.");
+            break;
+    }
+    
 }
 function flushCSS(element) { //flushes css to no transition.
     element.offsetHeight;

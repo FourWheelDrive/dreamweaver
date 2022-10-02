@@ -224,14 +224,12 @@ async function initializeGame() {
     player.addToInventory(entityDatabase.generateAttackByName("Heavy Attack"));
     player.addToInventory(entityDatabase.generateAttackByName("Basic Parry"));
     player.addToInventory(entityDatabase.generateAttackByName("Test Heal"));
+    player.addToInventory(entityDatabase.generateAttackByName("Test Stun"));
     player.addNewAttack(player.inventory[0], 0);
+    player.addNewAttack(player.inventory[4], 1);
 
     player.getInitialPosition(mapWidth, mapHeight);
     showPlayer();
-
-    //init cooldown modules.
-    var cooldownHandler = new CooldownHandler();
-    cooldownHandler.initCooldowns();
 
     //Input handler.
     document.addEventListener("keydown", keyDownHandler.bind(null, mapArray), false);

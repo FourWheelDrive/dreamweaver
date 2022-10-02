@@ -8,6 +8,7 @@ class EntityDatabase {
         this.minorEnemies = []; //NOTE: will also require enemies to have either an ID or a tier of some sort. Some way to say "i want random of this type."
         //unless i just make different arrays for different types of enemies? hmmmm.
     }
+    //=============ATTACKS=============
     //Can also use another one! generateAttackByTier?
     generateAttackByName(id) {
         switch (id) {
@@ -17,22 +18,25 @@ class EntityDatabase {
             case "Heavy Attack":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
             case "Basic Parry":
-                return new Attack(id, 0, 2, 0, "Guard against peril.", "parry", 1);
+                return new Attack(id, 0, 2, 0, "Guard against peril.", new StatusEffect(player, "parry", 1, "time"));
             //For testing only.
             case "Test Heal":
-                return new Attack(id, -1, 3, 1, "Mend wounds.", "heal", 0);
+                return new Attack(id, -1, 3, 1, "Mend wounds.", new StatusEffect(player, "heal"));
+            case "Test Stun":
+                return new Attack(id, 0, 4, 1, "Stun the foe.", new StatusEffect(player, "stun", 2, "turn"));
         }
     }
     generateEnemyAttackByName(id) {
-
     }
+
+    //=============ENEMIES=============
+    //Will bosses have their own subclass??
     generateBossByName(id){
         switch(id){
             case 1:
                 return new Enemy(30, "%", new Attack("Boss1_Attack", 3, 5, 2), ["A great beast intercepts the road.", "The Clairvoyant frowns."], [""]);
         }
     }
-
     //we can use 2 functions. generateEnemyByID or ByTier.
     //ℵ ℑ ℜ ¡ ? ¿ 
     generateTier1Enemy(type = -1) {
@@ -58,9 +62,5 @@ class EntityDatabase {
                 return new Enemy(3, "‼", new Attack("Quick Attack", 1, 1, 0.5, "quick enemy attack"), 
                 ["Bone-white flashes in monochrome light."], ["The creature shatters."])
         }
-    }
-    //NOTE: bosses will have their own Entity subclass.
-    generateBossEnemy() {
-
     }
 }

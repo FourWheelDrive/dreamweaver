@@ -56,13 +56,11 @@ class Entity {
         Heavy Armour?
         Stun 
         can only apply 1 buff/debuff to an entity at a time. Adding another replaces!*/
-        this.buffEffect = "";
-        this.debuffEffect = "";
+        this.buff = null;
+        this.debuff = null;
 
         //Canvas stuff.
         this.actionLine = this.status;                  //action: attacking, parrying
-        this.buffLine = this.buffEffect;
-        this.debuffLine = this.debuffEffect;
     }
 
     changeHealth(difference, target) {
@@ -105,6 +103,45 @@ class Entity {
         }
         if (caller instanceof Enemy) {
             document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = caller.status;
+        }
+    }
+    //pass in a statusEffect object. Add.
+    addStatusEffect(statusEffect, target) {
+        switch (statusEffect.type) {
+            case "buff":
+                this.buff = statusEffect;
+                if (target instanceof Player) {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
+                } else {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
+                }
+                break;
+            case "debuff":
+                this.debuff = statusEffect;
+                if (target instanceof Player) {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
+                } else {
+                    document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
+                }
+                break;
+        }
+    }
+    clearStatusEffect(operation, target) {
+        if (operation == "buff") {
+            this.buff = null;
+            if (target instanceof Player) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = `+`;
+            } else {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `+`;
+            }
+        }
+        if (operation == "debuff") {
+            this.debuff = null;
+            if (target instanceof Player) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = `-`;
+            } else {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `-`;
+            }
         }
     }
 }
@@ -249,6 +286,9 @@ class Player extends Entity {
                 for (var i = 0; i < player.inventory.length; i++) {
                     if (player.inventory[i] instanceof Attack) {
                         player.inventory[i].applyMasqueradeMulti();
+                        try {
+                            player.inventory[i].statusApplyMasqueradeMulti();
+                        } catch (e) { }
                     }
                 }
                 //update health.
@@ -293,7 +333,7 @@ class Enemy extends Entity {
 //=====================================================Combat utility classes
 //Might need to add a tier system! Or maybe just keep it all the same? Player can build combos or change multipliers?
 class Attack {
-    constructor(name, damage, cooldown, channelling, description, effect = "none", effectDuration = "0") {
+    constructor(name, damage, cooldown, channelling, description, effectObject = null) {
         //data stats
         this.name = name;
         this.id = game.nextInventoryObjectId;              //identifies the object. Could differentiate between the same type.
@@ -311,14 +351,12 @@ class Attack {
 
         - stun: for a certain number of attacks, attack does not land.
         */
-        this.effect = effect;
-        this.baseEffectDuration = effectDuration;
+        this.effectObject = effectObject;
 
         //Effectual stats
         this.damage;
         this.cooldown;
         this.channelling;
-        this.effectDuration;
 
         /*Attacks have four phases:
         Idle            - ready to be procced
@@ -332,14 +370,7 @@ class Attack {
         this.applyMasqueradeMulti();
     }
     //Call this when enemy or player procs attack.
-    //NOTE: also update canvas output when called. "Enemy hit you for attack.damage!"
     async attackProcced(caller, target) {
-        //NOTE: also needs to apply effects.
-        //no need to check if on cooldown. button gets disabled with animation.
-
-        //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
-        var tempAppliedStatus;
-        var attackParried;
         //Step 0: await channelling.
         //Timeout with sleep().
         //NOTE: It's possible I could await a setTimeout here.
@@ -348,67 +379,188 @@ class Attack {
             await sleep(this.baseChannelling * 1000);
         }
 
-        //Step 1: Apply changes to game and Entities. After channelling, attack
-        //Step 2: Update display elements
-        switch (this.effect) {
-            case "none": //standard damaging attack.
-                //always check if the channeling has been interrupted.
+        //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
+        //==================Step 1: Apply status effects!
+        //statusReturnCase 
+        //==================Step 1.1: call .applyEffect on all buffs/debuffs to check what is happening.
+        // array[0] is buff case, array[1] is debuff case.
+        let callerStatusCase = [null, null];
+        let targetStatusCase = [null, null];
+        //---- caller status
+        if (caller.buff != null) { callerStatusCase[0] = caller.buff.iterateDuration(); }
+        if (caller.debuff != null) { callerStatusCase[1] = caller.debuff.iterateDuration(); }
+        //---- target status
+        if (target.buff != null) { targetStatusCase[0] = target.buff.iterateDuration(); }
+        if (target.debuff != null) { targetStatusCase[1] = target.debuff.iterateDuration(); }
 
-                //if the player is channelling AND the channelled id is current attack.
-                //Blanket check if encounter is still ongoing and if player is not in inventory.
-                if (game.gameState == "encounter" && game.windowState == "fight") {
-                    if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
-                        tempAppliedStatus = "attacking";
-                        caller.changeStatus(tempAppliedStatus, caller);
-                        target.changeHealth(this.baseDamage, target);
-                        //Step 2: update display.
-                        game.canvasOutput(`You hit the enemy for ${this.baseDamage} damage!`);
-                        //just for reaction's sake, show attack status.
-                        await sleep(300);
-                    }
-
-                    if (caller instanceof Enemy) {
-                        tempAppliedStatus = "attacking";
-                        caller.changeStatus(tempAppliedStatus, caller);
-                        attackParried = target.changeHealth(this.baseDamage, target);//check if the player is parrying or not.
-                        if (!attackParried) {
-                            game.canvasOutput(`The enemy hit you for ${this.baseDamage} damage!`);
-                        } else if (attackParried) {
-                            game.canvasOutput(`You parried the enemy attack.`);
-                        }
+        //change necessary parameters here.
+        //if caller is player:
+        if (caller instanceof Player) {
+            //player buffs/debuffs
+            for (let i = 0; i < callerStatusCase.length; i++) {
+                //Apply changes depending on each buff or debuff?
+                if (callerStatusCase[i] != null) {
+                    switch (callerStatusCase[i]) {
+                        //Buffs_____________
+                        //Debuffs_____________
+                        case "stun":
+                            game.canvasOutput("You are stunned!");
+                            caller.changeStatus("", caller);
+                            return;
+                        case null:
+                            break;
                     }
                 }
-                break;
-            case "parry":
-                tempAppliedStatus = "parrying";
-                caller.changeStatus(tempAppliedStatus, caller);
-                await sleep(this.baseEffectDuration * 1000);
-                break;
-            case "heal":
-                //always check if the channeling has been interrupted.
-                if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
-                    tempAppliedStatus = "healing";
-                    caller.changeStatus(tempAppliedStatus, caller);
-                    target.changeHealth(this.baseDamage, caller); //health applied to self.
-
-                    //Step 2: update display
-                    if (caller instanceof Player) {
-                        if (caller.health >= caller.maxHealth) {
-                            game.canvasOutput(`You are at max health!`);
-                        } else {
-                            game.canvasOutput(`You recovered ${-1 * this.baseDamage} health.`);
-                        }
-                    }
-                    if (caller instanceof Enemy) {
-                        game.canvasOutput(`The enemy recovered ${-1 * this.baseDamage} health.`);
+            }
+            //enemy buffs/debuffs
+            for (let i = 0; i < targetStatusCase.length; i++) {
+                if (targetStatusCase[i] != null) {
+                    //Apply changes depending on each buff or debuff?
+                    switch (targetStatusCase[i]) {
+                        //Buffs_____________
+                        //Debuffs_____________
+                        case "stun":
+                            break;
+                        case null:
+                            break;
                     }
                 }
-                break;
+            }
         }
-        //Step 3: Reset canvas.
+        //if caller is enemy:
+        if (caller instanceof Enemy) {
+            //enemy buffs/debuffs
+            for (let i = 0; i < callerStatusCase.length; i++) {
+                //Apply changes depending on each buff or debuff?
+                if (callerStatusCase[i] != null) {
+                    switch (callerStatusCase[i]) {
+                        //Buffs_____________
+                        //Debuffs_____________
+                        case "stun":
+                            game.canvasOutput("Enemy is stunned!");
+                            caller.changeStatus("", caller);
+                            return;
+                        case null:
+                            break;
+                    }
+                }
+            }
+            //player buffs/debuffs
+            for (let i = 0; i < targetStatusCase.length; i++) {
+                if (targetStatusCase[i] != null) {
+                    //Apply changes depending on each buff or debuff?
+                    switch (targetStatusCase[i]) {
+                        //Buffs_____________
+                        //Debuffs_____________
+                        case "stun":
+                            break;
+                        case null:
+                            break;
+                    }
+                }
+            }
+        }
+
+        //==================Step 2: Apply changes to game and Entities. After channelling, attack
+        //==================Step 3: Update display elements
+        var attackParried;
+        var tempAppliedStatus;
+        if (this.effectObject == null) { //Standard attack, no effect.
+            //standard damaging attack.
+            //always check if the channeling has been interrupted.
+            //  2 cases! one for player, one for enemy(check for parry)
+            //Blanket check if encounter is still ongoing and if player is not in inventory.
+            if (game.gameState == "encounter" && game.windowState == "fight") {
+                //if the player is channelling AND the channelled id is current attack.
+                if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                    tempAppliedStatus = "attacking";
+                    caller.changeStatus(tempAppliedStatus, caller);
+                    target.changeHealth(this.damage, target);
+                    //Step 2: update display.
+                    game.canvasOutput(`You hit the enemy for ${this.damage} damage!`);
+                    //just for reaction's sake, show attack status.
+                    await sleep(300);
+                }
+
+                if (caller instanceof Enemy) {
+                    tempAppliedStatus = "attacking";
+                    caller.changeStatus(tempAppliedStatus, caller);
+                    attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                    if (!attackParried) {
+                        game.canvasOutput(`The enemy hit you for ${this.damage} damage!`);
+                    } else if (attackParried) {
+                        game.canvasOutput(`You parried the enemy attack.`);
+                    }
+                }
+            }
+        } else {
+            switch (this.effectObject.effect) {
+                //NOTE: Rework these two to use effectObjects.
+                case "parry":
+                    tempAppliedStatus = "parrying";
+                    caller.changeStatus(tempAppliedStatus, caller);
+                    await sleep(this.effectObject * 1000);
+                    break;
+                case "heal":
+                    //always check if the channeling has been interrupted.
+                    if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
+                        tempAppliedStatus = "healing";
+                        caller.changeStatus(tempAppliedStatus, caller);
+                        target.changeHealth(this.damage, caller); //health applied to self.
+
+                        //Step 2: update display
+                        if (caller instanceof Player) {
+                            if (caller.health >= caller.maxHealth) {
+                                game.canvasOutput(`You are at max health!`);
+                            } else {
+                                game.canvasOutput(`You recovered ${-1 * this.damage} health.`);
+                            }
+                        }
+                        if (caller instanceof Enemy) {
+                            game.canvasOutput(`The enemy recovered ${-1 * this.damage} health.`);
+                        }
+                    }
+                    break;
+
+                //Special effect cases. These apply buff to self/debuff to enemy.
+                //Buffs:
+                //Debuffs:
+                case "stun":
+                    //if the player is channelling AND the channelled id is current attack.
+                    //Blanket check if encounter is still ongoing and if player is not in inventory.
+                    if (game.gameState == "encounter" && game.windowState == "fight") {
+                        if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                            tempAppliedStatus = "casting";
+                            caller.changeStatus(tempAppliedStatus, caller);
+                            target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.durationType), target);
+                            game.canvasOutput(`Stunned the enemy!`);
+                            await sleep(300);
+                        }
+                        if (caller instanceof Enemy) {
+                            tempAppliedStatus = "casting";
+                            caller.changeStatus(tempAppliedStatus, caller);
+
+                            attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                            if (!attackParried) {
+                                target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.durationType), target);
+                                game.canvasOutput(`Stunned!`);
+                            } else if (attackParried) {
+                                game.canvasOutput(`Avoided the stun.`);
+                            }
+                        }
+                    }
+                    break;
+            }
+        }
+        //==================Step 4: Reset board.
         //after action, check if the move hasn't been interrupted and reset status.
         if (caller.status == tempAppliedStatus) {
             caller.changeStatus("", caller);
+        }
+        //Also reset stats that have been changed!
+        this.applyMasqueradeMulti();
+        if (this.effectObject != null) {
+            this.effectObject.statusApplyMasqueradeMulti();
         }
     }
     //when masquerade gets updated, change stats.
@@ -418,12 +570,89 @@ class Attack {
         this.damage = Math.floor(this.baseDamage * player.damageMulti[player.masquerade]);
     }
 }
+class StatusEffect {
+    constructor(parent, effect, duration = null, durationType = null) {
+        this.parent = parent;
+        this.target;
+        if (this.parent instanceof Enemy) {
+            this.target = player;
+        } else {
+            this.target = enemy;
+        }
+        this.duration = duration;
+        this.durationType = durationType;
+        this.remainingDuration = duration;
+
+        this.effect = effect;
+        this.type;
+        switch (this.effect) {
+            //buffs
+            //debuffs
+            case "stun":
+                this.type = "debuff";
+                break;
+        }
+        this.statusApplyMasqueradeMulti();
+    }
+    //when the affected entity makes an attack, iterate duration.
+    iterateDuration() {
+        if (this.durationType == "turn") {
+            this.remainingDuration = this.remainingDuration - 1;
+
+            switch (this.type) {
+                case "buff": //targets this.parent
+                    //update displays
+                    if (this.parent instanceof Player) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
+                    } else if (this.parent instanceof Enemy) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
+                    }
+                    if (this.remainingDuration <= 0) { this.parent.clearStatusEffect(this.type, this.parent); }
+                    break;
+                case "debuff": //targets this.target
+                    //update displays
+                    if (this.target instanceof Player) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
+                    } else if (this.target instanceof Enemy) {
+                        document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
+                    }
+                    if (this.remainingDuration <= 0) { this.target.clearStatusEffect(this.type, this.target); }
+                    break;
+            }
+        }
+        return this.effect; //for attackprocced.
+    }
+    //This also needs to apply masquerade! If duration changes.
+    //NOTE: difference in durations happen here.
+    statusApplyMasqueradeMulti() { }
+}
+
 class Item {
     /*
     requires
     this.equipped
     this.id, uses nextInventoryObjectId like attacks.
     */
+}
+
+//cooldown handler
+class CooldownHandler {
+    constructor() {
+        this.attackUCooldown;
+        this.attackICooldown;
+        this.attackJCooldown;
+        this.attackKCooldown;
+    }
+    clearCooldowns() {
+        clearTimeout(this.attackUCooldown);
+        clearTimeout(this.attackICooldown);
+        clearTimeout(this.attackJCooldown);
+        clearTimeout(this.attackKCooldown);
+        document.getElementById("gamePage__gameSpace__encounter__menu__button1").disabled = false;
+        document.getElementById("gamePage__gameSpace__encounter__menu__button2").disabled = false;
+        document.getElementById("gamePage__gameSpace__encounter__menu__button3").disabled = false;
+        document.getElementById("gamePage__gameSpace__encounter__menu__button4").disabled = false;
+    }
 }
 
 //=====================================================GAME class
@@ -461,7 +690,7 @@ class Game {
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
 
         this.nextInventoryObjectId = 1;                        //increments as attacks and items are created.
-        this.channelledID;
+        this.channelledID;                                  //identifies currently channelled attack. Helps differentiate if a channel interrupts another.
 
         //flags.
         this.encounterPromiseResolve = function () { };
@@ -514,7 +743,9 @@ class Game {
                 game.encounterPromiseResolve = resolve;
                 game.encounterPromiseReject = reject;
             }).then(
-                function (error) {
+                result => {
+                },
+                error => {
                     return;
                 }
             );
@@ -535,6 +766,8 @@ class Game {
 
         //reset encounter screen.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+        //clear cooldowns.
+        cooldownHandler.clearCooldowns();
     }
     async encounterBegins() {
         //initialize screen
@@ -576,8 +809,8 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
 
         if (player.health <= 0) { //player loses, trigger masquerade.
-            player.updateMasqueradeStats(1);
             this.encounterPromiseReject(); //reject the sequence promise.
+            player.updateMasqueradeStats(1);
             return;
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
@@ -824,60 +1057,5 @@ async function fadeElement(operation, element, time) { //fade elements in/out
 
 //===============================================================Global Variables
 var game = new Game();
+var cooldownHandler = new CooldownHandler();
 var entityDatabase = new EntityDatabase();
-
-
-//==========NOT CURRENTLY IN USE.=========================================================================COOLDOWN classes
-//Contains array of cooldownData. Has a clock that decrements cooldowns each tick.
-class CooldownHandler {
-    constructor() {
-        this.cooldowns = []; //an array of cooldownDatas.
-        this.lastUpdate = Date.now();
-        this.clockInterval;
-    }
-    initCooldowns() {//sets up clockInterval and calls processCooldowns each tick.
-        var deltaTime;
-        this.clockInterval = setInterval(() => { //<< TAG: EXTENSION: Why does arrow notation allow setInterval scope to work here?
-            deltaTime = this.tick();
-            this.processCooldowns(deltaTime);
-        }, 0);
-    }
-    tick() {//Subtract last update from current time to find time since last tick.
-        var currentTime = Date.now();
-        var deltaTime = currentTime - this.lastUpdate;
-        this.lastUpdate = currentTime;
-        return deltaTime;
-    }
-    processCooldowns(deltaTime) { //Decrements cooldowns, and deletes them from cooldown list if needed.
-        for (var i = 0; i < this.cooldowns.length; i++) {
-            if (this.cooldowns[i].decrementCooldown(deltaTime)) {//will be true if remainingtime == 0.
-                this.cooldowns.splice(i, 1);
-            }
-        }
-    }
-
-    checkForId(id) { //check if attack is on cooldown (in array).
-        for (var i = 0; i < this.cooldowns.length; i++) {
-            if (this.cooldowns.id == id) {
-                return true;
-            }
-            return false;
-        }
-    }
-    addCooldown(attack) {
-        //NOTE: multiply baseCooldown by masquerade.
-        this.cooldowns.push(new CooldownDate(attack.id, attack.baseCooldown));
-    }
-}
-//Contains data about cooldown things. Decrements its own remainingTime.
-class CooldownData {
-    constructor(id, duration) {
-        this.id = id;
-        this.remainingTime = duration;
-    }
-    //returns whether or not the cooldown is 0.
-    decrementCooldown(deltaTime) {
-        this.remainingTime = Math.max(this.remainingTime - deltaTime, 0);
-        return (this.remainingTime == 0);
-    }
-}
