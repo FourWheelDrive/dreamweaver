@@ -230,6 +230,8 @@ class Player extends Entity {
     //Methods for masquerade.
     //Updates stats, but ALSO CALLS ANIMATION.
     async updateMasqueradeStats(operation) { //operation is -1 or 1. -1 is heal, 1 is death.
+        //clear cooldowns.
+        cooldownHandler.clearCooldowns();
         switch (operation) {
             case -1:
                 //healing has different dialogues. only appears on some masks.
@@ -259,20 +261,20 @@ class Player extends Entity {
                     HP decreased.`
                         break;
                     case 4:
-                        message1 = `Urge caution. It is dark beyond.`
+                        message1 = `Exercise caution. It is dark beyond.`
                         message2 = `ATK increased. <br> 
                         HP decreased.`
                         break;
                     case 5:
                         message1 = `One stares into the abyss.`
                         message2 = `The abyss stares back. <br>
+                        <br>
                         ATK increased. <br> 
                         HP decreased.`
                         break;
                     case 6: //loss case
                         return game.loseGame();
                 }
-
                 let masqueradeWindow = document.getElementById("masquerade__lossScreen");
                 let maskOutput1 = document.getElementById("masquerade__lossScreen__output1");
                 let maskOutput2 = document.getElementById("masquerade__lossScreen__output2");
@@ -735,6 +737,8 @@ class Game {
         //For sequence length, generate new enemies.
         // Also generates enemies (different cases for different cells). special case for bosses.
         for (var i = 0; i < sequenceLength; i++) {
+            let encounterLost = false;
+
             //Generate a new enemy.
             //NOTE: update with different cell types.
             enemy = entityDatabase.generateTier1Enemy(1);
@@ -747,24 +751,45 @@ class Game {
                 result => {
                 },
                 error => {
-                    return;
+                    //hide canvas. From sequenceEnds().
+                    document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+                    //auto switch back to the map.
+                    this.gameState = "movement";
+                    do {
+                        document.getElementById("gamePage__header__left").click();
+                    } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
+                    //reset encounter screen.
+                    document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+                    //clear cooldowns.
+                    cooldownHandler.clearCooldowns();
+                    
+                    //catch things and end the loop.
+                    encounterLost = true;
                 }
             );
+            //Break the for loop and exit sequence.
+            if(encounterLost){
+                return;
+            }
         }
-
         //when the enemies are all dead, end sequence.
-        this.sequenceEnds();
+        this.sequenceEnds(sequenceLength);
     }
-    async sequenceEnds() {
+    async sequenceEnds(sequenceLength) {
+        //NOTE: wish calculation algs go here.
+        let newWishes = sequenceLength;
+        pushMainOutput(`You got ${newWishes} Wishes!`);
+        //add money.
+        player.addWishes(newWishes);
+        await sleep(1500);
+
         //hide canvas.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
-
         //auto switch back to the map.
         this.gameState = "movement";
         do {
             document.getElementById("gamePage__header__left").click();
         } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
-
         //reset encounter screen.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
         //clear cooldowns.
@@ -811,20 +836,16 @@ class Game {
 
         if (player.health <= 0) { //player loses, trigger masquerade.
             this.encounterPromiseReject(); //reject the sequence promise.
+            //Masquerade update.
             player.updateMasqueradeStats(1);
             return;
         }
         if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
-            //NOTE: wish calculation algs go here.
-            let newWishes = 1;
             //Display dialogue!
             for (var i = 0; i < enemy.defeatDialogue.length; i++) {
                 pushMainOutput(enemy.defeatDialogue[i]);
                 await sleep(1500);
             }
-            pushMainOutput(`You got ${newWishes} Wishes!`);
-            //add money.
-            player.addWishes(newWishes);
             await sleep(1500);
 
             this.encounterPromiseResolve();
@@ -848,6 +869,7 @@ class Game {
     //game win or lose.
     winGame() { }
     loseGame() {
+        document.getElementById("masquerade__lossScreen").style.display = "none";
         this.gameState = "masquerade";
         fadeElement("out", document.getElementById("gamePage"), 1);
         document.getElementById("game__over__screen").style.display = "flex";
