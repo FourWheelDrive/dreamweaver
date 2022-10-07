@@ -222,10 +222,8 @@ async function playerMovementHandler(key) {
         showCellsInVision(5, player.mapPosition[0], player.mapPosition[1], mapArray);
         showPlayer();
     }
-    //Check if the next cell is an encounter cell.
-    if (newCellEntity instanceof MinorEncounterCell) {
-        newCellEntity.firstVisit();
-    }
+    //Proc encounters!!!
+    newCellEntity.visit();
 }
 async function playerAttackHandler(e) {
     //player must be viewing the battle. No attacks can be made from other screens.

@@ -698,8 +698,6 @@ class Game {
         //flags.
         this.encounterPromiseResolve = function () { };
         this.encounterPromiseReject = function () { };
-        this.randomEncounterCooldown = 3;
-        this.randomEncounterChance = 0.1;
         //-----------------------------------------------------------------------------
         //Multipliers for game progression.
         this.attackMultiplier = 1;                      //increases with mask
@@ -762,13 +760,13 @@ class Game {
                     document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
                     //clear cooldowns.
                     cooldownHandler.clearCooldowns();
-                    
+
                     //catch things and end the loop.
                     encounterLost = true;
                 }
             );
             //Break the for loop and exit sequence.
-            if(encounterLost){
+            if (encounterLost) {
                 return;
             }
         }
@@ -880,8 +878,9 @@ class Game {
 //=====================================================CELL-based classes
 /*
 Contents [class CELL]:
-
-IN CELL, MAKE A FUNCTION. DEPENDING ON CELL TYPE, IT PICKS ITS OWN NAME!!!!!!!
+All child classes of [CELL] require:
+firstVisit()
+recurringVisit() (not always) <== case 1 is the first recurrance, case 0 is firstVisit().
 */
 class Cell {
     constructor(positionX, positionY) {
@@ -893,7 +892,7 @@ class Cell {
 
         this.cellID = `[${positionX}][${positionY}]`;   //HTML DOM ID
 
-        this.visited = false;                           //Boolean for display and revisits.
+        this.visitNumber = 0;
     }
     //func called by other cell types. Depending on caller and room, returns a name.
     cellNameGenerator(type, room) {
@@ -937,6 +936,20 @@ class Cell {
                 break;
         }
     }
+
+    //Visits handler.
+    visit() {
+        //console.log(this.constructor.name) <-- this works and returns the child constructor name.
+        if (this.visitNumber == 0) {
+            this.firstVisit();
+        } else if (this.recurringVisit) { //Not all cells have recurring visit events.
+            this.recurringVisit(this.visitNumber);
+        }
+        this.visitNumber = this.visitNumber + 1;
+    }
+    iterateVisits() {
+        this.visitNumber = this.visitNumber + 1;
+    }
 }
 class WallCell extends Cell {
     constructor(positionX, positionY) {
@@ -948,15 +961,20 @@ class WallCell extends Cell {
 class PathCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
+        this.randomEncounterChance = 0.005;
     }
     //NOTE: randomEncounters can be called from PathCell only!
-    //NOTE: for encounter procs, initialize all of the encounter window too! (Health display, enemy.)
     randomEncounterCheck() {
 
     }
     initializeCell() {
         this.name = super.cellNameGenerator("path", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("path", game.currentRoom);
+    }
+
+    //visits
+    firstVisit() {
+
     }
 }
 
@@ -969,11 +987,12 @@ class MinorEncounterCell extends Cell {
         this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
     }
+    //On first visit
     firstVisit() { //Start encounter.
-        if (this.visited == false) {
-            game.sequenceBegins(1);
-            this.visited = true;
-        }
+        game.sequenceBegins(1);
+    }
+    //On subsequent visits
+    recurringVisit(number) {
     }
 }
 //slightly less plentiful. Chain encounters, could reward with more wishes or items!
@@ -1017,11 +1036,8 @@ class BossEncounterCell extends Cell {
         }
     }
     room1BossBegins() {
-        if (this.visited == false) {
-            enemy = entityDatabase.generateBossByName(1);
-            game.sequenceBegins(5, "B1", true);
-            this.visited = true;
-        }
+        enemy = entityDatabase.generateBossByName(1);
+        game.sequenceBegins(5, "B1", true);
     }
     room2BossBegins() {
 
