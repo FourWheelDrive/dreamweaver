@@ -223,6 +223,7 @@ async function playerMovementHandler(key) {
     if (newCell != null && newCellEntity instanceof WallCell == false) {
         //if the new cell is a hidden boss room, exit.
         if (newCellEntity instanceof BossEncounterCell && !newCellEntity.revealed) { return; }
+        //Update previous cell.
         clearPlayer(mapArray);
         player.mapPosition = [nextCellPos[0], nextCellPos[1]];
         showCellsInVision(5);

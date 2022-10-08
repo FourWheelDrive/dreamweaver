@@ -180,14 +180,16 @@ function showPlayer() {
     currentCell.style.fontWeight = "900";
     currentCell.style.opacity = "1";
 }
-function clearPlayer(mapArray) {
+function clearPlayer(mapArray, masqueradeUpdateCase = false) {
     var previousCell = document.getElementById(`[${player.mapPosition[0]}][${player.mapPosition[1]}]`);
     var cellEntity = mapArray[player.mapPosition[0]][player.mapPosition[1]];
     previousCell.innerHTML = cellEntity.symbol;
     //NOTE: this may change as more room types are added.
-    previousCell.style.opacity = "0.5";
     if (cellEntity instanceof PathCell) {
         previousCell.style.fontWeight = "400";
+    }
+    if(!masqueradeUpdateCase){
+        previousCell.style.opacity = "0.5";
     }
 }
 

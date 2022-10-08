@@ -14,7 +14,7 @@ class EntityDatabase {
         switch (id) {
             //NOTE: change to make more thematically appropriate later :)
             case "Light Attack":
-                return new Attack(id, 1, 2, 0, "Strike nimbly.");
+                return new Attack(id, 11, 2, 0, "Strike nimbly.");
             case "Heavy Attack":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
             case "Basic Parry":
@@ -50,7 +50,7 @@ class EntityDatabase {
         }
         switch (temp) {
             case 1: //normal enemy
-                return new Enemy(10, "!", new Attack("Basic Attack", 1, 2, 1, "basic enemy attack"), 
+                return new Enemy(10, "!", new Attack("Basic Attack", 11, 2, 1, "basic enemy attack"), 
                 ["A wispy shape arises from the depths."], ["Diffuses back into shadow."])
             case 2: //long enemy
                 return new Enemy(5, "?", new Attack("Long Attack", 3, 5, 3, "long enemy attack"), 

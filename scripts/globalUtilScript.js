@@ -65,7 +65,11 @@ class Entity {
 
     changeHealth(difference, target) {
         if (target.status != "parrying") {
-            target.health = target.health - difference;
+            if(game.gameState == "encounter"){
+                target.health = target.health - difference;
+            } else {
+                return;
+            }
 
             //TAG: FLAG CHECK
             //Check if encounter ends. If target health <= 0.
@@ -300,7 +304,7 @@ class Player extends Entity {
                 document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
 
                 //return to game.
-                clearPlayer(mapArray);
+                clearPlayer(mapArray, true);
                 this.getInitialPosition(mapWidth, mapHeight); //reset player position
                 showPlayer();
                 fadeElement("out", masqueradeWindow, 1);
@@ -818,6 +822,7 @@ class Game {
         enemy.beginAttackSequence();
     }
     async encounterEnds() {
+        this.gameState = "tempTransition";
         clearInterval(enemy.attackInterval);
         enemy.attackInterval = null;
 
