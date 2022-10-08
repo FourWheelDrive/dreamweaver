@@ -299,9 +299,13 @@ class Player extends Entity {
                 }
                 //update health.
                 this.maxHealth = this.healthMulti[this.masquerade];
+                game.gameState = "encounter";       //Temporary flag update to let changeHealth through.
                 this.changeHealth(-100, this);
+                game.gameState = "masquerade";
                 //update displays.
                 document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
+                //Update map => cell needs to be reset.
+                mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber = mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber - 1;
 
                 //return to game.
                 clearPlayer(mapArray, true);
