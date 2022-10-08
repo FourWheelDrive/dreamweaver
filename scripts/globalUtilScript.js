@@ -688,6 +688,7 @@ class Game {
         */
 
         this.currentRoom = 1;
+        this.roomBossCellEntity;                            //the object of the cell for outside reference.
         this.gameTime = 0;                                  //Serves as moveCounter.
         this.encounterCounter = 0;                          //tracks number of battles. Might be more useful if track moves since last battle?
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
@@ -905,11 +906,10 @@ class Cell {
                         namesList = ["A Dusty Path", "A Desolate Avenue"] //Boulevard, street.
                         return namesList[randInt(namesList.length - 1)];
                     case "minorLocation":
-                        namesList = ["A Test Name"];
+                        namesList = ["A Tattered Square"];
                         return namesList[randInt(namesList.length - 1)];
-                    case "testLocations":
-                        namesList = ["A Cool Place", "A Grand Estate"];
-                        return namesList[randInt(namesList.length - 1)];
+                    case "bossLocation":
+                        return "The Dragon's Lair";
                 }
                 break;
             case 2:
@@ -930,6 +930,8 @@ class Cell {
                     case "minorLocation":
                         symbolsList = ["B", "F", "A"];
                         return symbolsList[randInt(symbolsList.length - 1)];
+                    case "bossLocation":
+                        return "Ψ";
                 }
                 break;
             case 2:
@@ -940,7 +942,7 @@ class Cell {
     //Visits handler.
     visit() {
         //console.log(this.constructor.name) <-- this works and returns the child constructor name.
-        if (this.visitNumber == 0) {
+        if (this.visitNumber == 0 && this.firstVisit) {
             this.firstVisit();
         } else if (this.recurringVisit) { //Not all cells have recurring visit events.
             this.recurringVisit(this.visitNumber);
@@ -958,6 +960,7 @@ class WallCell extends Cell {
         this.symbol = "#";
     }
 }
+//random encounters not done yet.
 class PathCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
@@ -971,10 +974,9 @@ class PathCell extends Cell {
         this.name = super.cellNameGenerator("path", game.currentRoom);
         this.symbol = super.cellSymbolGenerator("path", game.currentRoom);
     }
-
     //visits
     firstVisit() {
-
+        this.randomEncounterCheck();
     }
 }
 
@@ -1019,13 +1021,41 @@ class SpecialEncounterCell extends Cell {
 class BossEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
+        this.symbol = "#"; //boss room replaces a wall.
+        this.name = "";
+
+        this.storedSymbol;
+        this.storedName;
+        this.revealed = false;
         //use game.currentRoom to define the room.
     }
+    //Init 
     initializeCell() {
-        this.name = super.cellNameGenerator("bossLocation", game.currentRoom);
-        this.symbol = super.cellSymbolGenerator("bossLocation", game.currentRoom);
+        this.storedName = super.cellNameGenerator("bossLocation", game.currentRoom);
+        this.storedSymbol = super.cellSymbolGenerator("bossLocation", game.currentRoom);
     }
+    //room revealed
+    revealBossCell() {
+        //update cell!
+        this.revealed = true;
+        this.symbol = this.storedSymbol;
+        this.name = this.storedName;
+
+        var bossCellElement = document.getElementById(`[${this.mapX}][${this.mapY}]`);
+        bossCellElement.innerHTML = this.symbol;
+        bossCellElement.style.fontWeight = "700";
+        bossCellElement.style.fontStretch = "expanded";
+        bossCellElement.style.fontSize = "25px";
+        showCellsInVision(5);
+        showPlayer();
+    }
+
+    //visits
     firstVisit() {
+        if (!this.revealed) { //if the boss cell hasn't been revealed yet, pretend it hasn't been visited.
+            this.visitNumber = 0;
+            return;
+        }
         //Depending on which room it is, spawn a different boss.
         switch (game.currentRoom) {
             case 1:

@@ -89,10 +89,19 @@ function placeLocation(mapArray, xBound, yBound, centerCoord, roomClass) {
 
                     //This is the actual test part. Scalability comes from here!
                     switch (roomClass) {
-                        case 1: //test case.
+                        case "Minor":
                             if (mapArray[x][y] instanceof PathCell && (mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell || mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell)) {
                                 mapArray[randomCoord[0]][randomCoord[1]] = new MinorEncounterCell(randomCoord[0], randomCoord[1]);
                                 mapArray[randomCoord[0]][randomCoord[1]].initializeCell();
+
+                                pathFound = true;
+                            }
+                            break;
+                        case "Boss":
+                            if ((mapArray[x][y] instanceof PathCell) && (mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell) && (calcPythagDistance(randomCoord, centerCoord) < 10)) {
+                                mapArray[randomCoord[0]][randomCoord[1]] = new BossEncounterCell(randomCoord[0], randomCoord[1]);
+                                mapArray[randomCoord[0]][randomCoord[1]].initializeCell();
+                                game.roomBossCellEntity = mapArray[randomCoord[0]][randomCoord[1]];
 
                                 pathFound = true;
                             }
@@ -138,7 +147,10 @@ function pushMapToDOM(mapArray) { //pass in generation vars
 }
 
 //Show cells in vision. This is the fog of war function.
-function showCellsInVision(radius, x, y, mapArray) {
+function showCellsInVision(radius) {
+    var x = player.mapPosition[0];
+    var y = player.mapPosition[1];
+
     var minBoundX = x - radius,
         maxBoundX = x + radius,
         minBoundY = y - radius,
@@ -151,7 +163,7 @@ function showCellsInVision(radius, x, y, mapArray) {
         for (var j = 0; j < maxBoundY - minBoundY - 1; j++) { //add each cell.
             try { //might be out of bounds.
                 tempArray[i].push(mapArray[i + minBoundX + 1][j + minBoundY + 1]);
-            } catch (err) { }
+            } catch (err) {}
         }
     }
     var coordSetCenter = [Math.ceil(tempArray.length / 2) - 1, Math.ceil(tempArray[4].length / 2) - 1];
@@ -170,29 +182,44 @@ function showCellsInVision(radius, x, y, mapArray) {
                     if (mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof PathCell == false && mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof WallCell == false) {
                         cell.style.fontWeight = "700";
                         cell.style.fontStretch = "expanded";
+                        cell.style.fontSize = "15px";
                     }
-                } catch (err) {}
+                    //Special case for boss cells.
+                    if (mapArray[minBoundX + i + 1][minBoundY + j + 1] instanceof BossEncounterCell) {
+                        let tempCellEntity = mapArray[minBoundX + i + 1][minBoundY + j + 1];
+                        cell.innerHTML = tempCellEntity.symbol;
+                        //Visible case
+                        if (tempCellEntity.revealed) {
+                            cell.style.fontWeight = "700";
+                            cell.style.fontStretch = "expanded";
+                            cell.style.fontSize = "20px";
+                        } else { //Hidden case
+                            cell.style.fontWeight = "400";
+                            cell.style.fontStretch = "normal";
+                            cell.style.fontSize = "15px";
+                        }
+                    }
+                } catch (err) { }
             }
         }
     }
 }
 
 //Put them all together.
-function generateNewRoom(room, mapWidth, mapHeight, maxTunnels, maxLength){
+function generateNewRoom(room, mapWidth, mapHeight, maxTunnels, maxLength) {
     //generate array of walls
     var mapArray = createMapArray(mapWidth, mapHeight);
     //generate random paths procedurally
     mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
     //generate random locations of interest
     var centerCoord = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
-    for (var i = 0; i < 10; i++){
-        mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, 1);
+    for (var i = 0; i < 10; i++) {
+        mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Minor");
     }
+    //Generate the room's boss
+    mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Boss");
     //push complete mapArray to DOM
     pushMapToDOM(mapArray);
-
-    //calc all visible nodes. Player position begins at center.
-    showCellsInVision(5, centerCoord[0], centerCoord[1], mapArray);
 
     return mapArray;
 }

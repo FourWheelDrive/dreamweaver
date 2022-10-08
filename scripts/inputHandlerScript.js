@@ -1,6 +1,6 @@
 async function keyDownHandler(mapArray, e) {
     //Prevent default scrolling.
-    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+    if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
         e.preventDefault();
     }
 
@@ -79,6 +79,10 @@ async function keyDownHandler(mapArray, e) {
                 document.getElementById("gamePage__gameSpace__encounter__menu__button4").click();
                 break;
         }
+    }
+
+    if (e.code == "Enter") {
+        game.roomBossCellEntity.revealBossCell();
     }
 }
 
@@ -217,13 +221,18 @@ async function playerMovementHandler(key) {
 
     //Move the player.
     if (newCell != null && newCellEntity instanceof WallCell == false) {
+        //if the new cell is a hidden boss room, exit.
+        if (newCellEntity instanceof BossEncounterCell && !newCellEntity.revealed) { return; }
         clearPlayer(mapArray);
         player.mapPosition = [nextCellPos[0], nextCellPos[1]];
-        showCellsInVision(5, player.mapPosition[0], player.mapPosition[1], mapArray);
+        showCellsInVision(5);
         showPlayer();
+
+        //Proc encounters!!!
+        if (newCellEntity) {
+            newCellEntity.visit();
+        }
     }
-    //Proc encounters!!!
-    newCellEntity.visit();
 }
 async function playerAttackHandler(e) {
     //player must be viewing the battle. No attacks can be made from other screens.
@@ -284,9 +293,9 @@ function attackButtonCooldownAnimation(buttonId, time) {
     }
     //Cooldown the button while animation takes place.
     button.disabled = true;
-    
+
     //attach cooldown buttons to handler!
-    switch(buttonId){
+    switch (buttonId) {
         case "gamePage__gameSpace__encounter__menu__button1":
             cooldownHandler.attackUCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
             break;
@@ -303,7 +312,7 @@ function attackButtonCooldownAnimation(buttonId, time) {
             console.log("Error! Couldn't attach cooldown to cooldownHandler.");
             break;
     }
-    
+
 }
 function flushCSS(element) { //flushes css to no transition.
     element.offsetHeight;
@@ -317,7 +326,7 @@ async function inventoryButtonClickHandler(e) {
     let temp = player.inventoryPointerPosition;
     player.inventoryPointerPosition = e.target.id.slice(-1);
     moveInventoryMarker(temp);
-    
+
     //change equip buttons to have bold borders.
     document.querySelectorAll(".inventoryEquipButton").forEach(element => {
         element.style.border = "3px solid black";
@@ -326,7 +335,7 @@ async function inventoryButtonClickHandler(e) {
     //add document event listener for a click that fires once.
     document.addEventListener("click", clicked => {
         //switch borders back
-        if(!clicked.target.id.includes("gamePage__gameSpace__inventory__itemList__Button")){
+        if (!clicked.target.id.includes("gamePage__gameSpace__inventory__itemList__Button")) {
             document.querySelectorAll(".inventoryEquipButton").forEach(element => {
                 element.style.border = "1px solid black";
             })
@@ -379,10 +388,10 @@ function updateStatDisplay() {
     } else {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: --`;
     }
-    try{
+    try {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effectObject.type.toUpperCase()}, ${invObj.effectObject.effect}[${invObj.effectObject.duration}]
         <br> ${invObj.effectObject.effectDescription}`;
-    } catch (e){document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`;}
+    } catch (e) { document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`; }
     if (invObj.baseChannelling != null) {
         document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: ${invObj.baseChannelling}s`;
     } else {

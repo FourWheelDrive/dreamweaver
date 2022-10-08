@@ -211,13 +211,14 @@ async function pushMainOutput(message) {
 }
 
 async function initializeGame() {
+    //init player
+    player = new Player(10, "@");
+    player.getInitialPosition(mapWidth, mapHeight);
+    enemy = null;
+
     //create map for new room.
     var maxTunnels = 80, maxLength = 10;
     mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
-
-    //init player
-    player = new Player(10, "@");
-    enemy = null;
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
     player.addToInventory(entityDatabase.generateAttackByName("Light Attack"));
@@ -228,7 +229,8 @@ async function initializeGame() {
     player.addNewAttack(player.inventory[0], 0);
     player.addNewAttack(player.inventory[4], 1);
 
-    player.getInitialPosition(mapWidth, mapHeight);
+    //Show map.
+    showCellsInVision(5);
     showPlayer();
 
     //Input handler.
