@@ -223,13 +223,16 @@ async function initializeGame() {
     mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
-    player.addToInventory(entityDatabase.generateAttackByName("Light Attack"));
-    player.addToInventory(entityDatabase.generateAttackByName("Heavy Attack"));
-    player.addToInventory(entityDatabase.generateAttackByName("Basic Parry"));
-    player.addToInventory(entityDatabase.generateAttackByName("Test Heal"));
-    player.addToInventory(entityDatabase.generateAttackByName("Test Stun"));
+    player.addToInventory(entityDatabase.generateAttackByName("Attack"));
+    player.addToInventory(entityDatabase.generateAttackByName("Bash"));
+    player.addToInventory(entityDatabase.generateAttackByName("Parry"));
+    player.addToInventory(entityDatabase.generateAttackByName("Heal"));
+    player.addToInventory(entityDatabase.generateAttackByName("Stun"));
+    player.addToInventory(entityDatabase.generateAttackByName("Slash"));
+    player.addToInventory(entityDatabase.generateAttackByName("Barrier"));
     player.addNewAttack(player.inventory[0], 0);
     player.addNewAttack(player.inventory[4], 1);
+    player.addNewAttack(player.inventory[5], 2);
 
     //Show map.
     showCellsInVision(5);

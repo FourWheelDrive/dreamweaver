@@ -11,20 +11,37 @@ class EntityDatabase {
     //=============ATTACKS=============
     //Can also use another one! generateAttackByTier?
     generateAttackByName(id) {
+        let magnitude, duration;
         switch (id) {
             //NOTE: change to make more thematically appropriate later :)
-            case "Light Attack":
-                return new Attack(id, 11, 2, 0, "Strike nimbly.");
-            case "Heavy Attack":
+            //Attack constructor(name, damage, cooldown, channelling, description, effectObject = null)
+            //Effect constructor(parent, effect, duration = null, attackIterative = false, magnitude = null, effectDescription = null)
+            case "Attack":
+                return new Attack(id, 1, 2, 0, "Strike nimbly.");
+            case "Bash":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
-            case "Basic Parry":
-                return new Attack(id, 0, 2, 0, "Guard against peril.", new StatusEffect(player, "parry", 1));
-            //For testing only.
-            case "Test Heal":
+            case "Parry":
+                duration = 1;
+                return new Attack(id, 0, 2, 0, "Guard against peril.", new StatusEffect(player, "parry", duration));
+            case "Heal":
                 return new Attack(id, -1, 3, 1, "Mend wounds.", new StatusEffect(player, "heal"));
-            case "Test Stun":
-                return new Attack(id, 0, 4, 1, "Stun the foe.", new StatusEffect(player, "stun", 2, true, 
+            //Stuns for given turns.
+            case "Stun":
+                duration = 3;
+                return new Attack(id, 0, 4, 1, "Stun the foe.", new StatusEffect(player, "stun", duration, true, null, 
                 "Prevents enemy attacks."));
+            //Bleed: take 1 damage each turn.
+            case "Slash":
+                magnitude = 2;
+                duration = 3;
+                return new Attack(id, 1, 3, 1, "Rend asunder.", new StatusEffect(player, "bleed", duration, true, magnitude, 
+                `Foe takes ${magnitude} damage each attack.`));
+            //Barrier: Parry, but for given turns.
+            case "Barrier":
+                duration = 2;
+                return new Attack(id, 0, 6, 1, "The mind is a fortress.", new StatusEffect(player, "barrier", duration, true, null, 
+                `Negate incoming damage for ${duration} attacks.`));
+            //Pierce: Ignore Barrier.
         }
     }
     generateEnemyAttackByName(id) {
@@ -50,7 +67,7 @@ class EntityDatabase {
         }
         switch (temp) {
             case 1: //normal enemy
-                return new Enemy(10, "!", new Attack("Basic Attack", 11, 2, 1, "basic enemy attack"), 
+                return new Enemy(10, "!", new Attack("Basic Attack", 1, 2, 1, "basic enemy attack"), 
                 ["A wispy shape arises from the depths."], ["Diffuses back into shadow."])
             case 2: //long enemy
                 return new Enemy(5, "?", new Attack("Long Attack", 3, 5, 3, "long enemy attack"), 

@@ -63,32 +63,32 @@ class Entity {
         this.actionLine = this.status;                  //action: attacking, parrying
     }
 
-    changeHealth(difference, target) {
-        if (target.status != "parrying") {
-            if(game.gameState == "encounter"){
-                target.health = target.health - difference;
+    changeHealth(difference) {
+        if (this.status != "parrying") {
+            if (game.gameState == "encounter") {
+                this.health = this.health - difference;
             } else {
                 return;
             }
 
             //TAG: FLAG CHECK
             //Check if encounter ends. If target health <= 0.
-            if (target.health <= 0) {
+            if (this.health <= 0) {
                 game.encounterEnds();
                 return;
             }
             //Check if healed past maxHealth.
-            if (target instanceof Player && target.health > target.maxHealth) {
-                target.health = target.maxHealth;
+            if (this instanceof Player && this.health > this.maxHealth) {
+                this.health = this.maxHealth;
             }
 
             //depending on who got hit, change the health display.
-            if (target instanceof Player) {
-                document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = target.health;
-                document.getElementById("gamePage__footer__health").innerHTML = `Health: ${target.health}/${target.maxHealth}`;
+            if (this instanceof Player) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__playerHealth").innerHTML = this.health;
+                document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}/${this.maxHealth}`;
             }
-            if (target instanceof Enemy) {
-                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = target.health;
+            if (this instanceof Enemy) {
+                document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = this.health;
             }
             return false;
         } else {
@@ -96,25 +96,25 @@ class Entity {
             return true;
         }
     }
-    changeStatus(newStatus, caller, id = -1) {
-        if (newStatus == "channelling" && caller instanceof Player) { //for channelled attacks, update the global channelled attack id.
+    changeStatus(newStatus, id = -1) {
+        if (newStatus == "channelling" && this instanceof Player) { //for channelled attacks, update the global channelled attack id.
             game.channelledID = id;
         }
-        caller.status = newStatus;
+        this.status = newStatus;
         //depending on caller, update statusLine.
-        if (caller instanceof Player) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = caller.status;
+        if (this instanceof Player) {
+            document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = this.status;
         }
-        if (caller instanceof Enemy) {
-            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = caller.status;
+        if (this instanceof Enemy) {
+            document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = this.status;
         }
     }
     //pass in a statusEffect object. Add.
-    addStatusEffect(statusEffect, target) {
+    addStatusEffect(statusEffect) {
         switch (statusEffect.type) {
             case "buff":
                 this.buff = statusEffect;
-                if (target instanceof Player) {
+                if (this instanceof Player) {
                     document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
                 } else {
                     document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
@@ -122,7 +122,7 @@ class Entity {
                 break;
             case "debuff":
                 this.debuff = statusEffect;
-                if (target instanceof Player) {
+                if (this instanceof Player) {
                     document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
                 } else {
                     document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `${statusEffect.effect}[${statusEffect.remainingDuration}]`;
@@ -130,10 +130,10 @@ class Entity {
                 break;
         }
     }
-    clearStatusEffect(operation, target) {
+    clearStatusEffect(operation) {
         if (operation == "buff") {
             this.buff = null;
-            if (target instanceof Player) {
+            if (this instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = `+`;
             } else {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `+`;
@@ -141,7 +141,7 @@ class Entity {
         }
         if (operation == "debuff") {
             this.debuff = null;
-            if (target instanceof Player) {
+            if (this instanceof Player) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = `-`;
             } else {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `-`;
@@ -385,7 +385,7 @@ class Attack {
         //Timeout with sleep().
         //NOTE: It's possible I could await a setTimeout here.
         if (this.baseChannelling != 0) {
-            caller.changeStatus("channelling", caller, this.id);
+            caller.changeStatus("channelling", this.id);
             await sleep(this.baseChannelling * 1000);
         }
 
@@ -397,14 +397,26 @@ class Attack {
         let callerStatusCase = [null, null];
         let targetStatusCase = [null, null];
         //---- caller status
-        if (caller.buff != null) { callerStatusCase[0] = caller.buff.iterateDuration(); }
-        if (caller.debuff != null) { callerStatusCase[1] = caller.debuff.iterateDuration(); }
+        if (caller.buff != null) {
+            caller.buff.iterateDuration();
+            try{callerStatusCase[0] = caller.buff.effect;} catch(e){}
+        }
+        if (caller.debuff != null) {
+             caller.debuff.iterateDuration();
+             try{callerStatusCase[1] = caller.debuff.effect;} catch(e){}
+        }
         //---- target status
-        if (target.buff != null) { targetStatusCase[0] = target.buff.iterateDuration(); }
-        if (target.debuff != null) { targetStatusCase[1] = target.debuff.iterateDuration(); }
+        if (target.buff != null) {
+            target.buff.iterateDuration();
+            try{targetStatusCase[0] = target.buff.effect;} catch(e){}
+        }
+        if (target.debuff != null) {
+            target.debuff.iterateDuration(); 
+            try{targetStatusCase[1] = target.debuff.effect;} catch(e){}
+        }
 
         //change necessary parameters here.
-        //if caller is player:
+        //if caller is player: (OFFENSIVE parameters)
         if (caller instanceof Player) {
             //player buffs/debuffs
             for (let i = 0; i < callerStatusCase.length; i++) {
@@ -412,11 +424,17 @@ class Attack {
                 if (callerStatusCase[i] != null) {
                     switch (callerStatusCase[i]) {
                         //Buffs_____________
+                        case "barrier":
+                            break;
                         //Debuffs_____________
                         case "stun":
                             game.canvasOutput("You are stunned!");
-                            caller.changeStatus("", caller);
+                            caller.changeStatus("");
                             return;
+                        case "bleed":
+                            game.canvasOutput(`Bled ${caller.debuff.magnitude} health.`);
+                            caller.changeHealth(caller.debuff.magnitude);
+                            break;
                         case null:
                             break;
                     }
@@ -428,8 +446,14 @@ class Attack {
                     //Apply changes depending on each buff or debuff?
                     switch (targetStatusCase[i]) {
                         //Buffs_____________
+                        case "barrier":
+                            break;
                         //Debuffs_____________
                         case "stun":
+                            break;
+                        case "bleed":
+                            game.canvasOutput(`Enemy bleeds ${target.debuff.magnitude} health.`);
+                            target.changeHealth(target.debuff.magnitude);
                             break;
                         case null:
                             break;
@@ -437,7 +461,7 @@ class Attack {
                 }
             }
         }
-        //if caller is enemy:
+        //if caller is enemy: (DEFENSIVE parameters)
         if (caller instanceof Enemy) {
             //enemy buffs/debuffs
             for (let i = 0; i < callerStatusCase.length; i++) {
@@ -445,11 +469,17 @@ class Attack {
                 if (callerStatusCase[i] != null) {
                     switch (callerStatusCase[i]) {
                         //Buffs_____________
+                        case "barrier":
+                            break;
                         //Debuffs_____________
                         case "stun":
                             game.canvasOutput("Enemy is stunned!");
-                            caller.changeStatus("", caller);
+                            caller.changeStatus("");
                             return;
+                        case "bleed":
+                            game.canvasOutput(`Enemy bleeds ${caller.debuff.magnitude} health.`)
+                            caller.changeHealth(caller.debuff.magnitude);
+                            break;
                         case null:
                             break;
                     }
@@ -461,8 +491,21 @@ class Attack {
                     //Apply changes depending on each buff or debuff?
                     switch (targetStatusCase[i]) {
                         //Buffs_____________
+                        case "barrier":
+                            //if receiving a piercing attack, throw.
+                            if(this.effectObject != null && this.effectObject.effect == "pierce"){
+                                game.canvasOutput("The enemy attack pierces your barrier!");
+                                break;
+                            } else { //Else, block the attack.
+                                game.canvasOutput("Attack deflected by barrier!");
+                                return;
+                            }
                         //Debuffs_____________
                         case "stun":
+                            break;
+                        case "bleed":
+                            game.canvasOutput(`Bled ${target.debuff.magnitude} health!`);
+                            target.changeHealth(target.debuff.magnitude);
                             break;
                         case null:
                             break;
@@ -475,6 +518,10 @@ class Attack {
         //==================Step 3: Update display elements
         var attackParried;
         var tempAppliedStatus;
+        //Copy of the current statuseffect, if possible.
+        if(this.effectObject != null){
+            var statusEffectCopy = new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative, this.effectObject.magnitude, this.effectObject.effectDescription);
+        }
         if (this.effectObject == null) { //Standard attack, no effect.
             //standard damaging attack.
             //always check if the channeling has been interrupted.
@@ -484,8 +531,8 @@ class Attack {
                 //if the player is channelling AND the channelled id is current attack.
                 if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
                     tempAppliedStatus = "attacking";
-                    caller.changeStatus(tempAppliedStatus, caller);
-                    target.changeHealth(this.damage, target);
+                    caller.changeStatus(tempAppliedStatus);
+                    target.changeHealth(this.damage);
                     //Step 2: update display.
                     game.canvasOutput(`You hit the enemy for ${this.damage} damage!`);
                     //just for reaction's sake, show attack status.
@@ -494,8 +541,8 @@ class Attack {
 
                 if (caller instanceof Enemy) {
                     tempAppliedStatus = "attacking";
-                    caller.changeStatus(tempAppliedStatus, caller);
-                    attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                    caller.changeStatus(tempAppliedStatus);
+                    attackParried = target.changeHealth(this.damage);//check if the player is parrying or not.
                     if (!attackParried) {
                         game.canvasOutput(`The enemy hit you for ${this.damage} damage!`);
                     } else if (attackParried) {
@@ -508,15 +555,15 @@ class Attack {
                 //NOTE: Rework these two to use effectObjects.
                 case "parry":
                     tempAppliedStatus = "parrying";
-                    caller.changeStatus(tempAppliedStatus, caller);
+                    caller.changeStatus(tempAppliedStatus);
                     await sleep(this.effectObject.duration * 1000);
                     break;
                 case "heal":
                     //always check if the channeling has been interrupted.
                     if ((caller.status == "channelling" && game.channelledID == this.id) || this.baseChannelling == 0) {
                         tempAppliedStatus = "healing";
-                        caller.changeStatus(tempAppliedStatus, caller);
-                        target.changeHealth(this.damage, caller); //health applied to self.
+                        caller.changeStatus(tempAppliedStatus);
+                        caller.changeHealth(this.damage); //health applied to self.
 
                         //Step 2: update display
                         if (caller instanceof Player) {
@@ -541,18 +588,18 @@ class Attack {
                     if (game.gameState == "encounter" && game.windowState == "fight") {
                         if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
                             tempAppliedStatus = "casting";
-                            caller.changeStatus(tempAppliedStatus, caller);
-                            target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative), target);
+                            caller.changeStatus(tempAppliedStatus);
+                            target.addStatusEffect(statusEffectCopy);
                             game.canvasOutput(`Stunned the enemy!`);
                             await sleep(300);
                         }
                         if (caller instanceof Enemy) {
                             tempAppliedStatus = "casting";
-                            caller.changeStatus(tempAppliedStatus, caller);
+                            caller.changeStatus(tempAppliedStatus);
 
                             attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
                             if (!attackParried) {
-                                target.addStatusEffect(new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative), target);
+                                target.addStatusEffect(statusEffectCopy);
                                 game.canvasOutput(`Stunned!`);
                             } else if (attackParried) {
                                 game.canvasOutput(`Avoided the stun.`);
@@ -560,12 +607,39 @@ class Attack {
                         }
                     }
                     break;
+                case "bleed":
+                    //if the player is channelling AND the channelled id is current attack.
+                    //Blanket check if encounter is still ongoing and if player is not in inventory.
+                    if (game.gameState == "encounter" && game.windowState == "fight") {
+                        if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                            tempAppliedStatus = "casting";
+                            caller.changeStatus(tempAppliedStatus);
+                            target.addStatusEffect(statusEffectCopy);
+                            game.canvasOutput("The foe bleeds.");
+                            await sleep(300);
+                        }
+                    }
+                    if (caller instanceof Enemy) {
+                        tempAppliedStatus = "casting";
+                            caller.changeStatus(tempAppliedStatus);
+
+                            attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                            if (!attackParried) {
+                                target.addStatusEffect(statusEffectCopy);
+                                game.canvasOutput(`Bleeding!`);
+                            } else if (attackParried) {
+                                game.canvasOutput(`Parried the strike.`);
+                            }
+                    }
+                    break;
+                case "barrier":
+                    break;
             }
         }
         //==================Step 4: Reset board.
         //after action, check if the move hasn't been interrupted and reset status.
         if (caller.status == tempAppliedStatus) {
-            caller.changeStatus("", caller);
+            caller.changeStatus("");
         }
         //Also reset stats that have been changed!
         this.applyMasqueradeMulti();
@@ -581,7 +655,7 @@ class Attack {
     }
 }
 class StatusEffect {
-    constructor(parent, effect, duration = null, attackIterative = false, effectDescription = null) {
+    constructor(parent, effect, duration = null, attackIterative = false, magnitude = null, effectDescription = null) {
         this.parent = parent;
         this.target;
         if (this.parent instanceof Enemy) {
@@ -590,6 +664,7 @@ class StatusEffect {
             this.target = enemy;
         }
         this.duration = duration;
+        this.magnitude = magnitude;
         this.attackIterative = attackIterative;
         this.remainingDuration = duration;
 
@@ -601,6 +676,12 @@ class StatusEffect {
             //debuffs
             case "stun":
                 this.type = "debuff";
+                break;
+            case "bleed":
+                this.type = "debuff";
+                break;
+            case "barrier":
+                this.type = "buff";
                 break;
         }
         this.statusApplyMasqueradeMulti();
@@ -618,7 +699,7 @@ class StatusEffect {
                     } else if (this.parent instanceof Enemy) {
                         document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
                     }
-                    if (this.remainingDuration <= 0) { this.parent.clearStatusEffect(this.type, this.parent); }
+                    if (this.remainingDuration <= 0) { this.parent.clearStatusEffect(this.type); }
                     break;
                 case "debuff": //targets this.target
                     //update displays
@@ -627,11 +708,11 @@ class StatusEffect {
                     } else if (this.target instanceof Enemy) {
                         document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = `${this.effect}[${this.remainingDuration}]`;
                     }
-                    if (this.remainingDuration <= 0) { this.target.clearStatusEffect(this.type, this.target); }
+                    if (this.remainingDuration <= 0) { this.target.clearStatusEffect(this.type); }
                     break;
             }
         }
-        return this.effect; //for attackprocced.
+        return;
     }
     //This also needs to apply masquerade! If duration changes.
     //NOTE: difference in durations happen here.
@@ -839,6 +920,11 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemyStatus").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__enemy").innerHTML = "";
+
+        document.getElementById("gamePage__gameSpace__encounter__canvas__pbuff").innerHTML = "-";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__pdebuff").innerHTML = "-";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__ebuff").innerHTML = "-";
+        document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = "-";
 
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
 
