@@ -391,127 +391,140 @@ class Attack {
 
         //NOTE: there is probably a better way to apply effects. As it stands, I'm switch()ing.
         //==================Step 1: Apply status effects!
-        //statusReturnCase 
-        //==================Step 1.1: call .applyEffect on all buffs/debuffs to check what is happening.
-        // array[0] is buff case, array[1] is debuff case.
-        let callerStatusCase = [null, null];
-        let targetStatusCase = [null, null];
-        //---- caller status
-        if (caller.buff != null) {
-            caller.buff.iterateDuration();
-            try{callerStatusCase[0] = caller.buff.effect;} catch(e){}
-        }
-        if (caller.debuff != null) {
-             caller.debuff.iterateDuration();
-             try{callerStatusCase[1] = caller.debuff.effect;} catch(e){}
-        }
-        //---- target status
-        if (target.buff != null) {
-            target.buff.iterateDuration();
-            try{targetStatusCase[0] = target.buff.effect;} catch(e){}
-        }
-        if (target.debuff != null) {
-            target.debuff.iterateDuration(); 
-            try{targetStatusCase[1] = target.debuff.effect;} catch(e){}
-        }
 
         //change necessary parameters here.
+        //Apply changes depending on each buff or debuff
+        //==================Step 1.1: call .applyEffect on all buffs/debuffs to check what is happening.
+        var attackAborted = false; //<-- this is necessary. can't return instead, because we need to iterate durations.
         //if caller is player: (OFFENSIVE parameters)
         if (caller instanceof Player) {
-            //player buffs/debuffs
-            for (let i = 0; i < callerStatusCase.length; i++) {
-                //Apply changes depending on each buff or debuff?
-                if (callerStatusCase[i] != null) {
-                    switch (callerStatusCase[i]) {
-                        //Buffs_____________
-                        case "barrier":
-                            break;
-                        //Debuffs_____________
-                        case "stun":
-                            game.canvasOutput("You are stunned!");
-                            caller.changeStatus("");
-                            return;
-                        case "bleed":
-                            game.canvasOutput(`Bled ${caller.debuff.magnitude} health.`);
-                            caller.changeHealth(caller.debuff.magnitude);
-                            break;
-                        case null:
-                            break;
-                    }
+            //==========OFFENSIVE PLAYER BUFFS===========
+            if (caller.buff != null) {
+                switch (caller.buff.effect) {
+                    //Buffs_____________
+                    case "barrier":
+                        break;
                 }
             }
-            //enemy buffs/debuffs
-            for (let i = 0; i < targetStatusCase.length; i++) {
-                if (targetStatusCase[i] != null) {
-                    //Apply changes depending on each buff or debuff?
-                    switch (targetStatusCase[i]) {
-                        //Buffs_____________
-                        case "barrier":
+            //==========OFFENSIVE PLAYER DEBUFFS===========
+            if (caller.debuff != null) {
+                switch (caller.debuff.effect) {
+                    //Debuffs_____________
+                    case "stun":
+                        game.canvasOutput("You are stunned!");
+                        caller.changeStatus("");
+                        attackAborted = true;
+                        break;
+                    case "bleed":
+                        game.canvasOutput(`Bled ${caller.debuff.magnitude} health.`);
+                        caller.changeHealth(caller.debuff.magnitude);
+                        break;
+                    case null:
+                        break;
+                }
+            }
+
+            //==========DEFENSIVE ENEMY BUFFS===========
+            if (target.buff != null) {
+                //==========ENEMY BUFFS===========
+                switch (target.buff.effect) {
+                    //Buffs_____________
+                    case "barrier":
+                        //if attacking into a barrier, throw.
+                        if (this.effectObject != null && this.effectObject.effect == "pierce") {
+                            game.canvasOutput("Struck through the shield.");
                             break;
-                        //Debuffs_____________
-                        case "stun":
+                        } else { //Else, block the attack.
+                            game.canvasOutput("The enemy's barrier flares!");
+                            attackAborted = true;
                             break;
-                        case "bleed":
-                            game.canvasOutput(`Enemy bleeds ${target.debuff.magnitude} health.`);
-                            target.changeHealth(target.debuff.magnitude);
-                            break;
-                        case null:
-                            break;
-                    }
+                        }
+                }
+            }
+            //==========DEFENSIVE ENEMY DEBUFFS===========
+            if (target.debuff != null) {
+                switch (target.debuff.effect) {
+                    //Debuffs_____________
+                    case "stun":
+                        break;
+                    case "bleed":
+                        game.canvasOutput(`Enemy bleeds ${target.debuff.magnitude} health.`);
+                        target.changeHealth(target.debuff.magnitude);
+                        break;
+                    case null:
+                        break;
                 }
             }
         }
         //if caller is enemy: (DEFENSIVE parameters)
         if (caller instanceof Enemy) {
-            //enemy buffs/debuffs
-            for (let i = 0; i < callerStatusCase.length; i++) {
-                //Apply changes depending on each buff or debuff?
-                if (callerStatusCase[i] != null) {
-                    switch (callerStatusCase[i]) {
-                        //Buffs_____________
-                        case "barrier":
-                            break;
-                        //Debuffs_____________
-                        case "stun":
-                            game.canvasOutput("Enemy is stunned!");
-                            caller.changeStatus("");
-                            return;
-                        case "bleed":
-                            game.canvasOutput(`Enemy bleeds ${caller.debuff.magnitude} health.`)
-                            caller.changeHealth(caller.debuff.magnitude);
-                            break;
-                        case null:
-                            break;
-                    }
+            //==========OFFENSIVE ENEMY BUFFS===========
+            if (caller.buff != null) {
+                switch (caller.buff.effect) {
+                    //Buffs_____________
+                    case "barrier":
+                        break;
+
                 }
             }
-            //player buffs/debuffs
-            for (let i = 0; i < targetStatusCase.length; i++) {
-                if (targetStatusCase[i] != null) {
-                    //Apply changes depending on each buff or debuff?
-                    switch (targetStatusCase[i]) {
-                        //Buffs_____________
-                        case "barrier":
-                            //if receiving a piercing attack, throw.
-                            if(this.effectObject != null && this.effectObject.effect == "pierce"){
-                                game.canvasOutput("The enemy attack pierces your barrier!");
-                                break;
-                            } else { //Else, block the attack.
-                                game.canvasOutput("Attack deflected by barrier!");
-                                return;
-                            }
-                        //Debuffs_____________
-                        case "stun":
-                            break;
-                        case "bleed":
-                            game.canvasOutput(`Bled ${target.debuff.magnitude} health!`);
-                            target.changeHealth(target.debuff.magnitude);
-                            break;
-                        case null:
-                            break;
-                    }
+            //==========OFFENSIVE ENEMY DEBUFFS===========
+            if (caller.debuff != null) {
+                switch (caller.debuff.effect) {
+                    //Debuffs_____________
+                    case "stun":
+                        game.canvasOutput("Enemy is stunned!");
+                        caller.changeStatus("");
+                        attackAborted = true;
+                        break;
+                    case "bleed":
+                        game.canvasOutput(`Enemy bleeds ${caller.debuff.magnitude} health.`)
+                        caller.changeHealth(caller.debuff.magnitude);
+                        break;
+                    case null:
+                        break;
                 }
             }
+
+            //==========DEFENSIVE PLAYER BUFFS===========
+            if (target.buff != null) {
+                switch (target.buff.effect) {
+                    //Buffs_____________
+                    case "barrier":
+                        //if receiving a piercing attack, throw.
+                        if (this.effectObject != null && this.effectObject.effect == "pierce") {
+                            game.canvasOutput("The enemy attack pierces your barrier!");
+                            break;
+                        } else { //Else, block the attack.
+                            game.canvasOutput("Attack deflected by barrier!");
+                            attackAborted = true;
+                            break;
+                        }
+                }
+            }
+            //==========DEFENSIVE PLAYER DEBUFFS===========
+            if (target.debuff != null) {
+                switch (target.debuff.effect) {
+                    //Debuffs_____________
+                    case "stun":
+                        break;
+                    case "bleed":
+                        game.canvasOutput(`Bled ${target.debuff.magnitude} health!`);
+                        target.changeHealth(target.debuff.magnitude);
+                        break;
+                    case null:
+                        break;
+                }
+            }
+        }
+
+        //=================Step 1.2: iterate effects.
+        if (caller.buff != null) { caller.buff.iterateDuration(); }
+        if (caller.debuff != null) { caller.debuff.iterateDuration(); }
+        if (target.buff != null) { target.buff.iterateDuration(); }
+        if (target.debuff != null) { target.debuff.iterateDuration(); }
+        //=================Step 1.3: If the attack was nullified by an effect, abort.
+        if (attackAborted) {
+            return;
         }
 
         //==================Step 2: Apply changes to game and Entities. After channelling, attack
@@ -519,7 +532,7 @@ class Attack {
         var attackParried;
         var tempAppliedStatus;
         //Copy of the current statuseffect, if possible.
-        if(this.effectObject != null){
+        if (this.effectObject != null) {
             var statusEffectCopy = new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative, this.effectObject.magnitude, this.effectObject.effectDescription);
         }
         if (this.effectObject == null) { //Standard attack, no effect.
@@ -621,15 +634,15 @@ class Attack {
                     }
                     if (caller instanceof Enemy) {
                         tempAppliedStatus = "casting";
-                            caller.changeStatus(tempAppliedStatus);
+                        caller.changeStatus(tempAppliedStatus);
 
-                            attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
-                            if (!attackParried) {
-                                target.addStatusEffect(statusEffectCopy);
-                                game.canvasOutput(`Bleeding!`);
-                            } else if (attackParried) {
-                                game.canvasOutput(`Parried the strike.`);
-                            }
+                        attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                        if (!attackParried) {
+                            target.addStatusEffect(statusEffectCopy);
+                            game.canvasOutput(`Bleeding!`);
+                        } else if (attackParried) {
+                            game.canvasOutput(`Parried the strike.`);
+                        }
                     }
                     break;
                 case "barrier":
@@ -911,6 +924,38 @@ class Game {
         clearInterval(enemy.attackInterval);
         enemy.attackInterval = null;
 
+        if (player.health <= 0) { //player loses, trigger masquerade.
+            this.encounterPromiseReject(); //reject the sequence promise.
+            this.clearCanvas(); //Reset the encounter scene.
+            //Masquerade update.
+            player.updateMasqueradeStats(1);
+            return;
+        }
+        if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
+            //Display dialogue!
+            for (var i = 0; i < enemy.defeatDialogue.length; i++) {
+                pushMainOutput(enemy.defeatDialogue[i]);
+                await sleep(1500);
+            }
+            await sleep(1500);
+            this.encounterPromiseResolve();
+            this.clearCanvas(); //Reset the encounter scene.
+            //OLD RESULTS SCREEN
+            /*
+            document.getElementById("gamePage__gameSpace__encounter__result").style.display = "flex";
+            //Wait until player clicks button to go back.
+            await new Promise(resolve => {
+                document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) => {
+                    resolve();
+                }, { once: true }); //once: true removes the listener after clicked once.
+                //any key press will remove both eventlisteners.
+                document.addEventListener("keydown", (e) => {
+                    document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
+                }, { once: true }); //once: true removes the listener after clicked once.
+            })*/
+        }
+    }
+    clearCanvas() {
         //reset canvas.
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1").innerHTML = "";
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2").innerHTML = "";
@@ -927,37 +972,6 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = "-";
 
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
-
-        if (player.health <= 0) { //player loses, trigger masquerade.
-            this.encounterPromiseReject(); //reject the sequence promise.
-            //Masquerade update.
-            player.updateMasqueradeStats(1);
-            return;
-        }
-        if (enemy.health <= 0) { //player wins! Give rewards, reward screen.
-            //Display dialogue!
-            for (var i = 0; i < enemy.defeatDialogue.length; i++) {
-                pushMainOutput(enemy.defeatDialogue[i]);
-                await sleep(1500);
-            }
-            await sleep(1500);
-
-            this.encounterPromiseResolve();
-
-            //OLD RESULTS SCREEN
-            /*
-            document.getElementById("gamePage__gameSpace__encounter__result").style.display = "flex";
-            //Wait until player clicks button to go back.
-            await new Promise(resolve => {
-                document.getElementById("gamePage__gameSpace__encounter__result__returnButton").addEventListener("click", (e) => {
-                    resolve();
-                }, { once: true }); //once: true removes the listener after clicked once.
-                //any key press will remove both eventlisteners.
-                document.addEventListener("keydown", (e) => {
-                    document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
-                }, { once: true }); //once: true removes the listener after clicked once.
-            })*/
-        }
     }
 
     //game win or lose.

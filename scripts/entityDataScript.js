@@ -39,7 +39,7 @@ class EntityDatabase {
             //Barrier: Parry, but for given turns.
             case "Barrier":
                 duration = 2;
-                return new Attack(id, 0, 6, 1, "The mind is a fortress.", new StatusEffect(player, "barrier", duration, true, null, 
+                return new Attack(id, 0, 6, 2, "The mind is a fortress.", new StatusEffect(player, "barrier", duration, true, null, 
                 `Negate incoming damage for ${duration} attacks.`));
             //Pierce: Ignore Barrier.
         }
