@@ -524,6 +524,7 @@ class Attack {
         if (target.debuff != null) { target.debuff.iterateDuration(); }
         //=================Step 1.3: If the attack was nullified by an effect, abort.
         if (attackAborted) {
+            caller.changeStatus("");
             return;
         }
 
@@ -594,6 +595,34 @@ class Attack {
 
                 //Special effect cases. These apply buff to self/debuff to enemy.
                 //Buffs:
+                //Buffs do not check for parry, because they apply to oneself.
+                case "barrier":
+                    //if the player is channelling AND the channelled id is current attack.
+                    //Blanket check if encounter is still ongoing and if player is not in inventory.
+                    if (game.gameState == "encounter" && game.windowState == "fight") {
+                        if ((caller instanceof Player && caller.status == "channelling" && game.channelledID == this.id) || (caller instanceof Player && this.baseChannelling == 0)) {
+                            tempAppliedStatus = "casting";
+                            caller.changeStatus(tempAppliedStatus);
+                            caller.addStatusEffect(statusEffectCopy);
+                            game.canvasOutput("Barrier online!");
+                            await sleep(300);
+                        }
+                    }
+                    if (caller instanceof Enemy) {
+                        tempAppliedStatus = "casting";
+                        caller.changeStatus(tempAppliedStatus);
+                        caller.addStatusEffect(statusEffectCopy);
+                        game.canvasOutput("Enemy barrier online!");
+
+                        attackParried = target.changeHealth(this.damage, target);//check if the player is parrying or not.
+                        if (!attackParried) {
+                            target.addStatusEffect(statusEffectCopy);
+                            game.canvasOutput(`Bleeding!`);
+                        } else if (attackParried) {
+                            game.canvasOutput(`Parried the strike.`);
+                        }
+                    }
+                    break;
                 //Debuffs:
                 case "stun":
                     //if the player is channelling AND the channelled id is current attack.
@@ -644,8 +673,6 @@ class Attack {
                             game.canvasOutput(`Parried the strike.`);
                         }
                     }
-                    break;
-                case "barrier":
                     break;
             }
         }
