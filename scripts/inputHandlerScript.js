@@ -56,7 +56,7 @@ async function keyDownHandler(mapArray, e) {
     }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
-    if (game.gameState == "movement" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
+    if (game.gameState == "movement" && game.windowState == "map" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
         playerMovementHandler(e.code);
     }
     //change loadout from inventory.

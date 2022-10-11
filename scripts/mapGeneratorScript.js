@@ -192,7 +192,7 @@ function showCellsInVision(radius) {
                         if (tempCellEntity.revealed) {
                             cell.style.fontWeight = "700";
                             cell.style.fontStretch = "expanded";
-                            cell.style.fontSize = "20px";
+                            cell.style.fontSize = "22px";
                         } else { //Hidden case
                             cell.style.fontWeight = "400";
                             cell.style.fontStretch = "normal";

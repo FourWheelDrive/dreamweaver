@@ -72,11 +72,6 @@ class Entity {
             }
 
             //TAG: FLAG CHECK
-            //Check if encounter ends. If target health <= 0.
-            if (this.health <= 0) {
-                game.encounterEnds();
-                return;
-            }
             //Check if healed past maxHealth.
             if (this instanceof Player && this.health > this.maxHealth) {
                 this.health = this.maxHealth;
@@ -89,6 +84,12 @@ class Entity {
             }
             if (this instanceof Enemy) {
                 document.getElementById("gamePage__gameSpace__encounter__canvas__enemyHealth").innerHTML = this.health;
+            }
+
+            //Check if encounter ends. If target health <= 0.
+            if (this.health <= 0) {
+                game.encounterEnds();
+                return;
             }
             return false;
         } else {
@@ -301,6 +302,8 @@ class Player extends Entity {
                 this.maxHealth = this.healthMulti[this.masquerade];
                 game.gameState = "encounter";       //Temporary flag update to let changeHealth through.
                 this.changeHealth(-100, this);
+                this.clearStatusEffect("buff");
+                this.clearStatusEffect("debuff");
                 game.gameState = "masquerade";
                 //update displays.
                 document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
@@ -332,6 +335,10 @@ class Enemy extends Entity {
 
     //also initializes the encounter screen.
     async beginAttackSequence(cooldownHandler) {
+        //attack, then set timer.
+        this.attack.attackProcced(enemy, player, cooldownHandler);
+
+        //attack timer.
         this.attackInterval = setInterval(async () => {
             if (game.gameState == "encounter") {
                 this.attack.attackProcced(enemy, player, cooldownHandler);
@@ -534,7 +541,12 @@ class Attack {
         var tempAppliedStatus;
         //Copy of the current statuseffect, if possible.
         if (this.effectObject != null) {
-            var statusEffectCopy = new StatusEffect(this.effectObject.parent, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative, this.effectObject.magnitude, this.effectObject.effectDescription);
+            if (caller instanceof Enemy) {
+                var statusEffectCopy = new StatusEffect(enemy, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative, this.effectObject.magnitude, this.effectObject.effectDescription);
+            }
+            if (caller instanceof Player) {
+                var statusEffectCopy = new StatusEffect(player, this.effectObject.effect, this.effectObject.duration, this.effectObject.attackIterative, this.effectObject.magnitude, this.effectObject.effectDescription);
+            }
         }
         if (this.effectObject == null) { //Standard attack, no effect.
             //standard damaging attack.
@@ -564,7 +576,7 @@ class Attack {
                     }
                 }
             }
-        } else {
+        } else {                         //Special effect attacks.
             switch (this.effectObject.effect) {
                 //NOTE: Rework these two to use effectObjects.
                 case "parry":
@@ -730,7 +742,6 @@ class StatusEffect {
     iterateDuration() {
         if (this.attackIterative) {
             this.remainingDuration = this.remainingDuration - 1;
-
             switch (this.type) {
                 case "buff": //targets this.parent
                     //update displays
@@ -855,7 +866,7 @@ class Game {
 
     //Sequence functions: called per room.
     //Encounter functions: called per individual fight.
-    async sequenceBegins(sequenceLength, tier = 1, boss = false) {
+    async sequenceBegins(sequenceLength, tier = 1, boss = null) {
         //actually big brain this one, automatically switch to encounter screen.
         this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
@@ -866,10 +877,18 @@ class Game {
         // Also generates enemies (different cases for different cells). special case for bosses.
         for (var i = 0; i < sequenceLength; i++) {
             let encounterLost = false;
-
             //Generate a new enemy.
-            //NOTE: update with different cell types.
-            enemy = entityDatabase.generateTier1Enemy(1);
+            if (boss) { //BOSS ROOM CASE
+                if (i == sequenceLength - 1) {
+                    enemy = boss;
+                } else {
+                    //replace with special enemies for each room's boss.
+                    enemy = entityDatabase.generateTier1Enemy(1);
+                }
+            } else { //REGULAR CASE
+                //replace with enemies for each cell type and room.
+                enemy = entityDatabase.generateTier1Enemy(1);
+            }
             //NOTE: generate new enemies here, instead of in encounterBegins(). Use entityDatabase methods.
             this.encounterBegins();
             let encounterPromise = await new Promise(function (resolve, reject) {
@@ -901,27 +920,68 @@ class Game {
             }
         }
         //when the enemies are all dead, end sequence.
-        this.sequenceEnds(sequenceLength);
+        this.sequenceEnds(sequenceLength, boss);
     }
-    async sequenceEnds(sequenceLength) {
-        //NOTE: wish calculation algs go here.
-        let newWishes = sequenceLength;
-        pushMainOutput(`You got ${newWishes} Wishes!`);
-        //add money.
-        player.addWishes(newWishes);
-        await sleep(1500);
+    async sequenceEnds(sequenceLength, boss = null) {
+        if (boss) {//BOSS CASE
+            //we co-opt Masquerade screen for this lol
+            let newWishes = 5;
+            player.addWishes(newWishes);
+            fadeElement("out", document.getElementById("gamePage"), 1);
 
-        //hide canvas.
-        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
-        //auto switch back to the map.
-        this.gameState = "movement";
-        do {
-            document.getElementById("gamePage__header__left").click();
-        } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
-        //reset encounter screen.
-        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
-        //clear cooldowns.
-        cooldownHandler.clearCooldowns();
+            let masqueradeWindow = document.getElementById("masquerade__lossScreen");
+            let maskOutput1 = document.getElementById("masquerade__lossScreen__output1");
+            let maskOutput2 = document.getElementById("masquerade__lossScreen__output2");
+            switch (this.currentRoom) { //dialogues for each room.
+                case 1:
+                    maskOutput1.innerHTML = "The beast lies still.";
+                    maskOutput2.innerHTML = "The boulevard stretches into the mist.";
+                    break;
+            }
+
+            masqueradeWindow.style.display = "flex";
+            fadeElement("in", masqueradeWindow, 1);
+            //Generate a new room and reset player.
+            this.beginNewRoom();
+            //Automatically return to map screen.
+
+            //Disable transition screen.
+            await sleep(5000);
+            //hide canvas.
+            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+            //auto switch back to the map.
+            this.gameState = "movement";
+            do {
+                document.getElementById("gamePage__header__left").click();
+            } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
+            //reset canvas
+            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+            //fade back in.
+            fadeElement("out", masqueradeWindow, 1);
+            fadeElement("in", document.getElementById("gamePage"), 1);
+        } else { //NORMAL ENCOUNTER CASE
+            //NOTE: wish calculation algs go here.
+            let newWishes = Math.floor(sequenceLength / 2);
+            if (newWishes < 1) { //get at least 1 wish.
+                newWishes = 1;
+            }
+            pushMainOutput(`You got ${newWishes} Wishes!`);
+            //add money.
+            player.addWishes(newWishes);
+            await sleep(1500);
+
+            //hide canvas.
+            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+            //auto switch back to the map.
+            this.gameState = "movement";
+            do {
+                document.getElementById("gamePage__header__left").click();
+            } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
+            //reset canvas
+            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+            //clear cooldowns.
+            cooldownHandler.clearCooldowns();
+        }
     }
     async encounterBegins() {
         //initialize screen
@@ -999,6 +1059,28 @@ class Game {
         document.getElementById("gamePage__gameSpace__encounter__canvas__edebuff").innerHTML = "-";
 
         document.getElementById("gamePage__gameSpace__encounter__canvas__playerStatus").innerHTML = "";
+    }
+
+    //Start a new room.
+    beginNewRoom() {
+        //iterate room.
+        this.currentRoom = this.currentRoom + 1;
+        //remove children from map canvas.
+        var map = document.getElementById("gamePage__gameSpace__map__canvas");
+        while (map.firstChild) {
+            map.firstChild.remove();
+        }
+        //generate a new map.
+        var maxTunnels = 80, maxLength = 10;
+        mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
+
+        //reset player
+        clearPlayer(mapArray, true);
+        player.getInitialPosition(mapWidth, mapHeight);
+
+        //show vision
+        showCellsInVision(5);
+        showPlayer();
     }
 
     //game win or lose.
@@ -1181,7 +1263,7 @@ class BossEncounterCell extends Cell {
         bossCellElement.innerHTML = this.symbol;
         bossCellElement.style.fontWeight = "700";
         bossCellElement.style.fontStretch = "expanded";
-        bossCellElement.style.fontSize = "25px";
+        bossCellElement.style.fontSize = "22px";
         showCellsInVision(5);
         showPlayer();
     }
@@ -1202,8 +1284,7 @@ class BossEncounterCell extends Cell {
         }
     }
     room1BossBegins() {
-        enemy = entityDatabase.generateBossByName(1);
-        game.sequenceBegins(5, "B1", true);
+        game.sequenceBegins(1, "B1", entityDatabase.generateBossByName(1));
     }
     room2BossBegins() {
 

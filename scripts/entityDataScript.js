@@ -17,7 +17,7 @@ class EntityDatabase {
             //Attack constructor(name, damage, cooldown, channelling, description, effectObject = null)
             //Effect constructor(parent, effect, duration = null, attackIterative = false, magnitude = null, effectDescription = null)
             case "Attack":
-                return new Attack(id, 1, 2, 0, "Strike nimbly.");
+                return new Attack(id, 11, 2, 0, "Strike nimbly.");
             case "Bash":
                 return new Attack(id, 2, 4, 2, "Strike solidly.");
             case "Parry":
@@ -50,9 +50,15 @@ class EntityDatabase {
     //=============ENEMIES=============
     //Will bosses have their own subclass??
     generateBossByName(id){
+        let bossAttack;
+        let bossEffect;
         switch(id){
             case 1:
-                return new Enemy(30, "%", new Attack("Boss1_Attack", 3, 5, 2), ["A great beast intercepts the road.", "The Clairvoyant frowns."], [""]);
+                bossEffect = new StatusEffect(enemy, "stun", 1, true);
+                bossAttack = new Attack("boss1Attack", 3, 8, 1, "A long cooldown, heavy hitting, stun attack for boss.", bossEffect);
+                return new Enemy(30, "%", bossAttack, 
+                ["A great beast bars the road.", "Its bulk shrouds the boulevard in darkness."], 
+                ["A final roar shakes the city.", "It seems a little brighter."]);
         }
     }
     //we can use 2 functions. generateEnemyByID or ByTier.
