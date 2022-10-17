@@ -97,6 +97,14 @@ function placeLocation(mapArray, xBound, yBound, centerCoord, roomClass) {
                                 pathFound = true;
                             }
                             break;
+                        case "Special":
+                            if ((mapArray[x][y] instanceof PathCell) && (mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell) && (calcPythagDistance(randomCoord, centerCoord) > 10)) {
+                                mapArray[randomCoord[0]][randomCoord[1]] = new SpecialEncounterCell(randomCoord[0], randomCoord[1]);
+                                mapArray[randomCoord[0]][randomCoord[1]].initializeCell();
+
+                                pathFound = true;
+                            }
+                            break;
                         case "Boss":
                             if ((mapArray[x][y] instanceof PathCell) && (mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell) && (calcPythagDistance(randomCoord, centerCoord) < 10)) {
                                 mapArray[randomCoord[0]][randomCoord[1]] = new BossEncounterCell(randomCoord[0], randomCoord[1]);
@@ -206,15 +214,30 @@ function showCellsInVision(radius) {
 }
 
 //Put them all together.
-function generateNewRoom(room, mapWidth, mapHeight, maxTunnels, maxLength) {
+function generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength) {
     //generate array of walls
     var mapArray = createMapArray(mapWidth, mapHeight);
     //generate random paths procedurally
     mapArray = createMapPaths(maxTunnels, maxLength, mapWidth, mapHeight, mapArray);
+
+    //Array defining how many rooms of each type exist.
+    let roomTypeArray;
+    switch(game.currentRoom){
+        //CONVENTION: [MINOR, SPECIAL]
+        //always 1 boss.
+        case 1:
+            roomTypeArray = [10, 1];
+            break;
+        case 2:
+            break;
+    }
     //generate random locations of interest
     var centerCoord = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < roomTypeArray[0]; i++) { // MINOR
         mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Minor");
+    }
+    for(var j = 0; j < roomTypeArray[1]; j++) { //SPECIAL (story)
+        mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Special");
     }
     //Generate the room's boss
     mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Boss");

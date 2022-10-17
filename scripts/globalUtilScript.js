@@ -307,8 +307,8 @@ class Player extends Entity {
                 game.gameState = "masquerade";
                 //update displays.
                 document.getElementById("gamePage__footer__masquerade").innerHTML = `Masquerade: ${this.masquerade}`;
-                //Update map => cell needs to be reset.
-                mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber = mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber - 1;
+                //nevermind. Update map => cell needs to be reset.
+                //mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber = mapArray[this.mapPosition[0]][this.mapPosition[1]].visitNumber - 1;
 
                 //return to game.
                 clearPlayer(mapArray, true);
@@ -829,6 +829,8 @@ class Game {
 
         this.currentRoom = 1;
         this.roomBossCellEntity;                            //the object of the cell for outside reference.
+        this.roomBossHealth;                                //damage done to the boss stays there.
+
         this.gameTime = 0;                                  //Serves as moveCounter.
         this.encounterCounter = 0;                          //tracks number of battles. Might be more useful if track moves since last battle?
         this.gameDialogueIntervals = ["1B"] //These are not actually times! These are turn intervals between dialogues. Can be movement or battle based.
@@ -866,7 +868,7 @@ class Game {
 
     //Sequence functions: called per room.
     //Encounter functions: called per individual fight.
-    async sequenceBegins(sequenceLength, tier = 1, boss = null) {
+    async sequenceBegins(sequenceLength, cellEntity, tier = 1, boss = null) {
         //actually big brain this one, automatically switch to encounter screen.
         this.gameState = "encounter"; //<-- this is actually just here to keep the screen's opacity 1.0.
         do {
@@ -878,6 +880,7 @@ class Game {
         for (var i = 0; i < sequenceLength; i++) {
             let encounterLost = false;
             //Generate a new enemy.
+            //NOTE: Might move this to a cell function. Pass the cell entity into sequenceBegins()?
             if (boss) { //BOSS ROOM CASE
                 if (i == sequenceLength - 1) {
                     enemy = boss;
@@ -910,6 +913,11 @@ class Game {
                     //clear cooldowns.
                     cooldownHandler.clearCooldowns();
 
+                    //Update remaining boss health, if applicable.
+                    if (boss) {
+                        game.roomBossHealth = boss.health;
+                    }
+
                     //catch things and end the loop.
                     encounterLost = true;
                 }
@@ -920,68 +928,32 @@ class Game {
             }
         }
         //when the enemies are all dead, end sequence.
-        this.sequenceEnds(sequenceLength, boss);
+        this.sequenceEnds(sequenceLength, cellEntity);
     }
-    async sequenceEnds(sequenceLength, boss = null) {
-        if (boss) {//BOSS CASE
-            //we co-opt Masquerade screen for this lol
-            let newWishes = 5;
-            player.addWishes(newWishes);
-            fadeElement("out", document.getElementById("gamePage"), 1);
-
-            let masqueradeWindow = document.getElementById("masquerade__lossScreen");
-            let maskOutput1 = document.getElementById("masquerade__lossScreen__output1");
-            let maskOutput2 = document.getElementById("masquerade__lossScreen__output2");
-            switch (this.currentRoom) { //dialogues for each room.
-                case 1:
-                    maskOutput1.innerHTML = "The beast lies still.";
-                    maskOutput2.innerHTML = "The boulevard stretches into the mist.";
-                    break;
-            }
-
-            masqueradeWindow.style.display = "flex";
-            fadeElement("in", masqueradeWindow, 1);
-            //Generate a new room and reset player.
-            this.beginNewRoom();
-            //Automatically return to map screen.
-
-            //Disable transition screen.
-            await sleep(5000);
-            //hide canvas.
-            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
-            //auto switch back to the map.
-            this.gameState = "movement";
-            do {
-                document.getElementById("gamePage__header__left").click();
-            } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
-            //reset canvas
-            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
-            //fade back in.
-            fadeElement("out", masqueradeWindow, 1);
-            fadeElement("in", document.getElementById("gamePage"), 1);
-        } else { //NORMAL ENCOUNTER CASE
-            //NOTE: wish calculation algs go here.
-            let newWishes = Math.floor(sequenceLength / 2);
-            if (newWishes < 1) { //get at least 1 wish.
-                newWishes = 1;
-            }
-            pushMainOutput(`You got ${newWishes} Wishes!`);
-            //add money.
-            player.addWishes(newWishes);
-            await sleep(1500);
-
-            //hide canvas.
-            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
-            //auto switch back to the map.
-            this.gameState = "movement";
-            do {
-                document.getElementById("gamePage__header__left").click();
-            } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
-            //reset canvas
-            document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
-            //clear cooldowns.
-            cooldownHandler.clearCooldowns();
+    async sequenceEnds(sequenceLength, cellEntity) {
+        //Call cellEntity's endVisit.
+        await cellEntity.endVisit();
+        //NOTE: wish calculation algs go here.
+        let newWishes = Math.floor(sequenceLength / 2);
+        if (newWishes < 1) { //get at least 1 wish.
+            newWishes = 1;
         }
+        pushMainOutput(`You got ${newWishes} Wishes!`);
+        //add money.
+        player.addWishes(newWishes);
+        await sleep(1500);
+
+        //hide canvas.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+        //auto switch back to the map.
+        this.gameState = "movement";
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
+        //reset canvas
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+        //clear cooldowns.
+        cooldownHandler.clearCooldowns();
     }
     async encounterBegins() {
         //initialize screen
@@ -1014,6 +986,9 @@ class Game {
         if (player.health <= 0) { //player loses, trigger masquerade.
             this.encounterPromiseReject(); //reject the sequence promise.
             this.clearCanvas(); //Reset the encounter scene.
+
+            //if the player died on a boss, boss's health should be reduced.
+            //  This is actually handled in the Promise error case.
             //Masquerade update.
             player.updateMasqueradeStats(1);
             return;
@@ -1072,7 +1047,7 @@ class Game {
         }
         //generate a new map.
         var maxTunnels = 80, maxLength = 10;
-        mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
+        mapArray = generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength);
 
         //reset player
         clearPlayer(mapArray, true);
@@ -1084,7 +1059,13 @@ class Game {
     }
 
     //game win or lose.
-    winGame() { }
+    winGame() { 
+        document.getElementById("masquerade__lossScreen").style.display = "none";
+        this.gameState = "masquerade";
+        fadeElement("out", document.getElementById("gamePage"), 1);
+        document.getElementById("game__win__screen").style.display = "flex";
+        fadeElement("in", document.getElementById("game__win__screen"), 1);
+    }
     loseGame() {
         document.getElementById("masquerade__lossScreen").style.display = "none";
         this.gameState = "masquerade";
@@ -1100,6 +1081,9 @@ Contents [class CELL]:
 All child classes of [CELL] require:
 firstVisit()
 recurringVisit() (not always) <== case 1 is the first recurrance, case 0 is firstVisit().
+leaveVisit() <== for encounter cells after player wins.
+
+initializeCell() moved to Cell.
 */
 class Cell {
     constructor(positionX, positionY) {
@@ -1113,20 +1097,36 @@ class Cell {
 
         this.visitNumber = 0;
     }
+    initializeCell() {
+        if (this.constructor.name != "BossEncounterCell") {
+            this.name = this.cellNameGenerator(this.constructor.name, game.currentRoom);
+            this.symbol = this.cellSymbolGenerator(this.constructor.name, game.currentRoom);
+        } else {// boss case.
+            this.storedName = this.cellNameGenerator(this.constructor.name, game.currentRoom);
+            this.storedSymbol = this.cellSymbolGenerator(this.constructor.name, game.currentRoom);
+        }
+    }
     //func called by other cell types. Depending on caller and room, returns a name.
     cellNameGenerator(type, room) {
         var namesList;
         switch (room) {
             case 1:
                 switch (type) { //each room will need this same switch.
-                    case "path":
+                    case "PathCell":
                         //make an array. get random number in arr.length. return element at index.
                         namesList = ["A Dusty Path", "A Desolate Avenue"] //Boulevard, street.
                         return namesList[randInt(namesList.length - 1)];
-                    case "minorLocation":
+                    case "MinorEncounterCell":
                         namesList = ["A Tattered Square"];
                         return namesList[randInt(namesList.length - 1)];
-                    case "bossLocation":
+                    case "SpecialEncounterCell":
+                        //go by id.
+                        switch (this.id) {
+                            case "1-watchtower":
+                                return "A Spectral Tower";
+                        }
+                        return;
+                    case "BossEncounterCell":
                         return "The Dragon's Lair";
                 }
                 break;
@@ -1139,16 +1139,18 @@ class Cell {
     //func called by other cell types. Returns symbols depending on caller and room.
     cellSymbolGenerator(type, room) {
         var symbolsList;
-        if (type == "path") {
+        if (type == "PathCell") {
             return ";";
         }
         switch (room) {
             case 1:
                 switch (type) {
-                    case "minorLocation":
+                    case "MinorEncounterCell":
                         symbolsList = ["B", "F", "A"];
                         return symbolsList[randInt(symbolsList.length - 1)];
-                    case "bossLocation":
+                    case "SpecialEncounterCell":
+                        return "S";
+                    case "BossEncounterCell":
                         return "Ψ";
                 }
                 break;
@@ -1158,6 +1160,7 @@ class Cell {
     }
 
     //Visits handler.
+    //NOTE: also checks for event procs. Might need to interface with game flags?
     visit() {
         //console.log(this.constructor.name) <-- this works and returns the child constructor name.
         if (this.visitNumber == 0 && this.firstVisit) {
@@ -1188,10 +1191,6 @@ class PathCell extends Cell {
     randomEncounterCheck() {
 
     }
-    initializeCell() {
-        this.name = super.cellNameGenerator("path", game.currentRoom);
-        this.symbol = super.cellSymbolGenerator("path", game.currentRoom);
-    }
     //visits
     firstVisit() {
         this.randomEncounterCheck();
@@ -1199,40 +1198,61 @@ class PathCell extends Cell {
 }
 
 //plentiful encounters. Single encounters?
+//Hear more of the lore from these!
+//Side quests.
+//Absorbed SequenceEncounterCell. randomize sequence length 1-3.
 class MinorEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
     }
-    initializeCell() {
-        this.name = super.cellNameGenerator("minorLocation", game.currentRoom);
-        this.symbol = super.cellSymbolGenerator("minorLocation", game.currentRoom);
-    }
     //On first visit
     firstVisit() { //Start encounter.
-        game.sequenceBegins(1);
+        let sequenceLength = randInt(3);
+        if (sequenceLength <= 0) { sequenceLength = 1; }
+        game.sequenceBegins(sequenceLength, this);
     }
     //On subsequent visits
     recurringVisit(number) {
+        game.sequenceBegins(1, this);
+    }
+    endVisit() {
+        console.log("heheheha!")
     }
 }
-//slightly less plentiful. Chain encounters, could reward with more wishes or items!
-class SequenceEncounterCell extends Cell {
+//Story cells. Visiting one of these pushes the story.
+class SpecialEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
 
-        this.sequenceLength = randInt(2) + 1;
-    }
-    async firstVisit() {
-
-    }
-}
-//Story cells. Specific characters appear here, depending on ID.
-class SpecialEncounterCell extends Cell {
-    constructor() {
-
+        //pick id internally!!
+        this.id = "1-watchtower";
     }
     firstVisit() {
+        //CONVENTION: "roomNumber-roomName"
+        switch (this.id) {
+            case "1-watchtower":
+                this.endVisit();
+                break;
+        }
+    }
+    recurringVisit(number) {
 
+    }
+    async endVisit() {
+        let outputArray;
+        switch(this.id){
+            case "1-watchtower":
+                outputArray = [
+                    "A tower looms over the city.",
+                    "The ground shudders.",
+                    "Disturbances in the distance."];
+                for(var i = 0; i < outputArray.length; i++){
+                    pushMainOutput(outputArray[i]);
+                    await sleep(1500);
+                }
+                game.roomBossCellEntity.revealBossCell();
+                break;
+        }
     }
 }
 //End of room cells. Sequence enemies, then boss fights.
@@ -1240,17 +1260,11 @@ class BossEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
         this.symbol = "#"; //boss room replaces a wall.
-        this.name = "";
 
         this.storedSymbol;
         this.storedName;
         this.revealed = false;
         //use game.currentRoom to define the room.
-    }
-    //Init 
-    initializeCell() {
-        this.storedName = super.cellNameGenerator("bossLocation", game.currentRoom);
-        this.storedSymbol = super.cellSymbolGenerator("bossLocation", game.currentRoom);
     }
     //room revealed
     revealBossCell() {
@@ -1275,19 +1289,74 @@ class BossEncounterCell extends Cell {
             return;
         }
         //Depending on which room it is, spawn a different boss.
+        let tempEnemy;
+        tempEnemy = entityDatabase.generateBossByName(game.currentRoom);
+        game.sequenceBegins(3, this, `B${game.currentRoom}`, tempEnemy);
+        game.roomBossHealth = tempEnemy.health;
+    }
+    recurringVisit(number) {
+        let tempEnemy;
+        tempEnemy = entityDatabase.generateBossByName(game.currentRoom);
+        tempEnemy.health = game.roomBossHealth;
+        //New dialogues for returns.
+        //NOTE: could switch again with visitNumber for even more customized dialogues!
         switch (game.currentRoom) {
             case 1:
-                this.room1BossBegins();
+                tempEnemy.contactDialogue = [
+                    `The beast growls.`,
+                    `The fight wears on it, but not you.`
+                ]
                 break;
             case 2:
+                tempEnemy.contactDialogue = [
+                    ``,
+                    ``
+                ]
                 break;
         }
+        game.sequenceBegins(3, this, `B${game.currentRoom}`, tempEnemy);
     }
-    room1BossBegins() {
-        game.sequenceBegins(1, "B1", entityDatabase.generateBossByName(1));
-    }
-    room2BossBegins() {
+    //NOTE: Change this for additional rooms.
+    async endVisit() {
+        //NOTE: For TESTING purposes! Later, check if this is the last room to clear.
+        game.winGame();
+        return;
 
+        //we co-opt Masquerade screen for this lol
+        let newWishes = 5;
+        player.addWishes(newWishes);
+        fadeElement("out", document.getElementById("gamePage"), 1);
+
+        let masqueradeWindow = document.getElementById("masquerade__lossScreen");
+        let maskOutput1 = document.getElementById("masquerade__lossScreen__output1");
+        let maskOutput2 = document.getElementById("masquerade__lossScreen__output2");
+        switch (game.currentRoom) { //dialogues for each room.
+            case 1:
+                maskOutput1.innerHTML = "The beast lies still.";
+                maskOutput2.innerHTML = "The boulevard stretches into the mist.";
+                break;
+        }
+
+        masqueradeWindow.style.display = "flex";
+        fadeElement("in", masqueradeWindow, 1);
+        //Generate a new room and reset player.
+        game.beginNewRoom();
+        //Automatically return to map screen.
+
+        //Disable transition screen.
+        await sleep(5000);
+        //hide canvas.
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+        //auto switch back to the map.
+        game.gameState = "movement";
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__map").style.display != "grid")
+        //reset canvas
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+        //fade back in.
+        fadeElement("out", masqueradeWindow, 1);
+        fadeElement("in", document.getElementById("gamePage"), 1);
     }
 }
 

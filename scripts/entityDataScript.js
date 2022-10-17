@@ -59,6 +59,8 @@ class EntityDatabase {
                 return new Enemy(30, "%", bossAttack, 
                 ["A great beast bars the road.", "Its bulk shrouds the boulevard in darkness."], 
                 ["A final roar shakes the city.", "It seems a little brighter."]);
+            case 2:
+                bossEffect = new StatusEffect();
         }
     }
     //we can use 2 functions. generateEnemyByID or ByTier.

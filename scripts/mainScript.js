@@ -220,7 +220,7 @@ async function initializeGame() {
 
     //create map for new room.
     var maxTunnels = 80, maxLength = 10;
-    mapArray = generateNewRoom(game.currentRoom, mapWidth, mapHeight, maxTunnels, maxLength);
+    mapArray = generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength);
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
     player.addToInventory(entityDatabase.generateAttackByName("Attack"));
