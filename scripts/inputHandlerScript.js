@@ -110,19 +110,16 @@ async function windowNavButtonHandler(e) {
     //NOTE: Checks might be made here later for gameState if window switches are valid.
     if (buttonId == "gamePage__header__left" || buttonId == "gamePage__header__right") {
         var mapWindow = document.getElementById("gamePage__gameSpace__map");
-        var fightWindow = document.getElementById("gamePage__gameSpace__encounter");
-        var inventoryWindow = document.getElementById("gamePage__gameSpace__inventory");
+        var fightWindow = document.getElementById("gamePage__gameSpace__actionWindow");
         var shopWindow = document.getElementById("gamePage__gameSpace__shop");
         //first set all to display none, then display new one.
         //Set all opacity to 1. Will change depending on phase.
         mapWindow.style.display = "none";
         fightWindow.style.display = "none";
-        inventoryWindow.style.display = "none";
         shopWindow.style.display = "none";
 
         mapWindow.style.opacity = "1";
         fightWindow.style.opacity = "1";
-        inventoryWindow.style.opacity = "1";
         shopWindow.style.opacity = "1";
 
         //Show new window.
@@ -137,16 +134,16 @@ async function windowNavButtonHandler(e) {
             case "encounter":
                 fightWindow.style.display = "grid";
                 game.windowState = "fight";
-                if (game.gameState != "encounter" && game.gameState != "tempTransition") { //only valid when fighting.
+                if (game.gameState != "encounter" && game.gameState != "transition") { //only valid when fighting.
                     fightWindow.style.opacity = "0.5";
                 }
                 break;
-            case "inventory":
+            /* "inventory":
                 player.inventoryPointerPosition = 0;
                 initializeInventoryWindow(); //update the inventory.
 
                 //disable loadout switches during fights.
-                if (game.gameState == "encounter" || game.gameState == "tempTransition") {
+                if (game.gameState == "encounter" || game.gameState == "transition") {
                     document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "0.5";
                 } else {
                     document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "1.0";
@@ -154,7 +151,7 @@ async function windowNavButtonHandler(e) {
 
                 inventoryWindow.style.display = "grid";
                 game.windowState = "inventory";
-                break;
+                break;*/
             case "shop":
                 shopWindow.style.display = "grid";
                 game.windowState = "shop";
@@ -165,7 +162,7 @@ async function windowNavButtonHandler(e) {
         }
     }
     //update title.
-    document.getElementById("gamePage__header__windowDisplay").innerHTML = `test window name \"${windowDirectory[currentWindowIndex]}\"`;
+    document.getElementById("gamePage__header__windowDisplay").innerHTML = `${windowTitles[currentWindowIndex]}`;
     //update displays.
     if (currentWindowIndex - 1 < 0) {
         document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = `${windowDirectory[windowDirectory.length - 1]}`;

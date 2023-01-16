@@ -1,4 +1,5 @@
-const windowDirectory = ["map", "encounter", "inventory", "shop"];
+const windowDirectory = ["map", "encounter", "shop"];
+const windowTitles = ["THE DREAM", "THE WAR ROOM", "THE WISHING WELL"];
 var currentWindowIndex = 0;
 var player;
 var enemy;
@@ -195,6 +196,15 @@ function clearPlayer(mapArray, masqueradeUpdateCase = false) {
 
 //Output function
 async function pushMainOutput(message) {
+    var outputDiv = document.getElementById("gamePage__outputBar");
+    let newOutput = document.createElement("p");
+    let text = document.createTextNode(message);
+
+    newOutput.appendChild(text);
+    newOutput.setAttribute("class", "mainOutput");
+    outputDiv.insertBefore(newOutput, outputDiv.firstChild);
+
+    /*Previous output function.
     var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),
     document.getElementById("gamePage__outputBar__box2"),
     document.getElementById("gamePage__outputBar__box3"),
@@ -209,21 +219,23 @@ async function pushMainOutput(message) {
             outputBoxes[i].innerHTML = message;
             fadeElement("in", outputBoxes[i], 1);
         }
-    }
+    }*/
 }
 
 async function initializeGame() {
     //init player
-    player = new Player(10, "@");
+    player = new Player(10, 5, "@");
     player.getInitialPosition(mapWidth, mapHeight);
     enemy = null;
 
     //create map for new room.
     var maxTunnels = 80, maxLength = 10;
     mapArray = generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength);
+    //Set up displays.
+    document.getElementById("gamePage__header__windowDisplay").innerHTML = windowTitles[0];
 
     //NOTE: when inventory is added, Attack class may need additional descriptor attributes.
-    player.addToInventory(entityDatabase.generateAttackByName("Attack"));
+    /*player.addToInventory(entityDatabase.generateAttackByName("Attack"));
     player.addToInventory(entityDatabase.generateAttackByName("Bash"));
     player.addToInventory(entityDatabase.generateAttackByName("Parry"));
     player.addToInventory(entityDatabase.generateAttackByName("Heal"));
@@ -232,7 +244,7 @@ async function initializeGame() {
     player.addToInventory(entityDatabase.generateAttackByName("Barrier"));
     player.addNewAttack(player.inventory[0], 0);
     player.addNewAttack(player.inventory[4], 1);
-    player.addNewAttack(player.inventory[5], 2);
+    player.addNewAttack(player.inventory[5], 2);*/
 
     //Show map.
     showCellsInVision(5);
@@ -248,5 +260,5 @@ async function initializeGame() {
 
     //temporary tutorial panel.
     await sleep(1000);
-    pushMainOutput("Press Z for help!")
+    pushMainOutput("Press Z for help!");
 }

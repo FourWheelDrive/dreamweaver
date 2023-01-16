@@ -56,7 +56,7 @@ class EntityDatabase {
             case 1:
                 bossEffect = new StatusEffect(enemy, "stun", 1, true);
                 bossAttack = new Attack("boss1Attack", 3, 8, 1, "A long cooldown, heavy hitting, stun attack for boss.", bossEffect);
-                return new Enemy(30, "%", bossAttack, 
+                return new Enemy(30, "%", bossAttack, "An Armoured Behemoth",
                 ["A great beast bars the road.", "Its bulk shrouds the boulevard in darkness."], 
                 ["A final roar shakes the city.", "It seems a little brighter."]);
             case 2:
@@ -75,17 +75,17 @@ class EntityDatabase {
         }
         switch (temp) {
             case 1: //normal enemy
-                return new Enemy(10, "!", new Attack("Basic Attack", 1, 2, 1, "basic enemy attack"), 
+                return new Enemy(10, "!", new Attack("Basic Attack", 5, 2, 1, "basic enemy attack"), "a boi",
                 ["A wispy shape arises from the depths."], ["Diffuses back into shadow."])
             case 2: //long enemy
-                return new Enemy(5, "?", new Attack("Long Attack", 3, 5, 3, "long enemy attack"), 
+                return new Enemy(5, "?", new Attack("Long Attack", 3, 5, 3, "long enemy attack"), "another boi",
                 [""], [""])
             case 3:
                 break;
             case 4:
                 break;
             case 5: //quick enemy
-                return new Enemy(3, "‼", new Attack("Quick Attack", 1, 1, 0.5, "quick enemy attack"), 
+                return new Enemy(3, "‼", new Attack("Quick Attack", 1, 1, 0.5, "quick enemy attack"), "a quick boi",
                 ["Bone-white flashes in monochrome light."], ["The creature shatters."])
         }
     }

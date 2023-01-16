@@ -56,10 +56,10 @@
     </div>
 
     <!--Pages for Masquerade updates, losses, and wins.-->
-    <div id="masquerade__lossScreen">
+    <!--<div id="masquerade__lossScreen">
         <h1 id="masquerade__lossScreen__output1" class="masquerade_output"></h1>
         <p id="masquerade__lossScreen__output2" class="masquerade_output"></p>
-    </div>
+    </div>-->
     <div id="game__over__screen" class="gameEndScreen">
         <h1 class="gameEndScreenText">The abyss howls.</h1>
         <p class="gameEndScreenText">GAME OVER<br>
@@ -96,7 +96,7 @@
                     onclick="windowNavButtonHandler(event)">&lt</button>
                 <p id="gamePage__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
             </div>
-            <h1 id="gamePage__header__windowDisplay">test window name "main"</h1>
+            <h1 id="gamePage__header__windowDisplay"></h1>
             <div class="navDiv">
                 <button id="gamePage__header__right" class="windowNavButtons"
                     onclick="windowNavButtonHandler(event)">&gt</button>
@@ -107,20 +107,19 @@
         <div id="gamePage__gameSpace">
             <div id="gamePage__gameSpace__map">
                 <!--Movement Phase-->
-                <div id="gamePage__gameSpace__map__mapMvmt">
-                    <button id="gamePage__gameSpace__map__mapMvmtW" class="mapMvmtButton">⌃</button>
-                    <button id="gamePage__gameSpace__map__mapMvmtA" class="mapMvmtButton">&lt</button>
-                    <button id="gamePage__gameSpace__map__mapMvmtS" class="mapMvmtButton">⌄</button>
-                    <button id="gamePage__gameSpace__map__mapMvmtD" class="mapMvmtButton">&gt</button>
-                </div>
+                <button id="gamePage__gameSpace__map__mapMvmtW" class="mapMvmtButton">➤</button>
+                <button id="gamePage__gameSpace__map__mapMvmtA" class="mapMvmtButton">➤</button>
+                <button id="gamePage__gameSpace__map__mapMvmtS" class="mapMvmtButton">➤</button>
+                <button id="gamePage__gameSpace__map__mapMvmtD" class="mapMvmtButton">➤</button>
                 <div id="gamePage__gameSpace__map__canvas"></div>
             </div>
-            <div id="gamePage__gameSpace__encounter">
-                <!--Encounter Phase-->
+            <!--Sequences and stuff.-->
+            <div id="gamePage__gameSpace__actionWindow">
+
                 <div id="gamePage__gameSpace__encounter__header">
-                    <h1 id="gamePage__gameSpace__encounter__header__locationDisplay">test encounter location name</h1>
+                    <h1 id="gamePage__gameSpace__encounter__header__locationDisplay"></h1>
                 </div>
-                <!--contains 4 attack slots.-->
+                <!--[PLOT A: Menu for Equipped Actions]-->
                 <h1 id="gamePage__gameSpace__encounter__menuTitle">ACTIONS</h1>
                 <div id="gamePage__gameSpace__encounter__menu">
                     <button id="gamePage__gameSpace__encounter__menu__button1" class="encounterButton">
@@ -144,8 +143,8 @@
                             class="encounterButton__text">test button 4</span>
                     </button>
                 </div>
-                <!--"Canvas"-->
-                <div id="gamePage__gameSpace__encounter__canvas">
+                <!--[PLOT B: Canvas for Fights.]-->
+                <div id="gamePage__gameSpace__encounter__canvas" class="actionWindowEncounterToggle">
                     <!--icons-->
                     <p id="gamePage__gameSpace__encounter__canvas__player">@</p>
                     <p id="gamePage__gameSpace__encounter__canvas__enemy"></p>
@@ -168,60 +167,16 @@
                     <p id="gamePage__gameSpace__encounter__canvas__pdebuff" class="debuffStatusDisplay">-</p>
                     <p id="gamePage__gameSpace__encounter__canvas__ebuff" class="buffStatusDisplay">+</p>
                     <p id="gamePage__gameSpace__encounter__canvas__edebuff" class="debuffStatusDisplay">-</p>
+                </div>
+                <!--PLOT B-1: Identical to Plot B, but for inventory.-->
+                <div id="gamePage__gameSpace__inventory__canvas" class="actionWindowInventoryToggle">
 
-                    <!--Placeholder divs.-->
-                    <div id="gamePage__gameSpace__encounter__canvas__holder1"></div>
-                    <div id="gamePage__gameSpace__encounter__canvas__holder2"></div>
                 </div>
-                <!--OLD: Shares encounter window with canvas. Appears after fights.-->
-                <!--
-                    <div id="gamePage__gameSpace__encounter__result">
-                    <p id="gamePage__gameSpace__encounter__result__wishesGranted"></p>
-                    <button id="gamePage__gameSpace__encounter__result__returnButton">
-                        <p class="resultButtonTest">Return to the map</p>
-                        <p class="resultButtonTest">Press any key!</p>
-                    </button>
-                </div>
-            -->
-            </div>
-            <div id="gamePage__gameSpace__inventory">
-                <!--Inventory Display-->
-                <h1 id="gamePage__gameSpace__inventory__menuTitle">KIT</h1>
-                <!--AGENDA or PROGRAM-->
-                <h1 id="gamePage__gameSpace__inventory__header">INVENTORY</h1>
-                <!--REPERTOIRE-->
-                <div id="gamePage__gameSpace__inventory__equipMenu">
-                    <button id="gamePage__gameSpace__inventory__equipMenu__button1"
-                        class="inventoryEquipButton"></button>
-                    <button id="gamePage__gameSpace__inventory__equipMenu__button2"
-                        class="inventoryEquipButton"></button>
-                    <button id="gamePage__gameSpace__inventory__equipMenu__button3"
-                        class="inventoryEquipButton"></button>
-                    <button id="gamePage__gameSpace__inventory__equipMenu__button4"
-                        class="inventoryEquipButton"></button>
-                </div>
-                <div id="gamePage__gameSpace__inventory__itemList">
-                    <div id="gamePage__gameSpace__inventory__itemList__section1" class="inventoryListSection">
-                        <p id="gamePage__gameSpace__inventory__itemList__section1__marker">Equipped:</p>
-                    </div>
-                    <div id="gamePage__gameSpace__inventory__itemList__section2" class="inventoryListSection">
-                        <p id="gamePage__gameSpace__inventory__itemList__section2__marker">Attacks:</p>
-                    </div>
-                    <div id="gamePage__gameSpace__inventory__itemList__section3" class="inventoryListSection">
-                        <p id="gamePage__gameSpace__inventory__itemList__section3__marker">Items:</p>
-                    </div>
-                    <div id="gamePage__gameSpace__inventory__itemList__bottomMarker"></div>
-                </div>
-                <div id="gamePage__gameSpace__inventory__statDisplay">
-                    <h1 id="gamePage__gameSpace__inventory__statDisplay__type" class="statDisplayText">ATTACK</h1>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__description" class="statDisplayText">e</p>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__damage" class="statDisplayText">e</p>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__channelling" class="statDisplayText">e</p>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__cooldown" class="statDisplayText">e</p>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__equipped" class="statDisplayText">e</p>
-                    <p id="gamePage__gameSpace__inventory__statDisplay__effect" class="statDisplayText">e</p>
+                <div id="gamePage__gameSpace__inventory__statDisplay" class="actionWindowInventoryToggle">
+
                 </div>
             </div>
+            <!--Inventory window. This should be identical in layout to encounter!-->
             <div id="gamePage__gameSpace__shop">
                 <p>Window Test 0.0.4 Shop</p>
                 <!--End of the Room Shop-->
@@ -229,19 +184,15 @@
         </div>
         <!--footer for game elements-->
         <div id="gamePage__footer">
-            <p id="gamePage__footer__health"></p>
-            <p id="gamePage__footer__wishes"></p>
-            <p id="gamePage__footer__masquerade"></p>
-            <p id="gamePage__footer__position"></p>
-            <p id="gamePage__footer__cellName"></p>
+            <div id="gamePage__footer__statusBars">
+                <p id="gamePage__footer__health" class="footerText"></p>
+                <p id="gamePage__footer__wishes" class="footerText"></p>
+            </div>
+            <p id="gamePage__footer__position" class="footerText"></p>
+            <p id="gamePage__footer__cellName" class="footerText"></p>
         </div>
         <!--display for outputs.-->
         <div id="gamePage__outputBar">
-            <p id="gamePage__outputBar__box1" class="mainOutput"></p>
-            <p id="gamePage__outputBar__box2" class="mainOutput"></p>
-            <p id="gamePage__outputBar__box3" class="mainOutput"></p>
-            <p id="gamePage__outputBar__box4" class="mainOutput"></p>
-            <p id="gamePage__outputBar__box5" class="mainOutput"></p>
         </div>
     </div>
 </body>

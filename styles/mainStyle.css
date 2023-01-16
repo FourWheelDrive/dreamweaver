@@ -1,6 +1,10 @@
 body {
     background-color: #fff8e0;
     touch-action: manipulation;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 /*Text elements. Actually using h1 n stuff now!*/
 p {
@@ -27,15 +31,12 @@ button{color: black;}
     height: 90vh;
 
     display: grid;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
 
     grid-template-areas: "header outputBar"
         "gameSpace outputBar"
         "footer outputBar";
-    grid-template-columns: 3fr 1fr;
+    grid-template-columns: 2fr 1fr;
     grid-template-rows: 1fr 9fr 1fr;
 
     border: 1px solid black;
@@ -90,6 +91,9 @@ button{color: black;}
 
 /*This one will change as the windows do.*/
 #gamePage__gameSpace{
+    position: relative;
+    height: 100%;
+    width: 100%;
     grid-area: gameSpace;
 }
 
@@ -101,6 +105,12 @@ button{color: black;}
     flex-direction: row;
     justify-content: space-evenly;
     align-content: center;
+    padding-left: 3%;
+    padding-right: 3%;
+}
+#gamePage__footer__statusBars{
+    display: flex;
+    flex-direction: column;
 }
 #gamePage__footer__position{
     padding-left: 5%;
@@ -113,6 +123,10 @@ button{color: black;}
     width: 0;
     overflow: visible;
     white-space: nowrap;
+}
+.footerText{
+    margin: auto;
+    padding: 0;
 }
 
 /*output*/
@@ -128,15 +142,23 @@ button{color: black;}
     align-items: flex-start;
 
     padding: 5%;
+
+    overflow: scroll;
 }
-#gamePage__outputBar__box1{opacity: 1.0}
-#gamePage__outputBar__box2{opacity: 0.8}
-#gamePage__outputBar__box3{opacity: 0.6}
-#gamePage__outputBar__box4{opacity: 0.4}
-#gamePage__outputBar__box5{opacity: 0.2}
+::-webkit-scrollbar{
+    width: 1vw;
+}
+::-webkit-scrollbar-track{
+    background: #fff8e0;
+}
+::-webkit-scrollbar-thumb{
+    background: #d6cfb6;
+}
 .mainOutput{
     font-weight: 500;
     text-align: left;
+
+    margin-top: 1vh;
 }
 
 /*Death screen, but not loss screen.*/
