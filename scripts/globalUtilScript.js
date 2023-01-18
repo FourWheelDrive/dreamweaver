@@ -683,7 +683,6 @@ class MinorEncounterCell extends Cell {
 
     //On subsequent visits
     recurringVisit(number) {
-        game.sequenceBegins(1, this);
     }
     endVisit() {
         console.log("heheheha!")
