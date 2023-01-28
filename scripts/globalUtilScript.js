@@ -551,9 +551,11 @@ leaveVisit() <== for encounter cells after player wins.
 initializeCell() moved to Cell.
 */
 class Cell {
-    constructor(positionX, positionY) {
+    constructor(positionX, positionY, initialNode = null) {
         this.name;                             //name shown in encounter popup.
         this.symbol;
+        this.initialNode = initialNode;         //initial dialogue node. This is the TAG.
+                            //The above could be an ARRAY. This could indicate a recurring encounter.
 
         this.mapX = positionX;                          //Map positions.
         this.mapY = positionY;
@@ -628,9 +630,9 @@ class Cell {
     //NOTE: also checks for event procs. Might need to interface with game flags?
     visit() {
         //console.log(this.constructor.name) <-- this works and returns the child constructor name.
-        if (this.visitNumber == 0 && this.firstVisit) {
+        if (this.visitNumber == 0) {
             this.firstVisit();
-        } else if (this.recurringVisit) { //Not all cells have recurring visit events.
+        } else if (this.visitNumber > 0) { //Not all cells have recurring visit events.
             this.recurringVisit(this.visitNumber);
         }
         this.visitNumber = this.visitNumber + 1;
@@ -662,33 +664,20 @@ class PathCell extends Cell {
     }
 }
 
-//plentiful encounters. Single encounters?
-//Hear more of the lore from these!
-//Side quests.
-//Absorbed SequenceEncounterCell. randomize sequence length 1-3.
 class MinorEncounterCell extends Cell {
-    constructor(positionX, positionY, id = 0) {
-        super(positionX, positionY);
-        this.id = id;
+    constructor(positionX, positionY, initialNode) {
+        super(positionX, positionY, initialNode);
     }
     //On first visit
     firstVisit() { //Start encounter.
-        let sequenceLength = randInt(3);
-        if (sequenceLength <= 0) { sequenceLength = 1; }
-        //game.sequenceBegins(sequenceLength, this);
-    }
-
-    /*How do I code modular sequences? */
-
-
-    //On subsequent visits
-    recurringVisit(number) {
+        dialogueDictionary[this.initialNode].nodeEntered();
     }
     endVisit() {
         console.log("heheheha!")
     }
 }
-//Story cells. Visiting one of these pushes the story.
+
+/*//Story cells. Visiting one of these pushes the story.
 class SpecialEncounterCell extends Cell {
     constructor(positionX, positionY) {
         super(positionX, positionY);
@@ -829,7 +818,7 @@ class BossEncounterCell extends Cell {
         fadeElement("out", masqueradeWindow, 1);
         fadeElement("in", document.getElementById("gamePage"), 1);
     }
-}
+}*/
 
 //==============================================================Global functions
 function randInt(max) { //Random function, maximum inclusive.
@@ -846,40 +835,25 @@ function calcPythagDistance(coordSetOne, coordSetCenter) {
     return distanceFromCenter;
 }
 //Fades elements in.
-async function fadeElement(operation, element, time) { //fade elements in/out
-    switch (operation) {
-        case "in":
-            var newOpacity = 0;
-            element.style.opacity = newOpacity;
-            var timer = setInterval(function () {
-                //if animation is done
-                if (element.style.opacity > 1) {
-                    clearInterval(timer);
-                } else {
-                    element.style.opacity = newOpacity;
-                    let ticks = (time * 1000) / 10;
-                    newOpacity += 1 / ticks;
-                }
-            }, 10)
-            await sleep(time * 1000);
-            break;
-        case "out":
-            var newOpacity = 1;
-            element.style.opacity = newOpacity;
-            var timer = setInterval(function () {
-                //if animation is done
-                if (element.style.opacity < 0) {
-                    clearInterval(timer);
-                } else {
-                    element.style.opacity = newOpacity;
-                    let ticks = (time * 1000) / 10;
-                    newOpacity -= 1 / ticks;
-                }
-            }, 10)
-            await sleep(time * 1000);
-            break;
+async function fadeElement(operation, element, time){
+    if(operation == "in"){
+        element.style.opacity = "0.0";
+        element.style.transition = `opacity ${time}s`;
+        flushCSS(element);
+        element.style.opacity = "1.0";
     }
+    if(operation == "out"){
+        element.style.opacity = "1.0";
+        element.style.transition = `opacity ${time}s`;
+        flushCSS(element);
+        element.style.opacity = "0.0";
+    }
+    await sleep(time*1000);
+    //return the transition to normal.
+    element.style.transition = `opacity 0s`;
+    flushCSS(element);
 }
+
 
 //===============================================================Global Variables
 var game = new Game();

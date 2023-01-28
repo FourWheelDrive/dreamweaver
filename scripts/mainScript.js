@@ -202,7 +202,10 @@ async function pushMainOutput(message) {
 
     newOutput.appendChild(text);
     newOutput.setAttribute("class", "mainOutput");
+    newOutput.style.opacity = "0.0";
     outputDiv.insertBefore(newOutput, outputDiv.firstChild);
+
+    fadeElement("in", newOutput, 0.5);
 
     /*Previous output function.
     var outputBoxes = [document.getElementById("gamePage__outputBar__box1"),

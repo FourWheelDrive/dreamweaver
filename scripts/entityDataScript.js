@@ -90,3 +90,33 @@ class EntityDatabase {
         }
     }
 }
+class DialogueNode {
+    constructor(tag, entryText, options){
+        //process some shit here to put entryText in an array and option in some sort of tuple.
+        this.tag = tag;
+        this.entryText = entryText;
+        this.options = options;
+    }
+    /*
+    options include the next node number.
+     */
+    async nodeEntered(){
+        await sleep(100);
+        for(var i = 0; i < this.entryText.length; i++){
+            pushMainOutput(this.entryText[i]);
+            await sleep(1500);
+        }
+    }
+}
+
+//=====================================================DIALOGUE backend classes and DICTIONARY
+//Access with dialogueDictionary["1.1"].nodeEntered().
+const dialogueDictionary = {
+    "1.1" : new DialogueNode("1.1", ["Text1", "text2"], [
+        ["option1", "nextNodeTag"],
+        ["option2", "nextNodeTag2"]]
+        ),
+    "1.2" : new DialogueNode("1.2", ["Text1.1", "text1.2"], []
+
+    ),
+}

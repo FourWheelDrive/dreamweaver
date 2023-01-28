@@ -91,7 +91,7 @@ function placeLocation(mapArray, xBound, yBound, centerCoord, roomClass) {
                     switch (roomClass) {
                         case "Minor":
                             if (mapArray[x][y] instanceof PathCell && (mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell || mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell)) {
-                                mapArray[randomCoord[0]][randomCoord[1]] = new MinorEncounterCell(randomCoord[0], randomCoord[1]);
+                                mapArray[randomCoord[0]][randomCoord[1]] = new MinorEncounterCell(randomCoord[0], randomCoord[1], "1.1");
                                 mapArray[randomCoord[0]][randomCoord[1]].initializeCell();
 
                                 pathFound = true;
@@ -236,11 +236,11 @@ function generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength) {
     for (var i = 0; i < roomTypeArray[0]; i++) { // MINOR
         mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Minor");
     }
-    for(var j = 0; j < roomTypeArray[1]; j++) { //SPECIAL (story)
+    /*for(var j = 0; j < roomTypeArray[1]; j++) { //SPECIAL (story)
         mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Special");
     }
     //Generate the room's boss
-    mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Boss");
+    mapArray = placeLocation(mapArray, mapWidth - 1, mapHeight - 1, centerCoord, "Boss");*/
     //push complete mapArray to DOM
     pushMapToDOM(mapArray);
 
