@@ -127,6 +127,10 @@ class Player extends Entity {
     getInitialPosition(mapWidth, mapHeight) {
         this.mapPosition = [(mapWidth - 1) / 2, (mapHeight - 1) / 2];
     }
+    //Get Cell entity from position.
+    getCurrentCellEntity(){
+        return mapArray[this.mapPosition[0]][this.mapPosition[1]];
+    }
     //Wishes.
     updateWishes(difference) {
         this.wishes = this.wishes + difference;
@@ -637,6 +641,9 @@ class Cell {
         }
         this.visitNumber = this.visitNumber + 1;
     }
+    endVisit(){
+
+    }
     iterateVisits() {
         this.visitNumber = this.visitNumber + 1;
     }
@@ -671,9 +678,6 @@ class MinorEncounterCell extends Cell {
     //On first visit
     firstVisit() { //Start encounter.
         dialogueDictionary[this.initialNode].nodeEntered();
-    }
-    endVisit() {
-        console.log("heheheha!")
     }
 }
 

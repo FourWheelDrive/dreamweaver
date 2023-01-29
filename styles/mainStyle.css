@@ -137,6 +137,7 @@ button{color: black;}
 
 /*output*/
 #gamePage__outputBar{
+    position: relative;
     grid-area: outputBar;
 
     margin: 3%;
@@ -166,6 +167,27 @@ button{color: black;}
 
     margin-top: 1vh;
 }
+/*Output Options*/
+.outputOptionMenu{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.outputOptionMenu > button{
+    position: relative;
+    background-color: #fff8e0;
+    border: 1px solid black;
+
+    min-width: 100%;
+    margin-bottom: 1%;
+
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: 400;
+    text-align: center;
+}
+
 
 /*Death screen, but not loss screen.*/
 #masquerade__lossScreen{
