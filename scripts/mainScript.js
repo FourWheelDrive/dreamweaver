@@ -77,7 +77,7 @@ function initializeInventoryWindow() {
             }
         }); //for click stuff.
         */
-        
+
         /*Extra cases for mobile.
         if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
             button.addEventListener("click", e => {
@@ -85,8 +85,8 @@ function initializeInventoryWindow() {
                 inventoryButtonClickHandler(e, true);
             }); //for click stuff.
         }*/
-            button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
-        
+        button.addEventListener("click", inventoryButtonClickHandler); //for click stuff.
+
         //append depending on type.
         if (type == "Equipped Attack") {
             section1Menu.appendChild(button);
@@ -189,7 +189,7 @@ function clearPlayer(mapArray, masqueradeUpdateCase = false) {
     if (cellEntity instanceof PathCell) {
         previousCell.style.fontWeight = "400";
     }
-    if(!masqueradeUpdateCase){
+    if (!masqueradeUpdateCase) {
         previousCell.style.opacity = "0.5";
     }
 }
@@ -223,6 +223,25 @@ async function pushMainOutput(message) {
             fadeElement("in", outputBoxes[i], 1);
         }
     }*/
+}
+
+//Resize the Canvas to un-blurry itself.
+//Credits to  https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da!
+function initializeCanvas() {
+    var canvas = document.getElementById("gamePage__gameSpace__encounter__canvas__gameCanvas");
+    var dpi = window.devicePixelRatio;
+    //create a style object that returns width and height
+    let style = {
+        height() {
+            return +getComputedStyle(canvas).getPropertyValue('height').slice(0, -2);
+        },
+        width() {
+            return +getComputedStyle(canvas).getPropertyValue('width').slice(0, -2);
+        }
+    }
+    //set the correct attributes for a crystal clear image!
+    canvas.setAttribute('width', style.width() * dpi);
+    canvas.setAttribute('height', style.height() * dpi);
 }
 
 async function initializeGame() {

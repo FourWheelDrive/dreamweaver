@@ -33,7 +33,7 @@ async function keyDownHandler(mapArray, e) {
         }
     }
     //Inventory naviation keys.
-    if (game.windowState == "inventory" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
+    if (game.windowState == "action" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
         var previousPointerPosition = player.inventoryPointerPosition;
         var len = player.inventory.length;
 
@@ -60,7 +60,7 @@ async function keyDownHandler(mapArray, e) {
         playerMovementHandler(e.code);
     }
     //change loadout from inventory.
-    if (game.gameState == "movement" && game.windowState == "inventory" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
+    if (game.gameState != "encounter" && game.windowState == "action" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
         changeLoadout(e);
     }
     //Encounter keys and keybinds.
@@ -133,25 +133,11 @@ async function windowNavButtonHandler(e) {
                 break;
             case "encounter":
                 fightWindow.style.display = "grid";
-                game.windowState = "fight";
+                game.windowState = "encounter-inventory";
                 if (game.gameState != "encounter" && game.gameState != "transition") { //only valid when fighting.
                     fightWindow.style.opacity = "0.5";
                 }
                 break;
-            /* "inventory":
-                player.inventoryPointerPosition = 0;
-                initializeInventoryWindow(); //update the inventory.
-
-                //disable loadout switches during fights.
-                if (game.gameState == "encounter" || game.gameState == "transition") {
-                    document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "0.5";
-                } else {
-                    document.getElementById("gamePage__gameSpace__inventory__equipMenu").style.opacity = "1.0";
-                }
-
-                inventoryWindow.style.display = "grid";
-                game.windowState = "inventory";
-                break;*/
             case "shop":
                 shopWindow.style.display = "grid";
                 game.windowState = "shop";
@@ -234,7 +220,7 @@ async function playerMovementHandler(key) {
 }
 async function playerAttackHandler(e) {
     //player must be viewing the battle. No attacks can be made from other screens.
-    if (game.windowState == "fight") {
+    if (game.windowState == "action") {
         var tempCooldown;
         //NOTE: baseCooldown needs masq multiplier.
         //based on the attack procced, do stuff.

@@ -92,7 +92,6 @@ class EntityDatabase {
 }
 class DialogueNode {
     constructor(tag, entryText, options) {
-        //process some shit here to put entryText in an array and option in some sort of tuple.
         this.tag = tag;
         this.entryText = entryText;
         this.options = options;
@@ -148,15 +147,47 @@ class DialogueNode {
         outputDiv.insertBefore(newMenuDiv, outputDiv.firstChild);
     }
 }
+class EncounterNode{ //Some DialogueNodes will be of this class instead. It begins an encounter instead of just moving to options.
+    constructor(tag, enemyType, options) {
+        this.tag = tag;
+        this.options = options;
+    }
+    async nodeEntered(){ //Basically just setup. Hands off the encounter to Game class.
+        //call getNewEnemy when it's done.
+        var canvas = document.getElementById("gamePage__gameSpace__encounter__canvas__gameCanvas");
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
+        document.getElementById("gamePage__gameSpace__inventory__canvas").style.display = "none";
+
+        const ctx = canvas.getContext("2d");
+        player.canvasX = canvas.offsetWidth/4;
+        //enemy.canvasX = canvas.offsetWidth*(3/4);
+
+        initializeCanvas();
+        ctx.font = "2em monospace"
+        ctx.fillText("@", player.canvasX, canvas.offsetHeight/2);
+        ctx.fillText("!!", canvas.offsetWidth*(3/4), canvas.offsetHeight/2);
+    }
+    encounterNodeExit(){
+        document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
+        document.getElementById("gamePage__gameSpace__inventory__canvas").style.display = "grid";
+    }
+    getNewEnemy(){
+
+    }
+}
 
 //=====================================================DIALOGUE backend classes and DICTIONARY
 //Access with dialogueDictionary["1.1"].nodeEntered().
 const dialogueDictionary = {
-    "1.1": new DialogueNode("1.1", ["Text1", "text2"], [
+    /*"1.1": new DialogueNode("1.1", ["Text1", "text2"], [
         ["option1", "1.2"],
         ["option2", "1.3"]]
-    ),
-    "1.2": new DialogueNode("1.2", ["Text1.1", "text1.2"], []
+    ),*/
+    "1.1": new EncounterNode("1.1", -1, [
+        ["option1", "1.2"],
+        ["option2", "1.3"]
+    ]),
+    "1.2": new DialogueNode("1.2", ["Text1.1", "text1.2"], [
 
-    ),
+    ]),
 }

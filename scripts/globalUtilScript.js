@@ -47,6 +47,8 @@ class Entity {
         this.canvasSymbol = canvasSymbol;
         //Canvas stuff.
         this.actionLine = this.status;                  //action: attacking, parrying
+
+        this.canvasX;
     }
 
     //methods for:
@@ -303,8 +305,8 @@ Contents [class GAME]:
 class Game {
     constructor() {
         //use these in conjunction with flags to judge which statements can and cannot fire.
-        this.gameStates = ["movement", "encounter", "shop", "transition"];
-        this.windowStates = ["map", "encounter-fight", "encounter-dialogue", "inventory", "shop", "transition"];
+        this.gameStates = ["movement", "dialogue", "encounter", "shop", "transition"];
+        this.windowStates = ["map", "action", "shop", "transition"];
         this.gameState = this.gameStates[0];
         this.windowState = "map";
 
@@ -332,6 +334,8 @@ class Game {
         //shop inventory.
         this.shopInventory = [];
     }
+
+    /* Old canvasOutput.
     canvasOutput(newMessage) {
         var outputs = [document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output1"),
         document.getElementById("gamePage__gameSpace__encounter__canvas__outputBox__output2"),
@@ -345,7 +349,7 @@ class Game {
                 outputs[i].innerHTML = newMessage;
             }
         }
-    }
+    }*/
 
     /* Old sequence functions. New sequence procs are coded within Cell classes.
     //Sequence functions: called per room.
@@ -438,6 +442,7 @@ class Game {
     }
     */
 
+    /*Old Encounter functions.
     //Encounter functions: called per fight.
     async encounterBegins() {
         //initialize screen
@@ -501,9 +506,10 @@ class Game {
                 document.addEventListener("keydown", (e) => {
                     document.getElementById("gamePage__gameSpace__encounter__result__returnButton").click();
                 }, { once: true }); //once: true removes the listener after clicked once.
-            })*/
+            })
         }
     }
+    */
 
     //Start a new room.
     beginNewRoom() {
@@ -637,12 +643,14 @@ class Cell {
         if (this.visitNumber == 0) {
             this.firstVisit();
         } else if (this.visitNumber > 0) { //Not all cells have recurring visit events.
-            this.recurringVisit(this.visitNumber);
+            //this.recurringVisit(this.visitNumber);
         }
         this.visitNumber = this.visitNumber + 1;
     }
     endVisit(){
-
+        game.gameState = game.gameStates[0];
+        //Might need to reset the map.
+        document.getElementById("gamePage__gameSpace__map").style.opacity = "1.0";
     }
     iterateVisits() {
         this.visitNumber = this.visitNumber + 1;
@@ -677,6 +685,13 @@ class MinorEncounterCell extends Cell {
     }
     //On first visit
     firstVisit() { //Start encounter.
+        //Change gameState.
+        game.gameState = game.gameStates[1];
+        //switch screens.
+        do {
+            document.getElementById("gamePage__header__left").click();
+        } while (document.getElementById("gamePage__gameSpace__actionWindow").style.display != "grid")
+        //Start dialogue encounter.
         dialogueDictionary[this.initialNode].nodeEntered();
     }
 }

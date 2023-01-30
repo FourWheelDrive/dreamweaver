@@ -114,7 +114,7 @@ actionWindowInventoryToggle: Visible outside fights.*/
     width: 100%;
     height: 100%;
 
-    display: grid;
+    display: none;
     grid-template-areas: 
         "phealth phealth .... ehealth ehealth"
         "player player .... enemy enemy"
@@ -125,6 +125,14 @@ actionWindowInventoryToggle: Visible outside fights.*/
 
     border-bottom: 1px solid black;
 }
+#gamePage__gameSpace__encounter__canvas__gameCanvas{ /*New Encounter canvas stuff.*/
+    position: absolute;
+    display: block;
+    height: 100%;
+    width: 100%;
+    border: 1px solid red;
+}
+/* Old Encounter Canvas stuff.
 #gamePage__gameSpace__encounter__canvas__playerHealth {
     grid-area: phealth;
     height: 1em;
@@ -214,7 +222,7 @@ actionWindowInventoryToggle: Visible outside fights.*/
     justify-content: center;
     align-items: center;
 }
-
+*/
 #gamePage__gameSpace__encounter__menu {
     margin: 0px;
     grid-area: menu;
