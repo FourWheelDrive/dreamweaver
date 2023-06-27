@@ -222,7 +222,7 @@ function generateNewRoom(mapWidth, mapHeight, maxTunnels, maxLength) {
 
     //Array defining how many rooms of each type exist.
     let roomTypeArray;
-    switch(game.currentRoom){
+    switch(gameManager.currentRoom){
         //CONVENTION: [MINOR, SPECIAL]
         //always 1 boss.
         case 1:

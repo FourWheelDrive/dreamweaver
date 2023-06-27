@@ -24,11 +24,9 @@
 <html>
 
 <head>
-    <script type="text/javascript" src="scripts\entityDataScript.js"></script>
-    <script type="text/javascript" src="scripts\globalUtilScript.js"></script>
-    <script type="text/javascript" src="scripts\mapGeneratorScript.js"></script>
-    <script type="text/javascript" src="scripts\inputHandlerScript.js"></script>
-    <script type="text/javascript" src="scripts\mainScript.js"></script>
+    <script type="text/javascript" src="scripts\cell.js"></script>
+    <script type="text/javascript" src="scripts\entity.js"></script>
+    <script type="text/javascript" src="scripts\main.js"></script>
 
     <link rel="stylesheet" href="styles\mainStyle.css">
     <link rel="stylesheet" href="styles\windowStyle.css">
@@ -112,73 +110,6 @@
                 <button id="gamePage__gameSpace__map__mapMvmtS" class="mapMvmtButton">➤</button>
                 <button id="gamePage__gameSpace__map__mapMvmtD" class="mapMvmtButton">➤</button>
                 <div id="gamePage__gameSpace__map__canvas"></div>
-            </div>
-            <!--Sequences and stuff.-->
-            <div id="gamePage__gameSpace__actionWindow">
-
-                <div id="gamePage__gameSpace__encounter__header">
-                    <h1 id="gamePage__gameSpace__encounter__header__locationDisplay"></h1>
-                </div>
-                <!--[PLOT A: Menu for Equipped Actions]-->
-                <h1 id="gamePage__gameSpace__encounter__menuTitle">ACTIONS</h1>
-                <div id="gamePage__gameSpace__encounter__menu">
-                    <button id="gamePage__gameSpace__encounter__menu__button1" class="encounterButton">
-                        <span class="encounterButton__progress"></span>
-                        <span id="gamePage__gameSpace__encounter__menu__button1__text"
-                            class="encounterButton__text">test button 1</span>
-                    </button>
-                    <button id="gamePage__gameSpace__encounter__menu__button2" class="encounterButton">
-                        <span class="encounterButton__progress"></span>
-                        <span id="gamePage__gameSpace__encounter__menu__button2__text"
-                            class="encounterButton__text">test button 2</span>
-                    </button>
-                    <button id="gamePage__gameSpace__encounter__menu__button3" class="encounterButton">
-                        <span class="encounterButton__progress"></span>
-                        <span id="gamePage__gameSpace__encounter__menu__button3__text"
-                            class="encounterButton__text">test button 3</span>
-                    </button>
-                    <button id="gamePage__gameSpace__encounter__menu__button4" class="encounterButton">
-                        <span class="encounterButton__progress"></span>
-                        <span id="gamePage__gameSpace__encounter__menu__button4__text"
-                            class="encounterButton__text">test button 4</span>
-                    </button>
-                </div>
-                <!--[PLOT B: Canvas for Fights.]-->
-                <div id="gamePage__gameSpace__encounter__canvas">
-                    <canvas id="gamePage__gameSpace__encounter__canvas__gameCanvas"></canvas>
-                    <!--
-                    <p id="gamePage__gameSpace__encounter__canvas__player">@</p>
-                    <p id="gamePage__gameSpace__encounter__canvas__enemy"></p>
-
-                    <p id="gamePage__gameSpace__encounter__canvas__playerHealth"></p>
-                    <p id="gamePage__gameSpace__encounter__canvas__enemyHealth"></p>
-
-                    <p id="gamePage__gameSpace__encounter__canvas__playerStatus"></p>
-                    <div id="gamePage__gameSpace__encounter__canvas__outputBox">
-                        <p id="gamePage__gameSpace__encounter__canvas__outputBox__output1" class="canvasOutput"></p>
-                        <p id="gamePage__gameSpace__encounter__canvas__outputBox__output2" class="canvasOutput"></p>
-                        <p id="gamePage__gameSpace__encounter__canvas__outputBox__output3" class="canvasOutput"></p>
-                    </div>
-                    <p id="gamePage__gameSpace__encounter__canvas__enemyStatus"></p>
-
-                    <p id="gamePage__gameSpace__encounter__canvas__pbuff" class="buffStatusDisplay">+</p>
-                    <p id="gamePage__gameSpace__encounter__canvas__pdebuff" class="debuffStatusDisplay">-</p>
-                    <p id="gamePage__gameSpace__encounter__canvas__ebuff" class="buffStatusDisplay">+</p>
-                    <p id="gamePage__gameSpace__encounter__canvas__edebuff" class="debuffStatusDisplay">-</p>
-                -->
-                </div>
-                <!--PLOT B-1: Identical to Plot B, but for inventory.-->
-                <div id="gamePage__gameSpace__inventory__canvas">
-                    <div id="gamePage__gameSpace__inventory__itemList"></div>
-                </div>
-                <div id="gamePage__gameSpace__inventory__statDisplay" class="actionWindowInventoryToggle">
-
-                </div>
-            </div>
-            <!--Inventory window. This should be identical in layout to encounter!-->
-            <div id="gamePage__gameSpace__shop">
-                <p>Window Test 0.0.4 Shop</p>
-                <!--End of the Room Shop-->
             </div>
         </div>
         <!--footer for game elements-->

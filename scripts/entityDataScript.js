@@ -147,31 +147,26 @@ class DialogueNode {
         outputDiv.insertBefore(newMenuDiv, outputDiv.firstChild);
     }
 }
-class EncounterNode{ //Some DialogueNodes will be of this class instead. It begins an encounter instead of just moving to options.
+class EncounterNode { //Some DialogueNodes will be of this class instead. It begins an encounter instead of just moving to options.
     constructor(tag, enemyType, options) {
         this.tag = tag;
         this.options = options;
     }
-    async nodeEntered(){ //Basically just setup. Hands off the encounter to Game class.
-        //call getNewEnemy when it's done.
-        var canvas = document.getElementById("gamePage__gameSpace__encounter__canvas__gameCanvas");
+    async nodeEntered() { //Basically just setup. Hands off the encounter to Game class.
+        gameManager.gameState = gameManager.gameStates[2];
+        //call animation frames.
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "grid";
         document.getElementById("gamePage__gameSpace__inventory__canvas").style.display = "none";
-
-        const ctx = canvas.getContext("2d");
-        player.canvasX = canvas.offsetWidth/4;
-        //enemy.canvasX = canvas.offsetWidth*(3/4);
-
-        initializeCanvas();
-        ctx.font = "2em monospace"
-        ctx.fillText("@", player.canvasX, canvas.offsetHeight/2);
-        ctx.fillText("!!", canvas.offsetWidth*(3/4), canvas.offsetHeight/2);
+        //initialize the canvas ctx, since Game got loaded before the canvas did.
+        var canvas = document.getElementById("gamePage__gameSpace__encounter__canvas__gameCanvas");
+        encounterHandler.ctx = canvas.getContext("2d");
+        encounterHandler.startEncounter();
     }
-    encounterNodeExit(){
+    encounterNodeExit() {
         document.getElementById("gamePage__gameSpace__encounter__canvas").style.display = "none";
         document.getElementById("gamePage__gameSpace__inventory__canvas").style.display = "grid";
     }
-    getNewEnemy(){
+    getNewEnemy() {
 
     }
 }

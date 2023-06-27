@@ -33,7 +33,7 @@ async function keyDownHandler(mapArray, e) {
         }
     }
     //Inventory naviation keys.
-    if (game.windowState == "action" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
+    if (gameManager.windowState == "action" && (e.code == "ArrowUp" || e.code == "ArrowDown")) {
         var previousPointerPosition = player.inventoryPointerPosition;
         var len = player.inventory.length;
 
@@ -56,33 +56,16 @@ async function keyDownHandler(mapArray, e) {
     }
     //Player movment keys.
     //NOTE: needs to be restricted depending on gamestate!
-    if (game.gameState == "movement" && game.windowState == "map" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
+    if (gameManager.gameState == "movement" && gameManager.windowState == "map" && (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA")) {
         playerMovementHandler(e.code);
     }
     //change loadout from inventory.
-    if (game.gameState != "encounter" && game.windowState == "action" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
+    if (gameManager.gameState != "encounter" && gameManager.windowState == "action" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
         changeLoadout(e);
     }
-    //Encounter keys and keybinds.
-    if (game.gameState == "encounter" && (e.code == "KeyU" || e.code == "KeyI" || e.code == "KeyJ" || e.code == "KeyK")) {
-        switch (e.code) {
-            case "KeyU":
-                document.getElementById("gamePage__gameSpace__encounter__menu__button1").click();
-                break;
-            case "KeyI":
-                document.getElementById("gamePage__gameSpace__encounter__menu__button2").click();
-                break;
-            case "KeyJ":
-                document.getElementById("gamePage__gameSpace__encounter__menu__button3").click();
-                break;
-            case "KeyK":
-                document.getElementById("gamePage__gameSpace__encounter__menu__button4").click();
-                break;
-        }
-    }
-
+    //Note: Encounter keyDowns handled separately. 
     if (e.code == "Enter") {
-        game.roomBossCellEntity.revealBossCell();
+        gameManager.roomBossCellEntity.revealBossCell();
     }
 }
 
@@ -126,22 +109,22 @@ async function windowNavButtonHandler(e) {
         switch (windowDirectory[currentWindowIndex]) {
             case "map":
                 mapWindow.style.display = "grid";
-                game.windowState = "map";
-                if (game.gameState != "movement") { //only valid when moving.
+                gameManager.windowState = "map";
+                if (gameManager.gameState != "movement") { //only valid when moving.
                     mapWindow.style.opacity = "0.5";
                 }
                 break;
             case "encounter":
                 fightWindow.style.display = "grid";
-                game.windowState = "encounter-inventory";
-                if (game.gameState != "encounter" && game.gameState != "transition") { //only valid when fighting.
+                gameManager.windowState = "encounter-inventory";
+                if (gameManager.gameState != "encounter" && gameManager.gameState != "dialogue") { //only valid when fighting.
                     fightWindow.style.opacity = "0.5";
                 }
                 break;
             case "shop":
                 shopWindow.style.display = "grid";
-                game.windowState = "shop";
-                if (game.gameState != "shop") { //only valid when end of room.
+                gameManager.windowState = "shop";
+                if (gameManager.gameState != "shop") { //only valid when end of room.
                     shopWindow.style.opacity = "0.5";
                 }
                 break;
@@ -218,192 +201,6 @@ async function playerMovementHandler(key) {
         }
     }
 }
-async function playerAttackHandler(e) {
-    //player must be viewing the battle. No attacks can be made from other screens.
-    if (game.windowState == "action") {
-        var tempCooldown;
-        //NOTE: baseCooldown needs masq multiplier.
-        //based on the attack procced, do stuff.
-        if (game.gameState == "encounter") {
-            switch (e.target.id) {
-                case "gamePage__gameSpace__encounter__menu__button1":
-                case "gamePage__gameSpace__encounter__menu__button1__text":
-                    if (player.attacks[0] != null) {
-                        player.attacks[0].attackProcced(player, enemy);
-                        tempCooldown = player.attacks[0].baseCooldown;
-                    }
-                    break;
-                case "gamePage__gameSpace__encounter__menu__button2":
-                case "gamePage__gameSpace__encounter__menu__button2__text":
-                    if (player.attacks[1] != null) {
-                        player.attacks[1].attackProcced(player, enemy);
-                        tempCooldown = player.attacks[1].baseCooldown;
-                    }
-                    break;
-                case "gamePage__gameSpace__encounter__menu__button3":
-                case "gamePage__gameSpace__encounter__menu__button3__text":
-                    if (player.attacks[2] != null) {
-                        player.attacks[2].attackProcced(player, enemy);
-                        tempCooldown = player.attacks[2].baseCooldown;
-                    }
-                    break;
-                case "gamePage__gameSpace__encounter__menu__button4":
-                case "gamePage__gameSpace__encounter__menu__button4__text":
-                    if (player.attacks[3] != null) {
-                        player.attacks[3].attackProcced(player, enemy);
-                        tempCooldown = player.attacks[3].baseCooldown;
-                    }
-                    break;
-            }
-            attackButtonCooldownAnimation(e.currentTarget.id, tempCooldown);
-        }
-    }
-}
-//plays animation. Also disables button: cooldown
-function attackButtonCooldownAnimation(buttonId, time) {
-    let button = document.getElementById(buttonId);
-    let timer = button.querySelector(".encounterButton__progress");
-
-    if (!button.disabled && game.gameState == "encounter") {
-
-        //Animation!
-        timer.style.transition = "none"; //no animation.
-        timer.style.width = "100%";
-        flushCSS(timer);
-
-        timer.style.transition = `width ${time}s linear` //animation again
-        timer.style.width = "0%";
-        flushCSS(timer);
-    }
-    //Cooldown the button while animation takes place.
-    button.disabled = true;
-
-    //attach cooldown buttons to handler!
-    switch (buttonId) {
-        case "gamePage__gameSpace__encounter__menu__button1":
-            cooldownHandler.attackUCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
-            break;
-        case "gamePage__gameSpace__encounter__menu__button2":
-            cooldownHandler.attackICooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
-            break;
-        case "gamePage__gameSpace__encounter__menu__button3":
-            cooldownHandler.attackJCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
-            break;
-        case "gamePage__gameSpace__encounter__menu__button4":
-            cooldownHandler.attackKCooldown = setTimeout(function () { button.disabled = false; }, time * 1000);
-            break;
-        default:
-            console.log("Error! Couldn't attach cooldown to cooldownHandler.");
-            break;
-    }
-
-}
 function flushCSS(element) { //flushes css to no transition.
     element.offsetHeight;
 }
-
-//Inventory updates and actions. ============================================================================================||
-//handles clicks instead of arrow keys. calls moveInventoryMarker().
-//if player clicks on an equip button afterwards,
-// Depending on pointerPosition, switch out attacks and then update inventory display.
-async function inventoryButtonClickHandler(e) {
-    let temp = player.inventoryPointerPosition;
-    player.inventoryPointerPosition = e.target.id.slice(-1);
-    moveInventoryMarker(temp);
-
-    //change equip buttons to have bold borders.
-    document.querySelectorAll(".inventoryEquipButton").forEach(element => {
-        element.style.border = "3px solid black";
-    })
-    await sleep(1);
-    //add document event listener for a click that fires once.
-    document.addEventListener("click", clicked => {
-        //switch borders back
-        if (!clicked.target.id.includes("gamePage__gameSpace__inventory__itemList__Button")) {
-            document.querySelectorAll(".inventoryEquipButton").forEach(element => {
-                element.style.border = "1px solid black";
-            })
-        }
-        //check element.
-        if (clicked.target.id.includes("gamePage__gameSpace__inventory__equipMenu__button")) {
-            //i would call changeLoadout here, but it's not going to work. clicked and keyDown are different events.
-            let position = parseInt(clicked.target.id.slice(-1)) - 1;
-            let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
-            player.addNewAttack(attack, position);
-        }
-    }, { once: true })
-}
-//when player moves pointer, update display, scroll, and update stat panel.
-function moveInventoryMarker(previousPointerPosition = null) {
-    let display = document.getElementById("gamePage__gameSpace__inventory__itemList");
-    //------if previousPointer exists, then remove marker from last position.------
-    if (previousPointerPosition != null) {
-        let oldButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${previousPointerPosition}`);
-        oldButton.innerHTML = oldButton.innerHTML.slice(5, -5); //splice 5, -5 because > and < have esc chars.
-    }
-    //------update new button with marker ><------
-    let newButton = document.getElementById(`gamePage__gameSpace__inventory__itemList__Button${player.inventoryPointerPosition}`);
-
-    newButton.innerHTML = `> ${newButton.innerHTML} <`;
-
-    //------automatically scrolls!------
-    if (player.inventoryPointerPosition == 0) {
-        document.getElementById("gamePage__gameSpace__inventory__itemList__section1__marker").scrollIntoView({ behaviour: "smooth", block: "nearest" });
-        //display.scrollTop = 0;
-    } else if (player.inventoryPointerPosition == player.inventory.length - 1) {
-        document.getElementById("gamePage__gameSpace__inventory__itemList__bottomMarker").scrollIntoView({ behaviour: "smooth", block: "nearest" });
-        //display.scrollTop = display.scrollHeight;
-    } else {
-        newButton.scrollIntoView({ behaviour: "smooth", block: "nearest" });
-    }
-    //------Update attributes panel!------
-    updateStatDisplay()
-}
-function updateStatDisplay() {
-    //NOTE: this should probably apply modifiers instead of base values later.
-    let invObj = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
-    let type = invObj.constructor.name.toUpperCase();
-    document.getElementById("gamePage__gameSpace__inventory__statDisplay__type").innerHTML = type;
-    document.getElementById("gamePage__gameSpace__inventory__statDisplay__equipped").innerHTML = `Equipped: ${invObj.equipped}`;
-    document.getElementById("gamePage__gameSpace__inventory__statDisplay__description").innerHTML = invObj.description;
-
-    if (invObj.baseCooldown != null) {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: ${invObj.baseCooldown}`;
-    } else {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__cooldown").innerHTML = `Cooldown: --`;
-    }
-    try {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: ${invObj.effectObject.type.toUpperCase()}, ${invObj.effectObject.effect}[${invObj.effectObject.duration}]
-        <br> ${invObj.effectObject.effectDescription}`;
-    } catch (e) { document.getElementById("gamePage__gameSpace__inventory__statDisplay__effect").innerHTML = `Effect: --`; }
-    if (invObj.baseChannelling != null) {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: ${invObj.baseChannelling}s`;
-    } else {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__channelling").innerHTML = `Channelling: --`;
-    }
-    if (invObj.baseDamage != null) {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Damage: ${invObj.damage}`;
-    } else {
-        document.getElementById("gamePage__gameSpace__inventory__statDisplay__damage").innerHTML = `Damage: --`;
-    }
-}
-function changeLoadout(e) {
-    let position;
-    let attack = player.inventory[player.inventoryButtonData[player.inventoryPointerPosition]];
-    switch (e.code) {
-        case "KeyU":
-            position = 0;
-            break;
-        case "KeyI":
-            position = 1;
-            break;
-        case "KeyJ":
-            position = 2;
-            break;
-        case "KeyK":
-            position = 3;
-            break;
-    }
-    player.addNewAttack(attack, position);
-}
-
