@@ -29,10 +29,16 @@ class Game {
     */
     async turnHandler(map, player, mapHandler, e){
         map.hideCells();
+        
+        //Show Tower vision.
+        for(let i = 0; i < map.towerArray.length; i++){
+            if(map.towerArray[i].active){
+                map.towerArray[i].showTowerVision();
+            }
+        }
+
         this.playerMovementHandler(map.mapArray, player, mapHandler, e.code);
         //^ handles moving the player and showing the player!
-
-        //Still needs to handle tower vision n stuff.
     }
 
     async playerMovementHandler(mapArray, player, mapHandler, key) {
@@ -127,12 +133,15 @@ class MapHandler {
                 break;
         }
         //generate random locations of interest
-        var centerCoord = [(this.mapWidth - 1) / 2, (this.mapHeight - 1) / 2];
-        for (var i = 0; i < roomTypeArray[0]; i++) { // MINOR
+        for (var i = 0; i < 3; i++) { // MINOR
             /*
             Reinstate this when ready to place location blocks.
             this.mapArray = placeLocation(this.mapArray, this.mapWidth - 1, this.mapHeight - 1, centerCoord, "Minor");
             */
+           this.mapArray = this.placeLocation("Tower")
+        }
+        for( var j = 0; j < this.towerArray.length; j++){
+            this.towerArray[j].activateTower();
         }
         //push complete mapArray to DOM
         this.pushMapToDOM(this.mapArray);
@@ -206,6 +215,57 @@ class MapHandler {
             }
         }
 
+        return this.mapArray;
+    }
+    //Place locations at random positions.
+    placeLocation(type) {
+        let centerCoord = [Math.ceil(this.mapWidth/2), Math.ceil(this.mapHeight/2)];
+
+        let pathFound = false;
+        while (!pathFound) {
+            var randomCoord = [0, 0]; //This, randomly generated, is possible position for location.
+            randomCoord[0] = randInt(this.mapWidth - 1);
+            randomCoord[1] = randInt(this.mapHeight - 1);
+    
+            //Validate if above position is accessible.
+            //check if one of the neighbouring tiles instanceof PathCell.
+            //iterate through adjacent cells.
+            for (let x = Math.max(0, randomCoord[0] - 1); x <= Math.min(this.mapWidth - 1, randomCoord[0] + 1); x++) { //Math.min and Math.max specifies boundaries.
+                for (let y = Math.max(0, randomCoord[1] - 1); y <= Math.min(this.mapHeight - 1, randomCoord[1] + 1); y++) {
+                    //console.log(`[${randomCoord[0]}][${randomCoord[1]}]`)
+
+                    //randomCoord is the chosen location. X, Y are coords around it.
+                    //Check 1: Not the targeted tile.                      Also not corners. (Only on same plane x, y)
+                    if (((x != randomCoord[0] || y != randomCoord[1]) && (x == randomCoord[0] || y == randomCoord[1])) && this.mapArray[x][y] instanceof PathCell) { //<-- if there is a valid pathcell around it.
+                        //RANDOMCOORD IS THE LOCAITONCELL POSITION.
+                        //X AND Y ARE PATH CHECKS.
+
+                        //This is the actual test part. Scalability comes from here!
+                        switch (type) {
+                            case "Tower":
+                                if((this.mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell||this.mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell) &&
+                                    calcPythagDistance(randomCoord, centerCoord) > 5 && calcPythagDistance(randomCoord, centerCoord) < 10){
+
+                                        //Check distance between towers. Needs to be > 10.
+                                        let towerCheck = true;
+                                        for(let k = 0; k < this.towerArray.length; k++){
+                                            if(calcPythagDistance(randomCoord, [this.towerArray[k].mapX, this.towerArray[k].mapY]) < 10){
+                                                towerCheck = false;
+                                            }
+                                        }
+                                        if(towerCheck == true){
+                                            this.mapArray[randomCoord[0]][randomCoord[1]] = new TowerCell(randomCoord[0], randomCoord[1], this);
+                                            this.towerArray.push(this.mapArray[randomCoord[0]][randomCoord[1]]);
+    
+                                            pathFound = true;
+                                        }
+                                    }
+                                break;
+                        }
+                    }
+                }
+            }
+        }
         return this.mapArray;
     }
     //This takes the completed map array and displays it in the DOM.

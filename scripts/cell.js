@@ -1,5 +1,5 @@
 class Cell {
-    constructor(positionX, positionY, room, initialNode = null, map) {
+    constructor(positionX, positionY, map, room, initialNode = null) {
         this.room = room;
 
         this.name = this.cellNameGenerator(this.constructor.name, this.room);//name shown in encounter popup.
@@ -23,6 +23,9 @@ class Cell {
         var namesList;
         if(type == "WallCell"){
             return "";
+        }
+        if(type == "TowerCell"){
+            return "A Tower Dormant";
         }
         switch (room) {
             case 1:
@@ -59,6 +62,9 @@ class Cell {
         }
         if (type == "PathCell") {
             return ";";
+        }
+        if(type == "TowerCell"){
+            return "♜";
         }
         switch (room) {
             case 1:
@@ -130,13 +136,19 @@ class LocationCell extends Cell {
     }
 }
 class TowerCell extends Cell {
-    constructor(positionX, positionY, initialNode) {
-        super(positionX, positionY, initialNode);
+    constructor(positionX, positionY, map) {
+        super(positionX, positionY, map);
         this.active = false;
         this.visionRange = 4;
     }
     activateTower(){
         this.active = true;
         this.mapHandler.showCellsInVision(this.visionRange, this.mapX, this.mapY);
+        this.name = "A Tower Astir";
+    }
+    showTowerVision(){
+        if(this.active){
+            this.mapHandler.showCellsInVision(this.visionRange, this.mapX, this.mapY);
+        }
     }
 }
