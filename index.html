@@ -29,7 +29,8 @@
     <script type="text/javascript" src="scripts\main.js"></script>
 
     <link rel="stylesheet" href="styles\mainStyle.css">
-    <link rel="stylesheet" href="styles\windowStyle.css">
+    <link rel="stylesheet" href="styles\mapStyle.css">
+    <link rel="stylesheet" href="styles\combatStyle.css">
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 </head>
@@ -103,13 +104,27 @@
         </div>
         <!--gameSpace will handle all UI display elements.-->
         <div id="gamePage__gameSpace">
+            <!--Movement Phase-->
             <div id="gamePage__gameSpace__map">
-                <!--Movement Phase-->
                 <button id="gamePage__gameSpace__map__mapMvmtW" class="mapMvmtButton">➤</button>
                 <button id="gamePage__gameSpace__map__mapMvmtA" class="mapMvmtButton">➤</button>
                 <button id="gamePage__gameSpace__map__mapMvmtS" class="mapMvmtButton">➤</button>
                 <button id="gamePage__gameSpace__map__mapMvmtD" class="mapMvmtButton">➤</button>
                 <div id="gamePage__gameSpace__map__canvas"></div>
+            </div>
+            <!--Combat Phase-->
+            <div id="gamePage__gameSpace__combat">
+                <div id="testCell"></div>
+                <!--For animations. Might also show things like turns.
+                Should also include entity health and effect.s-->
+                <div id="gamePage__gameSpace__combat__spriteDisplay"></div>
+                <!--For displaying card turn order.-->
+                <div id="gamePage__gameSpace__combat__cardOrder"></div>
+                <!--For displaying cards in inventory.-->
+                <div id="gamePage__gameSpace__combat__inventoryDisplay"></div>
+
+                <!--Select a card to blow it up and view it here.-->
+                <div id="gamePage__gameSpace__combat__card"></div>
             </div>
         </div>
         <!--footer for game elements-->
