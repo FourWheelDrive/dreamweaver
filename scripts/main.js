@@ -9,14 +9,15 @@ var mapWidth = 31, mapHeight = 31;
 class Game {
     constructor() {
         this.gameState = 0;
-        this.windowState = 0;
-
-        this.currentRoom = 1;
+        this.windowState = 1;
         /*
         0 - dialogue, win/end pages ||| disable movement keys, attack keys
         1 - movement                ||| disable                attack keys
-        2 - encounter               ||| disable movement keys,            
+        2 - encounter               ||| disable movement keys            
+        3 - shop                    ||| disable movement keys, attack keys
         */
+
+        this.currentRoom = 1;
     }
     //Begin a new turn each time the player moves.
     /*
@@ -39,6 +40,28 @@ class Game {
 
         this.playerMovementHandler(map.mapArray, player, mapHandler, e.code);
         //^ handles moving the player and showing the player!
+    }
+    async changeWindow(newWindowState){
+        this.windowState = newWindowState;
+        switch(this.windowState){
+            case 0:
+                break;
+            case 1:
+                document.getElementById("gamePage__gameSpace__map").style.display = "block";
+                document.getElementById("gamePage__gameSpace__combat").style.display = "none";
+                document.getElementById("gamePage__gameSpace__shop").style.display = "none";
+                break;
+            case 2:
+                document.getElementById("gamePage__gameSpace__map").style.display = "none";
+                document.getElementById("gamePage__gameSpace__combat").style.display = "block";
+                document.getElementById("gamePage__gameSpace__shop").style.display = "none";
+                break;
+            case 3:
+                document.getElementById("gamePage__gameSpace__map").style.display = "none";
+                document.getElementById("gamePage__gameSpace__combat").style.display = "none";
+                document.getElementById("gamePage__gameSpace__shop").style.display = "block";
+                break;
+        }
     }
 
     async playerMovementHandler(mapArray, player, mapHandler, key) {
@@ -102,6 +125,7 @@ class Game {
             this.turnHandler(map, player, mapHandler, e);
         }
     }
+
 }
 class MapHandler {
     constructor(mapWidth, mapHeight, maxTunnels, maxLength) {
@@ -531,4 +555,9 @@ async function initializeGame() {
     //temporary tutorial panel.
     await sleep(1000);
     pushMainOutput("Press Z for help!");
+
+
+    //COMBAT TESTING, begin encounter here.
+    await sleep(1000);
+    game.changeWindow(2);
 }
