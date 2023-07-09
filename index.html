@@ -95,11 +95,12 @@
                     onclick="windowNavButtonHandler(event)">&lt</button>
                 <p id="gamePage__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
             </div>
+            <!--Displays the current window.-->
             <h1 id="gamePage__header__windowDisplay"></h1>
             <div class="navDiv">
                 <button id="gamePage__header__right" class="windowNavButtons"
                     onclick="windowNavButtonHandler(event)">&gt</button>
-                <p id="gamePage__header__rightWindowDisplay" class="navWindowDisplay">encounter</p>
+                <p id="gamePage__header__rightWindowDisplay" class="navWindowDisplay">inventory</p>
             </div>
         </div>
         <!--gameSpace will handle all UI display elements.-->
@@ -119,16 +120,22 @@
                 Should also include entity health and effect.s-->
                 <div id="gamePage__gameSpace__combat__spriteDisplay"></div>
                 <!--For displaying card turn order.-->
-                <div id="gamePage__gameSpace__combat__cardOrder"></div>
+                <div id="gamePage__gameSpace__combat__cardOrder">
+                    <div id="gamePage__gameSpace__combat__cardOrder__1" class="combatCardSlot"></div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__2" class="combatCardSlot"></div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__3" class="combatCardSlot"></div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__4" class="combatCardSlot"></div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__5" class="combatCardSlot"></div>
+                </div>
                 <!--For displaying cards in inventory.-->
                 <div id="gamePage__gameSpace__combat__inventoryDisplay"></div>
 
                 <!--Select a card to blow it up and view it here.-->
-                <div id="gamePage__gameSpace__combat__card"></div>
+                <div id="gamePage__gameSpace__combat__fullCardDisplay"></div>
             </div>
             <!--Shop Phase-->
             <div id="gamePage__gameSpace__shop">
-                
+
             </div>
         </div>
         <!--footer for game elements-->

@@ -1,15 +1,8 @@
-const windowDirectory = ["map", "encounter", "shop"];
-const windowTitles = ["THE DREAM", "THE WAR ROOM", "THE WISHING WELL"];
-var currentWindowIndex = 0;
-var player;
-var enemy;
-var mapArray; //this is global now. It was too hard to keep encapsulated. Required for player masquerade.
-var mapWidth = 31, mapHeight = 31;
-
 class Game {
     constructor() {
         this.gameState = 0;
         this.windowState = 1;
+        this.windowTitles = ["test dialogue", "THE DREAM", "THE WAR ROOM", "THE WISHING WELL"];
         /*
         0 - dialogue, win/end pages ||| disable movement keys, attack keys
         1 - movement                ||| disable                attack keys
@@ -41,29 +34,39 @@ class Game {
         this.playerMovementHandler(map.mapArray, player, mapHandler, e.code);
         //^ handles moving the player and showing the player!
     }
+
     async changeWindow(newWindowState){
         this.windowState = newWindowState;
         switch(this.windowState){
             case 0:
                 break;
             case 1:
-                document.getElementById("gamePage__gameSpace__map").style.display = "block";
+                document.getElementById("gamePage__gameSpace__map").style.display = "grid";
                 document.getElementById("gamePage__gameSpace__combat").style.display = "none";
                 document.getElementById("gamePage__gameSpace__shop").style.display = "none";
+
+                document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = "shop";
+                document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = "inventory";
                 break;
             case 2:
                 document.getElementById("gamePage__gameSpace__map").style.display = "none";
-                document.getElementById("gamePage__gameSpace__combat").style.display = "block";
+                document.getElementById("gamePage__gameSpace__combat").style.display = "grid";
                 document.getElementById("gamePage__gameSpace__shop").style.display = "none";
+
+                document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = "map";
+                document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = "shop";
                 break;
             case 3:
                 document.getElementById("gamePage__gameSpace__map").style.display = "none";
                 document.getElementById("gamePage__gameSpace__combat").style.display = "none";
-                document.getElementById("gamePage__gameSpace__shop").style.display = "block";
+                document.getElementById("gamePage__gameSpace__shop").style.display = "grid";
+
+                document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = "inventory";
+                document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = "map";
                 break;
         }
+        document.getElementById("gamePage__header__windowDisplay").innerHTML = this.windowTitles[this.windowState];
     }
-
     async playerMovementHandler(mapArray, player, mapHandler, key) {
         //very cool directions array! Append each element instead of having 4 switch statements.
         //[left] [right] [up] [down]
@@ -120,12 +123,31 @@ class Game {
         //Show the player.
         mapHandler.showPlayer(player);
     }
+    //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
     async keyDownHandler(map, player, mapHandler, e) {
+        //movement keys
         if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
             this.turnHandler(map, player, mapHandler, e);
         }
+        if(e.code == "ArrowRight" || e.code == "ArrowLeft"){
+            switch(e.code){
+                case "ArrowRight":
+                    this.windowState = this.windowState + 1;
+                    if(this.windowState > 3){
+                        this.windowState = 1;
+                    }
+                    this.changeWindow(this.windowState);
+                    break;
+                case "ArrowLeft":
+                    this.windowState = this.windowState - 1;
+                    if(this.windowState < 1){
+                        this.windowState = 3;
+                    }
+                    this.changeWindow(this.windowState);
+                    break;
+            }
+        }
     }
-
 }
 class MapHandler {
     constructor(mapWidth, mapHeight, maxTunnels, maxLength) {
@@ -534,7 +556,7 @@ async function initializeGame() {
     //create map for new room.
     map.mapArray = map.generateNewRoom(game);
     //Set up displays.
-    document.getElementById("gamePage__header__windowDisplay").innerHTML = windowTitles[0];
+    document.getElementById("gamePage__header__windowDisplay").innerHTML = game.windowTitles[1];
 
     //Show map.
     map.showCellsInVision(player.visionRange, player.mapX, player.mapY);
