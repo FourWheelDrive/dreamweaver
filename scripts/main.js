@@ -9,8 +9,11 @@ class Game {
         2 - encounter               ||| disable movement keys            
         3 - shop                    ||| disable movement keys, attack keys
         */
+        this.player;
 
         this.currentRoom = 1;
+        this.enemies = [];     //Array of enemy entities. Will be moved towards the player if within certain radius in turnHandler.
+        this.currentEnemy;
     }
     //Begin a new turn each time the player moves.
     /*
@@ -21,23 +24,55 @@ class Game {
     - display vision
     - check for special locations
     */
-    async turnHandler(map, player, mapHandler, e){
+    async turnHandler(map, mapHandler, e) {
         map.hideCells();
-        
+
         //Show Tower vision.
-        for(let i = 0; i < map.towerArray.length; i++){
-            if(map.towerArray[i].active){
+        for (let i = 0; i < map.towerArray.length; i++) {
+            if (map.towerArray[i].active) {
                 map.towerArray[i].showTowerVision();
             }
         }
 
-        this.playerMovementHandler(map.mapArray, player, mapHandler, e.code);
+        this.playerMovementHandler(map.mapArray, mapHandler, e.code);
         //^ handles moving the player and showing the player!
     }
 
-    async changeWindow(newWindowState){
+    //Inventory initializations and updates.
+    //when card icons happen, this needs to be updated.
+    updateInventoryDisplay() {
+        //Step 1: Clear all current child elements.
+        var inventoryDiv = document.getElementById("gamePage__gameSpace__combat__inventoryDisplay");
+        //Super https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript to the rescue!
+        inventoryDiv.replaceChildren();
+
+        //Step 2: Find player inventory and add.
+        for (let i = 0; i < this.player.inventory.length; i++) {
+            let newCard = document.createElement("div");
+            let newIcon; //when i sort out card icons.
+            let newName = document.createElement("p");
+
+            newName.innerText = `${this.player.inventory[i].name}`;
+
+            newCard.setAttribute("id", `gamePage__gameSpace__combat__inventoryDisplay__${i}`);
+            newCard.setAttribute("class", "inventoryCard");
+            newName.setAttribute("id", `gamePage__gameSpace__combat__inventoryDisplay__${i}__name`);
+
+            //newCard.appendChild(newIcon);
+            newCard.appendChild(newName);
+            inventoryDiv.appendChild(newCard);
+
+            //Update the card's DOM Element.
+            this.player.inventory[i].domElement = document.getElementById(`gamePage__gameSpace__combat__inventoryDisplay__${i}`);
+        }
+        //reset hover listener to show cards in full display.
+        setCardHoverListener(this.player);
+    }
+
+    //Key handlers:
+    async changeWindow(newWindowState) {
         this.windowState = newWindowState;
-        switch(this.windowState){
+        switch (this.windowState) {
             case 0:
                 break;
             case 1:
@@ -55,6 +90,9 @@ class Game {
 
                 document.getElementById("gamePage__header__leftWindowDisplay").innerHTML = "map";
                 document.getElementById("gamePage__header__rightWindowDisplay").innerHTML = "shop";
+
+                //also remember to init inventory.
+                this.updateInventoryDisplay(this.player);
                 break;
             case 3:
                 document.getElementById("gamePage__gameSpace__map").style.display = "none";
@@ -67,17 +105,17 @@ class Game {
         }
         document.getElementById("gamePage__header__windowDisplay").innerHTML = this.windowTitles[this.windowState];
     }
-    async playerMovementHandler(mapArray, player, mapHandler, key) {
+    async playerMovementHandler(mapArray, mapHandler, key) {
         //very cool directions array! Append each element instead of having 4 switch statements.
         //[left] [right] [up] [down]
         let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]],
             newDirection;
 
         //Cells to update
-        let currentCell = mapArray[player.position[0]][player.position[1]],
+        let currentCell = mapArray[this.player.position[0]][this.player.position[1]],
             nextCellPos;
 
-            
+
         //Make an array [x][y] of position. .filter removes whitespace from split.
         let currentCellPos = currentCell.cellID.split(/[\[\]]/).filter(element => element.length >= 1);
         //deltapos depending on key pressed.
@@ -111,9 +149,9 @@ class Game {
             //if the new cell is a hidden boss room, exit.
             //if (newCellEntity instanceof BossEncounterCell && !newCellEntity.revealed) { return; }
             //Update previous cell.
-            mapHandler.clearPlayer(mapArray);
-            player.updatePosition(nextCellPos[0], nextCellPos[1]);
-            
+            mapHandler.clearPlayer(this.player);
+            this.player.updatePosition(nextCellPos[0], nextCellPos[1]);
+
 
             //Proc encounters!!!
             /*if (newCellEntity) {
@@ -121,26 +159,26 @@ class Game {
             }*/
         }
         //Show the player.
-        mapHandler.showPlayer(player);
+        mapHandler.showPlayer(this.player);
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
-    async keyDownHandler(map, player, mapHandler, e) {
+    async keyDownHandler(map, mapHandler, e) {
         //movement keys
         if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
-            this.turnHandler(map, player, mapHandler, e);
+            this.turnHandler(map, mapHandler, e);
         }
-        if(e.code == "ArrowRight" || e.code == "ArrowLeft"){
-            switch(e.code){
+        if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
+            switch (e.code) {
                 case "ArrowRight":
                     this.windowState = this.windowState + 1;
-                    if(this.windowState > 3){
+                    if (this.windowState > 3) {
                         this.windowState = 1;
                     }
                     this.changeWindow(this.windowState);
                     break;
                 case "ArrowLeft":
                     this.windowState = this.windowState - 1;
-                    if(this.windowState < 1){
+                    if (this.windowState < 1) {
                         this.windowState = 3;
                     }
                     this.changeWindow(this.windowState);
@@ -164,8 +202,10 @@ class MapHandler {
     generateNewRoom(game) {
         //generate array of walls
         this.mapArray = this.createMapArray(game);
+        console.log("M1: Array complete.")
         //generate random paths procedurally
         this.mapArray = this.createMapPaths();
+        console.log("M2: Paths complete.")
 
         //Array defining how many rooms of each type exist.
         let roomTypeArray;
@@ -184,11 +224,14 @@ class MapHandler {
             Reinstate this when ready to place location blocks.
             this.mapArray = placeLocation(this.mapArray, this.mapWidth - 1, this.mapHeight - 1, centerCoord, "Minor");
             */
-           this.mapArray = this.placeLocation("Tower")
+            this.mapArray = this.placeLocation("Tower")
+            console.log(`M3: Tower ${i} complete.`)
         }
-        for( var j = 0; j < this.towerArray.length; j++){
+        for (var j = 0; j < this.towerArray.length; j++) {
             this.towerArray[j].activateTower();
         }
+        console.log("M3: Towers complete.")
+
         //push complete mapArray to DOM
         this.pushMapToDOM(this.mapArray);
 
@@ -265,14 +308,14 @@ class MapHandler {
     }
     //Place locations at random positions.
     placeLocation(type) {
-        let centerCoord = [Math.ceil(this.mapWidth/2), Math.ceil(this.mapHeight/2)];
+        let centerCoord = [Math.ceil(this.mapWidth / 2), Math.ceil(this.mapHeight / 2)];
 
         let pathFound = false;
         while (!pathFound) {
             var randomCoord = [0, 0]; //This, randomly generated, is possible position for location.
             randomCoord[0] = randInt(this.mapWidth - 1);
             randomCoord[1] = randInt(this.mapHeight - 1);
-    
+
             //Validate if above position is accessible.
             //check if one of the neighbouring tiles instanceof PathCell.
             //iterate through adjacent cells.
@@ -286,26 +329,28 @@ class MapHandler {
                         //RANDOMCOORD IS THE LOCAITONCELL POSITION.
                         //X AND Y ARE PATH CHECKS.
 
+                        console.log("PathFound!") //<== this got infinite looped. Why?
                         //This is the actual test part. Scalability comes from here!
                         switch (type) {
                             case "Tower":
-                                if((this.mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell||this.mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell) &&
-                                    calcPythagDistance(randomCoord, centerCoord) > 5 && calcPythagDistance(randomCoord, centerCoord) < 10){
+                                if ((this.mapArray[randomCoord[0]][randomCoord[1]] instanceof WallCell || this.mapArray[randomCoord[0]][randomCoord[1]] instanceof PathCell) &&
+                                    calcPythagDistance(randomCoord, centerCoord) > 5 && calcPythagDistance(randomCoord, centerCoord) < 10) {
 
-                                        //Check distance between towers. Needs to be > 10.
-                                        let towerCheck = true;
-                                        for(let k = 0; k < this.towerArray.length; k++){
-                                            if(calcPythagDistance(randomCoord, [this.towerArray[k].mapX, this.towerArray[k].mapY]) < 10){
-                                                towerCheck = false;
-                                            }
-                                        }
-                                        if(towerCheck == true){
-                                            this.mapArray[randomCoord[0]][randomCoord[1]] = new TowerCell(randomCoord[0], randomCoord[1], this);
-                                            this.towerArray.push(this.mapArray[randomCoord[0]][randomCoord[1]]);
-    
-                                            pathFound = true;
+                                    //Check distance between towers. Needs to be > 10.
+                                    let towerCheck = true;
+                                    for (let k = 0; k < this.towerArray.length; k++) {
+                                        if (calcPythagDistance(randomCoord, [this.towerArray[k].mapX, this.towerArray[k].mapY]) < 10) {
+                                            console.log("TowerCheckFailed!")
+                                            towerCheck = false;
                                         }
                                     }
+                                    if (towerCheck == true) {
+                                        this.mapArray[randomCoord[0]][randomCoord[1]] = new TowerCell(randomCoord[0], randomCoord[1], this);
+                                        this.towerArray.push(this.mapArray[randomCoord[0]][randomCoord[1]]);
+
+                                        pathFound = true;
+                                    }
+                                }
                                 break;
                         }
                     }
@@ -394,7 +439,7 @@ class MapHandler {
         currentCell.domElement.style.fontWeight = "900";
         currentCell.domElement.style.opacity = "1";
     }
-    clearPlayer() {
+    clearPlayer(player) {
         var previousCell = this.mapArray[player.position[0]][player.position[1]];
         previousCell.domElement.innerHTML = previousCell.symbol;
         //NOTE: this may change as more room types are added.
@@ -445,8 +490,8 @@ async function fadeElement(operation, element, time) {
 }
 
 //==============================================================initializing functions
-//Display position listeners.
-function setHoverListener(mapArray) {
+//Display hover listeners.
+function setMapHoverListener(mapArray) {
     for (var i = 0; i < mapArray.length; i++) {
         for (var j = 0; j < mapArray[0].length; j++) {
             let cell = mapArray[i][j];
@@ -464,6 +509,23 @@ function setHoverListener(mapArray) {
         }
     }
 }
+//Show expanded inventory card in display.
+//UPDATE when EFFECTS (buffs/debuffs) are added. Also when ICONS are added.
+function setCardHoverListener(player) {
+    for (let i = 0; i < player.inventory.length; i++) {
+        player.inventory[i].domElement.addEventListener("mouseover", function () {
+            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = player.inventory[i].name;
+            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${player.inventory[i].type}-${player.inventory[i].magnitude}`;
+            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore").innerHTML = player.inventory[i].lore;
+            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description").innerHTML = player.inventory[i].description;
+
+            //effect updaters. Uncomment when effects implemented.
+            //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name").innerHTML = player.inventory[i].effect.name;
+            //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description").innerHTML = player.inventory[i].effect.description;
+        })
+    }
+}
+
 //Initialize movement button listeners.
 function initMvmtListener(game) {
     document.getElementById("gamePage__gameSpace__map__mapMvmtW").addEventListener("click", function () {
@@ -550,8 +612,8 @@ async function initializeGame() {
     const map = new MapHandler(30, 30, 80, 10);
 
     //init player
-    player = new Player(10, 5, "@");
-    player.getInitialPosition(map.mapWidth, map.mapHeight);
+    game.player = new Player(10, game);
+    game.player.getInitialPosition(map.mapWidth, map.mapHeight);
 
     //create map for new room.
     map.mapArray = map.generateNewRoom(game);
@@ -559,27 +621,29 @@ async function initializeGame() {
     document.getElementById("gamePage__header__windowDisplay").innerHTML = game.windowTitles[1];
 
     //Show map.
-    map.showCellsInVision(player.visionRange, player.mapX, player.mapY);
-    map.showPlayer(player);
+    map.showCellsInVision(game.player.visionRange, game.player.mapX, game.player.mapY);
+    map.showPlayer(game.player);
 
     //Input handlers.
     //KEYBOARD input, handled in Game.
     document.addEventListener("keydown", (e) => {
-        game.keyDownHandler(map, player, map, e);
+        game.keyDownHandler(map, map, e);
     })
 
     //Add listeners to attack and movement buttons.
     //initAtkListener();
     //initMvmtListener(game);
     //Hover listener.
-    setHoverListener(map.mapArray);
+    setMapHoverListener(map.mapArray);
 
     //temporary tutorial panel.
     await sleep(1000);
     pushMainOutput("Press Z for help!");
 
 
+    //INVENTORY TESTING
+    game.player.addToInventory(new Card(-1, game.player));
+    game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
-    game.changeWindow(2);
 }

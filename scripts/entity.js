@@ -35,7 +35,7 @@ class Entity {
     }
 }
 class Player extends Entity {
-    constructor(health) {
+    constructor(health, game) {
         super(health, "@");
         this.equipped = [null, null, null, null];        //four Encounter slots.
 
@@ -49,78 +49,44 @@ class Player extends Entity {
         this.damageMulti = [1, 1, 1.5, 2, 2.5, 3] //math.floor and multiply base damage by these. Scales well for baseDMG 1-3.
         this.healthMulti = [10, 9, 8, 7, 6, 5];*/
 
-        this.wishes = 10;
+        this.wishes = health;
         this.visionRange = 2;
 
-        //set up header.
-        document.getElementById("gamePage__footer__health").innerHTML = `Health: ${this.health}`;
-        document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+        this.game = game; //the game object. Has helpful methods.
+
+        //set up header. Player uses Wishes as max health.
+        document.getElementById("gamePage__footer__health").innerHTML = `Wishes: ${this.health}/${this.wishes}`;
+        //document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
     }
     //Inventory methods
-    addToInventory(newObject) {
-        this.inventory.push(newObject);
-    }
-    //Loadout switch from inventory
-    addNewAttack(newAttack, position) {
-        //NOTE: needs new case for 4+ attacks to go to replace.
-        //NOTE: this should also be paired with a selection for which button to replace. Might come with inventory system.
-
-        //NOTE: IF THE ATTACK IS ALREADY EQUIPPED, CHANGE LAST POSITION (this.attacks) TO NULL.
-        //if the attack is equipped, remove it.
-        if (newAttack.equipped) {
-            for (var i = 0; i < player.attacks.length; i++) {
-                try {
-                    if (player.attacks[i].id == newAttack.id) {
-                        player.attacks[i] = null;
-                    }
-                } catch (e) { }
+    //Also needs to CHECK IF INVENTORY IS FULL! Check Discord for quantity stacking idea.
+    addToInventory(newCard) {
+        let alreadyHave = false;
+        for(let i = 0; i < this.inventory.length; i++){
+            if(newCard.id == this.inventory[i].id){
+                this.inventory[i].quantity = this.inventory[i].quantity + 1;
+                alreadyHave = true;
             }
         }
-        //unequip last attack.
-        let previousAttack = this.attacks[position];
-        if (previousAttack != null) {
-            previousAttack.equipped = false;
+        if(!alreadyHave){
+            this.inventory.push(newCard);
         }
-        this.attacks[position] = newAttack;
-        newAttack.equipped = true;
-
-        //Update the button displays-- both for encounters and for inventory!
-        for (var i = 0; i < this.attacks.length; i++) {
-            if (this.attacks[i] == null) {
-                document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = "";
-                document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = "";
-            } else {
-                document.getElementById(`gamePage__gameSpace__encounter__menu__button${i + 1}__text`).textContent = `${this.attacks[i].name}`;
-                document.getElementById(`gamePage__gameSpace__inventory__equipMenu__button${i + 1}`).innerHTML = `${this.attacks[i].name}`;
-            }
-        }
-        //update inventory display.
-        initializeInventoryWindow();
-    }
-    getInventoryCounterpartIndex(id) {
-        for (var i = 0; i < player.inventory.length; i++) {
-            if (player.inventory[i].id == id) {
-                return i;
-            }
-        }
-    }
-    
-    //Get Cell entity from position.
-    getCurrentCellEntity() {
-        return mapArray[this.mapPosition[0]][this.mapPosition[1]];
+        this.game.updateInventoryDisplay();
     }
     //Wishes.
-    updateWishes(difference) {
-        this.wishes = this.wishes + difference;
-        document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+    updateWishes(addedDiff) {
+        this.wishes = this.wishes + addedDiff;
+        if(this.health > this.wishes){
+            this.health = this.wishes;
+        }
+        document.getElementById("gamePage__footer__health").innerHTML = `Wishes: ${this.health}/${this.wishes}`;
     }
 }
 
 class Enemy extends Entity {
     constructor(health, canvasSymbol, attack, name, contactDialogue = [], defeatDialogue = []) {
         super(health, canvasSymbol);
-        this.attack = attack;
-        this.attackInterval;
+        this.inventory = [];
 
         this.name = name;
         //for dialogues, pass in arrays! We'll cycle through the array in the output.
@@ -129,15 +95,7 @@ class Enemy extends Entity {
     }
 
     //also initializes the encounter screen.
-    async beginAttackSequence(cooldownHandler) {
-        //attack, then set timer.
-        this.attack.attackProcced(enemy, player, cooldownHandler);
+    async placeCards(inTowerRange) {
 
-        //attack timer.
-        this.attackInterval = setInterval(async () => {
-            if (gameManager.gameState == "encounter") {
-                this.attack.attackProcced(enemy, player, cooldownHandler);
-            }
-        }, this.attack.baseCooldown * 1000);
     }
 }

@@ -26,6 +26,7 @@
 <head>
     <script type="text/javascript" src="scripts\cell.js"></script>
     <script type="text/javascript" src="scripts\entity.js"></script>
+    <script type="text/javascript" src="scripts\card.js"></script>
     <script type="text/javascript" src="scripts\main.js"></script>
 
     <link rel="stylesheet" href="styles\mainStyle.css">
@@ -118,7 +119,19 @@
                 <div id="testCell"></div>
                 <!--For animations. Might also show things like turns.
                 Should also include entity health and effect.s-->
-                <div id="gamePage__gameSpace__combat__spriteDisplay"></div>
+                <canvas id="gamePage__gameSpace__combat__spriteDisplay"></canvas>
+                <div id="gamePage__gameSpace__combat__entityStats">
+                    <div id="gamePage__gameSpace__combat__entityStats__playerStats">
+                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__health"></p>
+                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeBuff"></p>
+                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeDebuff"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__entityStats__enemyStats">
+                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__health"></p>
+                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeBuff"></p>
+                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeDebuff"></p>
+                    </div>
+                </div>
                 <!--For displaying card turn order.-->
                 <div id="gamePage__gameSpace__combat__cardOrder">
                     <div id="gamePage__gameSpace__combat__cardOrder__1" class="combatCardSlot"></div>
@@ -131,7 +144,18 @@
                 <div id="gamePage__gameSpace__combat__inventoryDisplay"></div>
 
                 <!--Select a card to blow it up and view it here.-->
-                <div id="gamePage__gameSpace__combat__fullCardDisplay"></div>
+                <div id="gamePage__gameSpace__combat__fullDisplays">
+                    <div id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay">
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type"  class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name"            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore"            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description"     class="fullDisplayText"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay">
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name"          class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description"   class="fullDisplayText"></p>
+                    </div>
+                </div>
             </div>
             <!--Shop Phase-->
             <div id="gamePage__gameSpace__shop">
@@ -142,7 +166,6 @@
         <div id="gamePage__footer">
             <div id="gamePage__footer__statusBars">
                 <p id="gamePage__footer__health" class="footerText"></p>
-                <p id="gamePage__footer__wishes" class="footerText"></p>
             </div>
             <p id="gamePage__footer__position" class="footerText"></p>
             <p id="gamePage__footer__cellName" class="footerText"></p>
