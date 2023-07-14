@@ -73,9 +73,9 @@ class Card{
     }
 
     //this needs to deal damage to target and apply effects.
-    //How to handle passive effects?
     //How to proccess effects? >>Process at the end of the turn. Separate effect object?
-    cardPlayed(){
+    //does this need to have a position argument? (position in queue)
+    cardPlayed(position){
         this.onCooldown = this.cooldown;
     }
     //handles cooldowns each turn.

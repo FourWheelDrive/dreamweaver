@@ -1,6 +1,6 @@
 class Game {
     constructor() {
-        this.gameState = 0;
+        this.gameState = 1;
         this.windowState = 1;
         this.windowTitles = ["test dialogue", "THE DREAM", "THE WAR ROOM", "THE WISHING WELL"];
         /*
@@ -67,6 +67,31 @@ class Game {
         }
         //reset hover listener to show cards in full display.
         setCardHoverListener(this.player);
+    }
+
+    //Combat Functions:
+    //Might need to pass in Enemy.
+    startCombat(inTowerRange){
+        //1) change gameState flags
+        this.gameState = 2;
+        this.changeWindow(2);
+        //2) make sure keyHandlers handle flags
+            //done.
+        //3) Unlock cards for combat.
+        for(let i = 0; i < this.player.inventory.length; i++){
+            //make cards draggable
+            this.player.inventory[i].domElement.setAttribute("draggable", "true");
+            //set functions for drop.
+        }
+
+        //4) Choose Player card slots, including modifiers.
+        //5) Choose Enemy card slots.
+        //6) Enemy places cards.
+        //7) Player places cards.
+
+
+        //8) Evaluate.
+
     }
 
     //Key handlers:
@@ -164,25 +189,32 @@ class Game {
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
     async keyDownHandler(map, mapHandler, e) {
         //movement keys
-        if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
-            this.turnHandler(map, mapHandler, e);
+        //state check
+        if(this.gameState == 1 && this.windowState == 1){
+            if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
+                this.turnHandler(map, mapHandler, e);
+            }
         }
-        if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
-            switch (e.code) {
-                case "ArrowRight":
-                    this.windowState = this.windowState + 1;
-                    if (this.windowState > 3) {
-                        this.windowState = 1;
-                    }
-                    this.changeWindow(this.windowState);
-                    break;
-                case "ArrowLeft":
-                    this.windowState = this.windowState - 1;
-                    if (this.windowState < 1) {
-                        this.windowState = 3;
-                    }
-                    this.changeWindow(this.windowState);
-                    break;
+        
+        //window navigation keys
+        if(this.gameState == 1){
+            if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
+                switch (e.code) {
+                    case "ArrowRight":
+                        this.windowState = this.windowState + 1;
+                        if (this.windowState > 3) {
+                            this.windowState = 1;
+                        }
+                        this.changeWindow(this.windowState);
+                        break;
+                    case "ArrowLeft":
+                        this.windowState = this.windowState - 1;
+                        if (this.windowState < 1) {
+                            this.windowState = 3;
+                        }
+                        this.changeWindow(this.windowState);
+                        break;
+                }
             }
         }
     }
@@ -646,4 +678,5 @@ async function initializeGame() {
     game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
+    //game.startCombat(true);
 }

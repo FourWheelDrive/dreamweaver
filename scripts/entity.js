@@ -93,9 +93,62 @@ class Enemy extends Entity {
         this.contactDialogue = contactDialogue;
         this.defeatDialogue = defeatDialogue;
     }
+    //same as Player method.
+    addToInventory(newCard) {
+        let alreadyHave = false;
+        for(let i = 0; i < this.inventory.length; i++){
+            if(newCard.id == this.inventory[i].id){
+                this.inventory[i].quantity = this.inventory[i].quantity + 1;
+                alreadyHave = true;
+            }
+        }
+        if(!alreadyHave){
+            this.inventory.push(newCard);
+        }
+        this.game.updateInventoryDisplay();
+    }
 
     //also initializes the encounter screen.
     async placeCards(inTowerRange) {
+        //check tower range. Pick 2/3 random slots.
+        //Pick random cards. Enemy's cards will have cooldowns. However, enemy will have enough cards to sustain 3 card turns.
+        //fire cards. This is essentially same as player turn sequence.
+        var enemyCardPositions = [];
+        var enemyCards;
+        if(inTowerRange){
+            enemyCards = 2;
+        } else {
+            enemyCards = 3;
+        }
 
+        //Generate random card positions.
+        //Might need to be moved to another function if player messes with this.
+        for(let i = 0; i < enemyCards; i++){
+            //random number from 1 - 5, 6 exclusive.
+            let n = Math.floor(Math.random()*6)
+            //Thank you to https://stackoverflow.com/questions/2380019/generate-unique-random-numbers-between-1-and-100 !
+            if(enemyCardPositions.indexOf(n) === -1){ //if index not found, push n to card positions.
+                enemyCardPositions.push(n);
+            }
+        }
+
+        //Place random cards.
+        //AMENDEMENT: Actually, go in inventory order. Makes the enemy more predictable, when you learn its moves.
+        //needs to account for card order?
+        let index = 0;
+        for(let j = 0; j < this.inventory.length; j++){
+            //if played the number of cards.
+            if(index == enemyCards){
+                break;
+            }
+            if(this.inventory[j].onCooldown == 0){
+                this.inventory[j],cardPlayed(index);
+                index = index + 1;
+            }
+        }
+        //if ran out of cards, play filler card:
+        if(index < enemyCards){
+            //play filler card.
+        }
     }
 }
