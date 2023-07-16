@@ -14,6 +14,16 @@ class Game {
         this.currentRoom = 1;
         this.enemies = [];     //Array of enemy entities. Will be moved towards the player if within certain radius in turnHandler.
         this.currentEnemy;
+
+        this.combatCardSlots = [
+            document.getElementById("gamePage__gameSpace__combat__cardOrder__0"),
+            document.getElementById("gamePage__gameSpace__combat__cardOrder__1"),
+            document.getElementById("gamePage__gameSpace__combat__cardOrder__2"),
+            document.getElementById("gamePage__gameSpace__combat__cardOrder__3"),
+            document.getElementById("gamePage__gameSpace__combat__cardOrder__4")
+        ];
+        this.playerCardPositions = [];
+        this.enemyCardPositions = [];
     }
     //Begin a new turn each time the player moves.
     /*
@@ -70,28 +80,105 @@ class Game {
     }
 
     //Combat Functions:
+    //Handles drag/drop data.
+    initializeCombatCardSlots(){
+        //Make player card slots light up.
+        //reset card slots.
+        for(let z = 0; z < 5; z++){
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${z}`).style.border = "1px solid black";
+        }
+
+        console.log(this.playerCardPositions)
+        for(let y = 0; y < this.playerCardPositions.length; y++){
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${this.playerCardPositions[y]}`).style.border = "2px solid black";
+        }
+
+        //4) Initialize event listeners for card slots.
+        for (let m = 0; m < this.playerCardPositions.length; m++) {
+            this.combatCardSlots[this.playerCardPositions[m]].addEventListener("dragover", (e) => {
+                e.preventDefault();
+            })
+            this.combatCardSlots[this.playerCardPositions[m]].addEventListener("drop", (e) => {
+                e.preventDefault();
+                var data = e.dataTransfer.getData("text");
+                e.target.appendChild(document.getElementById(data));
+            })
+        }
+    }
     //Might need to pass in Enemy.
-    startCombat(inTowerRange){
+    startCombat(inTowerRange) {
         //1) change gameState flags
         this.gameState = 2;
         this.changeWindow(2);
         //2) make sure keyHandlers handle flags
-            //done.
-        //3) Unlock cards for combat.
-        for(let i = 0; i < this.player.inventory.length; i++){
-            //make cards draggable
-            this.player.inventory[i].domElement.setAttribute("draggable", "true");
-            //set functions for drop.
-        }
-
-        //4) Choose Player card slots, including modifiers.
-        //5) Choose Enemy card slots.
+        //done.
+        this.startCombatTurn(inTowerRange);
+        
         //6) Enemy places cards.
         //7) Player places cards.
 
 
         //8) Evaluate.
 
+    }
+    startCombatTurn(inTowerRange) {
+        //reset card slots.
+        this.playerCardPositions = [];
+        this.enemyCardPositions = [];
+        //===================================================
+        //3) Choose card slots.
+        //if(player priority): /else
+        let playerCardTotal;
+        if (inTowerRange) {
+            playerCardTotal = 3;
+        } else { playerCardTotal = 2; }
+        //4) Choose Player card slots, including modifiers.
+        //5) Choose Enemy card slots.
+        //get player card pos
+        while(this.playerCardPositions.length < playerCardTotal){
+            //random number from 0 - 4, 5 exclusive.
+            let n = Math.floor(Math.random() * 5)
+            //Thank you to https://stackoverflow.com/questions/2380019/generate-unique-random-numbers-between-1-and-100 !
+            if (this.playerCardPositions.indexOf(n) === -1) { //if index not found, push n to card positions.
+                this.playerCardPositions.push(n);
+            }
+        }
+        //get enemy card pos
+        for (let k = 0; k < 5; k++) {
+            let v = k;
+            if (this.playerCardPositions.indexOf(v) === -1) {
+                this.enemyCardPositions.push(v);
+            }
+        }
+        //===================================================
+        //3) Unlock inventory cards for combat.
+        for (let i = 0; i < this.player.inventory.length; i++) {
+            //make cards draggable
+            this.player.inventory[i].domElement.setAttribute("draggable", "true");
+            //set functions for drop.
+            //Defines data to send with drag.
+            this.player.inventory[i].domElement.addEventListener("dragstart", (e) => {
+                e.dataTransfer.setData("text", e.target.id);
+                for (let m = 0; m < this.playerCardPositions.length; m++) {
+                }
+            })
+        }
+        //Clear and re-add drag-drop event listeners.
+        for(let n = 0; n < this.combatCardSlots.length; n++){
+            this.combatCardSlots[n] = document.getElementById(`gamePage__gameSpace__combat__cardOrder__${n}`).cloneNode(true);
+        }
+        document.getElementById("gamePage__gameSpace__combat__cardOrder").replaceChildren();
+        for(let l = 0; l < this.combatCardSlots.length; l++){
+            document.getElementById("gamePage__gameSpace__combat__cardOrder").appendChild(this.combatCardSlots[l]);
+        }
+        this.initializeCombatCardSlots();
+        
+        //===================================================
+        //if all card slots filled, end turn.
+    }
+    endCombatTurn() {
+
+        //draggable = false. Evaluate damage.
     }
 
     //Key handlers:
@@ -190,14 +277,14 @@ class Game {
     async keyDownHandler(map, mapHandler, e) {
         //movement keys
         //state check
-        if(this.gameState == 1 && this.windowState == 1){
+        if (this.gameState == 1 && this.windowState == 1) {
             if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
                 this.turnHandler(map, mapHandler, e);
             }
         }
-        
+
         //window navigation keys
-        if(this.gameState == 1){
+        if (this.gameState == 1) {
             if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
                 switch (e.code) {
                     case "ArrowRight":
@@ -678,5 +765,5 @@ async function initializeGame() {
     game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
-    //game.startCombat(true);
+    game.startCombat(true);
 }
