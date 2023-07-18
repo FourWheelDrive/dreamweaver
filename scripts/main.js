@@ -13,7 +13,7 @@ class Game {
 
         this.currentRoom = 1;
         this.enemies = [];     //Array of enemy entities. Will be moved towards the player if within certain radius in turnHandler.
-        this.currentEnemy;
+        this.currentEnemy;     //Index of current enemy.
 
         this.combatCardSlots = [
             document.getElementById("gamePage__gameSpace__combat__cardOrder__0"),
@@ -24,6 +24,8 @@ class Game {
         ];
         this.playerCardPositions = [];
         this.enemyCardPositions = [];
+
+        this.cardQueue = [null, null, null, null, null]; //combat turn cards.
     }
     //Begin a new turn each time the player moves.
     /*
@@ -88,7 +90,6 @@ class Game {
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${z}`).style.border = "1px solid black";
         }
 
-        console.log(this.playerCardPositions)
         for(let y = 0; y < this.playerCardPositions.length; y++){
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${this.playerCardPositions[y]}`).style.border = "2px solid black";
         }
@@ -100,18 +101,30 @@ class Game {
             })
             this.combatCardSlots[this.playerCardPositions[m]].addEventListener("drop", (e) => {
                 e.preventDefault();
+
                 var data = e.dataTransfer.getData("text");
-                e.target.appendChild(document.getElementById(data));
+                this.player.inventory[data].cardPlayed(this.playerCardPositions[m]);
+                //Transfer inventory data instead. Use card.cardPlayed() to move things into new div on drop.
+                //e.target.appendChild(document.getElementById(data));
+
+                //Sweep check for if this was the last card in queue.
+                if(this.cardQueue.length == 5 && this.cardQueue.indexOf(null) === -1){
+                    this.endCombatTurn();
+                }
             })
         }
     }
     //Might need to pass in Enemy.
-    startCombat(inTowerRange) {
+    startCombat(inTowerRange, currentEnemyIndex) {
         //1) change gameState flags
         this.gameState = 2;
         this.changeWindow(2);
+        this.currentEnemy = currentEnemyIndex;
         //2) make sure keyHandlers handle flags
         //done.
+        //clear cardq
+        this.cardQueue = [null, null, null, null, null];
+        //start turn.
         this.startCombatTurn(inTowerRange);
         
         //6) Enemy places cards.
@@ -158,7 +171,9 @@ class Game {
             //set functions for drop.
             //Defines data to send with drag.
             this.player.inventory[i].domElement.addEventListener("dragstart", (e) => {
-                e.dataTransfer.setData("text", e.target.id);
+
+                //send ("text", i) instead? We can use player.inventory[i] on the other side to trigger card response.
+                e.dataTransfer.setData("text", i);
                 for (let m = 0; m < this.playerCardPositions.length; m++) {
                 }
             })
@@ -172,13 +187,25 @@ class Game {
             document.getElementById("gamePage__gameSpace__combat__cardOrder").appendChild(this.combatCardSlots[l]);
         }
         this.initializeCombatCardSlots();
-        
         //===================================================
-        //if all card slots filled, end turn.
+        //4) Place enemy cards.
+        //===================================================
+        //if all card slots filled, end turn. HOW DO I DETECT THIS, WTH?
+        //Add a check at the end of each ondrop listener to check if queue is filled??
     }
     endCombatTurn() {
-
+        console.log("ended turn")
+        //===================================================
+        //Freeze combat flags.
         //draggable = false. Evaluate damage.
+        for (let i = 0; i < this.player.inventory.length; i++) {
+            this.player.inventory[i].domElement.setAttribute("draggable", "false");
+        }
+        //===================================================
+        //evaluate cards.
+        for(let j = 0; j < this.cardQueue.length; j++){
+            this.cardQueue[j].cardPlayed(j);
+        }
     }
 
     //Key handlers:

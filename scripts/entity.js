@@ -84,11 +84,12 @@ class Player extends Entity {
 }
 
 class Enemy extends Entity {
-    constructor(health, canvasSymbol, attack, name, contactDialogue = [], defeatDialogue = []) {
+    constructor(health, canvasSymbol, index, name, contactDialogue = [], defeatDialogue = []) {
         super(health, canvasSymbol);
         this.inventory = [];
 
         this.name = name;
+        this.index = index;
         //for dialogues, pass in arrays! We'll cycle through the array in the output.
         this.contactDialogue = contactDialogue;
         this.defeatDialogue = defeatDialogue;
@@ -122,7 +123,7 @@ class Enemy extends Entity {
                 break;
             }
             if(this.inventory[j].onCooldown == 0){
-                this.inventory[j],cardPlayed(index);
+                this.inventory[j].cardPlayed(index);
                 index = index + 1;
             }
         }

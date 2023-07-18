@@ -74,10 +74,21 @@ class Card{
 
     //this needs to deal damage to target and apply effects.
     //How to proccess effects? >>Process at the end of the turn. Separate effect object?
-    //does this need to have a position argument? (position in queue)
+    //position in queue: 0-4
+
+    //might need 2 methods. 1 when drag-drop update, and 1 to evaluate card.
+    //Drag-Drop Update
     cardPlayed(position){
         this.onCooldown = this.cooldown;
+        //add this card to game.cardQueue at the position it was played.
+
+        console.log(position)
     }
+    //Evaluation Check
+    cardEvaluated(){
+
+    }
+
     //handles cooldowns each turn.
     iterateCooldown(){
         if(this.onCooldown > 0){
