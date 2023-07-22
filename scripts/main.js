@@ -36,7 +36,7 @@ class Game {
     - display vision
     - check for special locations
     */
-    async turnHandler(map, mapHandler, e) {
+    async turnHandler(map, e) {
         map.hideCells();
 
         //Show Tower vision.
@@ -46,7 +46,29 @@ class Game {
             }
         }
 
-        this.playerMovementHandler(map.mapArray, mapHandler, e.code);
+        var movementCode;
+        //Check input type!
+        //Mouse input
+        if(e.type == "click"){
+            switch(e.target.id){
+                case "gamePage__gameSpace__map__mapMvmtW":
+                    movementCode = "KeyW";
+                    break;
+                case "gamePage__gameSpace__map__mapMvmtA":
+                    movementCode = "KeyA";
+                    break;
+                case "gamePage__gameSpace__map__mapMvmtS":
+                    movementCode = "KeyS";
+                    break;
+                case "gamePage__gameSpace__map__mapMvmtD":
+                    movementCode = "KeyD";
+                    break;
+            }
+        } else {
+            //Keyboard input
+            movementCode = e.code;
+        }
+        this.playerMovementHandler(map.mapArray, map, movementCode);
         //^ handles moving the player and showing the player!
     }
 
@@ -83,14 +105,14 @@ class Game {
 
     //Combat Functions:
     //Handles drag/drop data.
-    initializeCombatCardSlots(){
+    initializeCombatCardSlots() {
         //Make player card slots light up.
         //reset card slots.
-        for(let z = 0; z < 5; z++){
+        for (let z = 0; z < 5; z++) {
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${z}`).style.border = "1px solid black";
         }
 
-        for(let y = 0; y < this.playerCardPositions.length; y++){
+        for (let y = 0; y < this.playerCardPositions.length; y++) {
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${this.playerCardPositions[y]}`).style.border = "2px solid black";
         }
 
@@ -108,7 +130,7 @@ class Game {
                 //e.target.appendChild(document.getElementById(data));
 
                 //Sweep check for if this was the last card in queue.
-                if(this.cardQueue.length == 5 && this.cardQueue.indexOf(null) === -1){
+                if (this.cardQueue.length == 5 && this.cardQueue.indexOf(null) === -1) {
                     this.endCombatTurn();
                 }
             })
@@ -126,7 +148,7 @@ class Game {
         this.cardQueue = [null, null, null, null, null];
         //start turn.
         this.startCombatTurn(inTowerRange);
-        
+
         //6) Enemy places cards.
         //7) Player places cards.
 
@@ -148,7 +170,7 @@ class Game {
         //4) Choose Player card slots, including modifiers.
         //5) Choose Enemy card slots.
         //get player card pos
-        while(this.playerCardPositions.length < playerCardTotal){
+        while (this.playerCardPositions.length < playerCardTotal) {
             //random number from 0 - 4, 5 exclusive.
             let n = Math.floor(Math.random() * 5)
             //Thank you to https://stackoverflow.com/questions/2380019/generate-unique-random-numbers-between-1-and-100 !
@@ -179,11 +201,11 @@ class Game {
             })
         }
         //Clear and re-add drag-drop event listeners.
-        for(let n = 0; n < this.combatCardSlots.length; n++){
+        for (let n = 0; n < this.combatCardSlots.length; n++) {
             this.combatCardSlots[n] = document.getElementById(`gamePage__gameSpace__combat__cardOrder__${n}`).cloneNode(true);
         }
         document.getElementById("gamePage__gameSpace__combat__cardOrder").replaceChildren();
-        for(let l = 0; l < this.combatCardSlots.length; l++){
+        for (let l = 0; l < this.combatCardSlots.length; l++) {
             document.getElementById("gamePage__gameSpace__combat__cardOrder").appendChild(this.combatCardSlots[l]);
         }
         this.initializeCombatCardSlots();
@@ -203,7 +225,7 @@ class Game {
         }
         //===================================================
         //evaluate cards.
-        for(let j = 0; j < this.cardQueue.length; j++){
+        for (let j = 0; j < this.cardQueue.length; j++) {
             this.cardQueue[j].cardPlayed(j);
         }
     }
@@ -301,33 +323,74 @@ class Game {
         mapHandler.showPlayer(this.player);
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
-    async keyDownHandler(map, mapHandler, e) {
-        //movement keys
-        //state check
-        if (this.gameState == 1 && this.windowState == 1) {
-            if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
-                this.turnHandler(map, mapHandler, e);
+    async keyDownHandler(e, map = null) {
+        //Keyboard handlers from document listeners.
+        if (e.type == "keyPress") {
+            //movement keys
+            //state check
+            if (this.gameState == 1 && this.windowState == 1) {
+                if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
+                    this.turnHandler(map, e);
+                }
+            }
+
+            //window navigation keys
+            if (this.gameState == 1) {
+                if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
+                    switch (e.code) {
+                        case "ArrowRight":
+                            this.windowState = this.windowState + 1;
+                            if (this.windowState > 3) {
+                                this.windowState = 1;
+                            }
+                            this.changeWindow(this.windowState);
+                            break;
+                        case "ArrowLeft":
+                            this.windowState = this.windowState - 1;
+                            if (this.windowState < 1) {
+                                this.windowState = 3;
+                            }
+                            this.changeWindow(this.windowState);
+                            break;
+                    }
+                }
             }
         }
+        //Mouse handlers from button listeners. (More complete)
+        if (e.type == "click") {
+            //Movement keys.
+            //state check
+            if (this.gameState == 1 && this.windowState == 1) {
+                if (e.target.id == "gamePage__gameSpace__map__mapMvmtW" || 
+                e.target.id == "gamePage__gameSpace__map__mapMvmtA" || 
+                e.target.id == "gamePage__gameSpace__map__mapMvmtS" || 
+                e.target.id == "gamePage__gameSpace__map__mapMvmtD") {
+                    this.turnHandler(map, e);
+                }
+            }
 
-        //window navigation keys
-        if (this.gameState == 1) {
-            if (e.code == "ArrowRight" || e.code == "ArrowLeft") {
-                switch (e.code) {
-                    case "ArrowRight":
-                        this.windowState = this.windowState + 1;
-                        if (this.windowState > 3) {
-                            this.windowState = 1;
-                        }
-                        this.changeWindow(this.windowState);
-                        break;
-                    case "ArrowLeft":
-                        this.windowState = this.windowState - 1;
-                        if (this.windowState < 1) {
-                            this.windowState = 3;
-                        }
-                        this.changeWindow(this.windowState);
-                        break;
+            //window navigation keys
+            if (this.gameState == 1) {
+                if (e.target.id == "gamePage__header__left" || e.target.id == "gamePage__header__right"||
+                e.target.id == "gamePage__header__leftWindowDisplay" || e.target.id == "gamePage__header__rightWindowDisplay") {
+                    switch (e.target.id) {
+                        case "gamePage__header__left":
+                        case "gamePage__header__leftWindowDisplay":
+                            this.windowState = this.windowState + 1;
+                            if (this.windowState > 3) {
+                                this.windowState = 1;
+                            }
+                            this.changeWindow(this.windowState);
+                            break;
+                        case "gamePage__header__right":
+                        case "gamePage__header__rightWindowDisplay":
+                            this.windowState = this.windowState - 1;
+                            if (this.windowState < 1) {
+                                this.windowState = 3;
+                            }
+                            this.changeWindow(this.windowState);
+                            break;
+                    }
                 }
             }
         }
@@ -773,8 +836,21 @@ async function initializeGame() {
     //Input handlers.
     //KEYBOARD input, handled in Game.
     document.addEventListener("keydown", (e) => {
-        game.keyDownHandler(map, map, e);
+        game.keyDownHandler(e, map);
     })
+    //MOUSE input, also handled in Game.
+    var mapMouseButtons = document.getElementsByClassName("mapMvmtButton");
+    for (var i = 0; i < mapMouseButtons.length; i++) {
+        mapMouseButtons[i].addEventListener("click", (e) => {
+            game.keyDownHandler(e, map);
+        })
+    }
+    var windowNavButtons = document.getElementsByClassName("windowNavButtons");
+    for (var j = 0; j < windowNavButtons.length; j++){
+        windowNavButtons[j].addEventListener("click", (e) => {
+            game.keyDownHandler(e, map);
+        })
+    }
 
     //Add listeners to attack and movement buttons.
     //initAtkListener();
@@ -786,11 +862,10 @@ async function initializeGame() {
     await sleep(1000);
     pushMainOutput("Press Z for help!");
 
-
     //INVENTORY TESTING
     game.player.addToInventory(new Card(-1, game.player));
     game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
-    game.startCombat(true);
+    //game.startCombat(true);
 }

@@ -15,7 +15,7 @@ body {
 /*Text elements. Actually using h1 n stuff now!*/
 p {
     font-family: monospace;
-    font-size: 15px;
+    font-size: 1rem;
     line-height: 100%;
     letter-spacing: 2px;
     text-align: center;
@@ -98,9 +98,11 @@ button{color: black;}
 /*This one will change as the windows do.*/
 #gamePage__gameSpace{
     position: relative;
-    height: 100%;
+    height: auto;
     width: 100%;
     grid-area: gameSpace;
+
+    overflow: scroll;
 }
 
 /*footer*/

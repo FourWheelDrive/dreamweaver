@@ -11,6 +11,8 @@
         "card inventory";
     grid-template-columns: 1fr 3fr;
     grid-template-rows: 3fr 1fr 3fr 4fr;
+
+    overflow: auto;
 }
 
 #gamePage__gameSpace__combat__spriteDisplay {
@@ -24,7 +26,7 @@
 }
 
 #gamePage__gameSpace__combat__cardOrder {
-    padding: 2%;
+    padding: 1%;
     grid-area: board;
     display: flex;
 
@@ -37,6 +39,7 @@
 
 /*CARD CLASS STYLES. APPLIES TO SLOTS & INVENTORY CARDS!*/
 .combatCardSlot {
+    position: relative;
     height: 100%;
     width: 16%;
 
@@ -45,12 +48,22 @@
 
     display: flex;
     flex-direction: column;
-
-    overflow: auto;
-    overflow-wrap: break-word;
 }
 .combatCardSlot:hover {
     box-shadow: 5px 5px 2px lightgray;
+}
+.magStat{
+    position: absolute;
+    top: calc(86% - 0.5rem);
+    left: calc(50% - 1rem);
+
+    padding: 1%;
+    margin: none;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    height: 1rem;
+    width: 2rem;
 }
 
 .inventoryCard {

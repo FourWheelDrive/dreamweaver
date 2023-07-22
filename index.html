@@ -92,15 +92,13 @@
         <!--Header for navigation. Ooh! Maybe only display one, nav with arrow keys for keyboard controls?-->
         <div id="gamePage__header">
             <div class="navDiv">
-                <button id="gamePage__header__left" class="windowNavButtons"
-                    onclick="windowNavButtonHandler(event)">&lt</button>
+                <button id="gamePage__header__left" class="windowNavButtons">&lt</button>
                 <p id="gamePage__header__leftWindowDisplay" class="navWindowDisplay">shop</p>
             </div>
             <!--Displays the current window.-->
             <h1 id="gamePage__header__windowDisplay"></h1>
             <div class="navDiv">
-                <button id="gamePage__header__right" class="windowNavButtons"
-                    onclick="windowNavButtonHandler(event)">&gt</button>
+                <button id="gamePage__header__right" class="windowNavButtons">&gt</button>
                 <p id="gamePage__header__rightWindowDisplay" class="navWindowDisplay">inventory</p>
             </div>
         </div>
@@ -134,11 +132,26 @@
                 </div>
                 <!--For displaying card turn order.-->
                 <div id="gamePage__gameSpace__combat__cardOrder">
-                    <div id="gamePage__gameSpace__combat__cardOrder__0" class="combatCardSlot"></div>
-                    <div id="gamePage__gameSpace__combat__cardOrder__1" class="combatCardSlot"></div>
-                    <div id="gamePage__gameSpace__combat__cardOrder__2" class="combatCardSlot"></div>
-                    <div id="gamePage__gameSpace__combat__cardOrder__3" class="combatCardSlot"></div>
-                    <div id="gamePage__gameSpace__combat__cardOrder__4" class="combatCardSlot"></div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__0" class="combatCardSlot">
+                        <p id="gamePage__gameSpace__combat__cardOrder__0__name"></p>
+                        <p id="gamePage__gameSpace__combat__cardOrder__0__magStat" class="magStat"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__1" class="combatCardSlot">
+                        <p id="gamePage__gameSpace__combat__cardOrder__1__name"></p>
+                        <p id="gamePage__gameSpace__combat__cardOrder__1__magStat" class="magStat"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__2" class="combatCardSlot">
+                        <p id="gamePage__gameSpace__combat__cardOrder__2__name"></p>
+                        <p id="gamePage__gameSpace__combat__cardOrder__2__magStat" class="magStat"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__3" class="combatCardSlot">
+                        <p id="gamePage__gameSpace__combat__cardOrder__3__name"></p>
+                        <p id="gamePage__gameSpace__combat__cardOrder__3__magStat" class="magStat"></p>
+                    </div>
+                    <div id="gamePage__gameSpace__combat__cardOrder__4" class="combatCardSlot">
+                        <p id="gamePage__gameSpace__combat__cardOrder__4__name"></p>
+                        <p id="gamePage__gameSpace__combat__cardOrder__4__magStat" class="magStat"></p>
+                    </div>
                 </div>
                 <!--For displaying cards in inventory.-->
                 <div id="gamePage__gameSpace__combat__inventoryDisplay"></div>
@@ -146,14 +159,20 @@
                 <!--Select a card to blow it up and view it here.-->
                 <div id="gamePage__gameSpace__combat__fullDisplays">
                     <div id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay">
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type"  class="fullDisplayText"></p>
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name"            class="fullDisplayText"></p>
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore"            class="fullDisplayText"></p>
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description"     class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type"
+                            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name"
+                            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore"
+                            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description"
+                            class="fullDisplayText"></p>
                     </div>
                     <div id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay">
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name"          class="fullDisplayText"></p>
-                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description"   class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name"
+                            class="fullDisplayText"></p>
+                        <p id="gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description"
+                            class="fullDisplayText"></p>
                     </div>
                 </div>
             </div>
