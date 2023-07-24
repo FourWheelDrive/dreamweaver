@@ -1,5 +1,5 @@
 class Entity {
-    constructor(health, canvasSymbol, mapX, mapY) {
+    constructor(health, game, canvasSymbol) {
         this.health = health;
         this.canvasSymbol = canvasSymbol;
 
@@ -8,9 +8,11 @@ class Entity {
 
         this.inventory = [];
 
-        this.mapX = mapX;
-        this.mapY = mapY;
+        this.mapX;  //get position with getInitialPosition();
+        this.mapY;
         this.position;
+
+        this.game = game; //<-- game object.
     }
 
     //INITIALIZE Functions
@@ -18,6 +20,9 @@ class Entity {
     getInitialPosition(mapWidth, mapHeight) {
         if(this.constructor.name == "Player"){
             this.updatePosition(Math.ceil(mapWidth / 2), Math.ceil(mapHeight / 2)); //For Player only!
+        }
+        if(this.constructor.name == "Enemy"){
+            //random location on #PathCell.
         }
     }
     //UPDATE Functions
@@ -36,7 +41,7 @@ class Entity {
 }
 class Player extends Entity {
     constructor(health, game) {
-        super(health, "@");
+        super(health, game, "@");
         this.equipped = [null, null, null, null];        //four Encounter slots.
 
         this.inventory = [];           //Array of item objects.
@@ -51,8 +56,6 @@ class Player extends Entity {
 
         this.wishes = health;
         this.visionRange = 2;
-
-        this.game = game; //the game object. Has helpful methods.
 
         //set up header. Player uses Wishes as max health.
         document.getElementById("gamePage__footer__health").innerHTML = `Wishes: ${this.health}/${this.wishes}`;
@@ -84,8 +87,8 @@ class Player extends Entity {
 }
 
 class Enemy extends Entity {
-    constructor(health, canvasSymbol, index, name, contactDialogue = [], defeatDialogue = []) {
-        super(health, canvasSymbol);
+    constructor(health, game, canvasSymbol, index, name, contactDialogue = [], defeatDialogue = []) {
+        super(health, game, canvasSymbol);
         this.inventory = [];
 
         this.name = name;

@@ -49,8 +49,8 @@ class Game {
         var movementCode;
         //Check input type!
         //Mouse input
-        if(e.type == "click"){
-            switch(e.target.id){
+        if (e.type == "click") {
+            switch (e.target.id) {
                 case "gamePage__gameSpace__map__mapMvmtW":
                     movementCode = "KeyW";
                     break;
@@ -125,7 +125,7 @@ class Game {
                 e.preventDefault();
 
                 var data = e.dataTransfer.getData("text");
-                this.player.inventory[data].cardPlayed(this.playerCardPositions[m]);
+                this.player.inventory[data].cardPlayed(this.playerCardPositions[m], this);
                 //Transfer inventory data instead. Use card.cardPlayed() to move things into new div on drop.
                 //e.target.appendChild(document.getElementById(data));
 
@@ -226,7 +226,7 @@ class Game {
         //===================================================
         //evaluate cards.
         for (let j = 0; j < this.cardQueue.length; j++) {
-            this.cardQueue[j].cardPlayed(j);
+            this.cardQueue[j].cardEvaluated(j);
         }
     }
 
@@ -325,7 +325,7 @@ class Game {
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
     async keyDownHandler(e, map = null) {
         //Keyboard handlers from document listeners.
-        if (e.type == "keyPress") {
+        if (e.type == "keydown") {
             //movement keys
             //state check
             if (this.gameState == 1 && this.windowState == 1) {
@@ -361,29 +361,29 @@ class Game {
             //Movement keys.
             //state check
             if (this.gameState == 1 && this.windowState == 1) {
-                if (e.target.id == "gamePage__gameSpace__map__mapMvmtW" || 
-                e.target.id == "gamePage__gameSpace__map__mapMvmtA" || 
-                e.target.id == "gamePage__gameSpace__map__mapMvmtS" || 
-                e.target.id == "gamePage__gameSpace__map__mapMvmtD") {
+                if (e.target.id == "gamePage__gameSpace__map__mapMvmtW" ||
+                    e.target.id == "gamePage__gameSpace__map__mapMvmtA" ||
+                    e.target.id == "gamePage__gameSpace__map__mapMvmtS" ||
+                    e.target.id == "gamePage__gameSpace__map__mapMvmtD") {
                     this.turnHandler(map, e);
                 }
             }
 
             //window navigation keys
             if (this.gameState == 1) {
-                if (e.target.id == "gamePage__header__left" || e.target.id == "gamePage__header__right"||
-                e.target.id == "gamePage__header__leftWindowDisplay" || e.target.id == "gamePage__header__rightWindowDisplay") {
+                if (e.target.id == "gamePage__header__left" || e.target.id == "gamePage__header__right" ||
+                    e.target.id == "gamePage__header__leftWindowDisplay" || e.target.id == "gamePage__header__rightWindowDisplay") {
                     switch (e.target.id) {
-                        case "gamePage__header__left":
-                        case "gamePage__header__leftWindowDisplay":
+                        case "gamePage__header__right":
+                        case "gamePage__header__rightWindowDisplay":
                             this.windowState = this.windowState + 1;
                             if (this.windowState > 3) {
                                 this.windowState = 1;
                             }
                             this.changeWindow(this.windowState);
                             break;
-                        case "gamePage__header__right":
-                        case "gamePage__header__rightWindowDisplay":
+                        case "gamePage__header__left":
+                        case "gamePage__header__leftWindowDisplay":
                             this.windowState = this.windowState - 1;
                             if (this.windowState < 1) {
                                 this.windowState = 3;
@@ -846,7 +846,7 @@ async function initializeGame() {
         })
     }
     var windowNavButtons = document.getElementsByClassName("windowNavButtons");
-    for (var j = 0; j < windowNavButtons.length; j++){
+    for (var j = 0; j < windowNavButtons.length; j++) {
         windowNavButtons[j].addEventListener("click", (e) => {
             game.keyDownHandler(e, map);
         })
@@ -867,5 +867,5 @@ async function initializeGame() {
     game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
-    //game.startCombat(true);
+    game.startCombat(true);
 }

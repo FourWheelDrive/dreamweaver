@@ -1,5 +1,5 @@
 class Card{
-    constructor(id, owner){
+    constructor(id, owner, quantity = 1){
         this.name;
         this.type; //P or A
         this.lore;
@@ -14,7 +14,7 @@ class Card{
         this.onCooldown = 0;    //tracks turns until cooldown lifted.
         this.price;    //in Wishes. For forging.
 
-        this.quantity;//Tracker for inventory purposes. Tracks # charges.
+        this.quantity = quantity;//Tracker for inventory purposes. Tracks # charges.
         this.id = id; //ID for quick identification in code.
         this.domElement; //DOM Element for quick processing.
 
@@ -78,15 +78,23 @@ class Card{
 
     //might need 2 methods. 1 when drag-drop update, and 1 to evaluate card.
     //Drag-Drop Update
-    cardPlayed(position){
+    cardPlayed(position, game){
         this.onCooldown = this.cooldown;
         //add this card to game.cardQueue at the position it was played.
 
+        //console.log(this.owner.game.gameState); //<-- find game in owner object.
+        //^^^^ passed in game instead for better readability.
+
+        //Add this card to the Queue.
+        game.cardQueue[position] = this;
+        //Update display screen.
         console.log(position)
+        document.getElementById(`gamePage__gameSpace__combat__cardOrder__${position}__name`).innerHTML = this.name;
+        document.getElementById(`gamePage__gameSpace__combat__cardOrder__${position}__magStat`).innerHTML = this.quantity;
     }
     //Evaluation Check
     cardEvaluated(){
-
+        
     }
 
     //handles cooldowns each turn.
