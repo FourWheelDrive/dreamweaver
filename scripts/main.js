@@ -24,6 +24,7 @@ class Game {
         ];
         this.playerCardPositions = [];
         this.enemyCardPositions = [];
+        this.filledCardPositions = [];
 
         this.cardQueue = [null, null, null, null, null]; //combat turn cards.
     }
@@ -104,59 +105,58 @@ class Game {
     }
 
     //Combat Functions:
-    //Handles drag/drop data.
-    initializeCombatCardSlots() {
-        //Make player card slots light up.
-        //reset card slots.
-        for (let z = 0; z < 5; z++) {
-            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${z}`).style.border = "1px solid black";
-        }
 
-        for (let y = 0; y < this.playerCardPositions.length; y++) {
-            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${this.playerCardPositions[y]}`).style.border = "2px solid black";
-        }
-
-        //4) Initialize event listeners for card slots.
-        for (let m = 0; m < this.playerCardPositions.length; m++) {
-            this.combatCardSlots[this.playerCardPositions[m]].addEventListener("dragover", (e) => {
-                e.preventDefault();
-            })
-            this.combatCardSlots[this.playerCardPositions[m]].addEventListener("drop", (e) => {
-                e.preventDefault();
-
-                var data = e.dataTransfer.getData("text");
-                this.player.inventory[data].cardPlayed(this.playerCardPositions[m], this);
-                //Transfer inventory data instead. Use card.cardPlayed() to move things into new div on drop.
-                //e.target.appendChild(document.getElementById(data));
-
-                //Sweep check for if this was the last card in queue.
-                if (this.cardQueue.length == 5 && this.cardQueue.indexOf(null) === -1) {
-                    this.endCombatTurn();
-                }
-            })
-        }
-    }
-    //Might need to pass in Enemy.
+    //Sets flags and changes gamestates for combat.
     startCombat(inTowerRange, currentEnemyIndex) {
         //1) change gameState flags
         this.gameState = 2;
         this.changeWindow(2);
-        this.currentEnemy = currentEnemyIndex;
+        this.currentEnemy = this.enemies[currentEnemyIndex];
+
+        this.startCombatTurn(inTowerRange);
+    }
+    //Sets flags and ends combat.
+    endCombat() {
+
+    }
+
+    //Clears queue and sets up each card turn.
+    startCombatTurn(inTowerRange) {
         //2) make sure keyHandlers handle flags
         //done.
         //clear cardq
         this.cardQueue = [null, null, null, null, null];
+        this.filledCardPositions = [];
+        //3) update displays.
+        document.getElementById("gamePage__gameSpace__combat__entityStats__playerStats__health").innerHTML = `${this.player.health}`;
+        document.getElementById("gamePage__gameSpace__combat__entityStats__enemyStats__health").innerHTML = `${this.currentEnemy.health}`
+
         //start turn.
-        this.startCombatTurn(inTowerRange);
-
-        //6) Enemy places cards.
-        //7) Player places cards.
-
-
-        //8) Evaluate.
-
+        //Find card positions
+        this.generateCardSlots(inTowerRange);
+        //Enemy places cards.
+        //this.enemies[currentEnemyIndex].placeCards(this.enemyCardPositions);
+        //Unlock player cards. Player places cards.
+        this.unlockPlayerCards();
+        this.initializeCombatCardSlots();
     }
-    startCombatTurn(inTowerRange) {
+    //Evaluates card queue. Evaluates win conditions.
+    endCombatTurn() {
+        console.log("ended turn")
+        //===================================================
+        //Freeze combat flags.
+        //draggable = false. Evaluate damage.
+        for (let i = 0; i < this.player.inventory.length; i++) {
+            this.player.inventory[i].domElement.setAttribute("draggable", "false");
+        }
+        //===================================================
+        //evaluate cards.
+        for (let j = 0; j < this.cardQueue.length; j++) {
+            this.cardQueue[j].cardEvaluated(j);
+        }
+    }
+
+    generateCardSlots(inTowerRange) {
         //reset card slots.
         this.playerCardPositions = [];
         this.enemyCardPositions = [];
@@ -185,20 +185,25 @@ class Game {
                 this.enemyCardPositions.push(v);
             }
         }
+    }
+
+    unlockPlayerCards() {
         //===================================================
         //3) Unlock inventory cards for combat.
         for (let i = 0; i < this.player.inventory.length; i++) {
-            //make cards draggable
-            this.player.inventory[i].domElement.setAttribute("draggable", "true");
-            //set functions for drop.
-            //Defines data to send with drag.
-            this.player.inventory[i].domElement.addEventListener("dragstart", (e) => {
+            //make cards draggable if onCooldown is off.
+            if (this.player.inventory[i].onCooldown == 0) {
+                this.player.inventory[i].domElement.setAttribute("draggable", "true");
+                //set functions for drop.
+                //Defines data to send with drag.
+                this.player.inventory[i].domElement.addEventListener("dragstart", (e) => {
 
-                //send ("text", i) instead? We can use player.inventory[i] on the other side to trigger card response.
-                e.dataTransfer.setData("text", i);
-                for (let m = 0; m < this.playerCardPositions.length; m++) {
-                }
-            })
+                    //send ("text", i) instead? We can use player.inventory[i] on the other side to trigger card response.
+                    e.dataTransfer.setData("text", i);
+                    for (let m = 0; m < this.playerCardPositions.length; m++) {
+                    }
+                })
+            }
         }
         //Clear and re-add drag-drop event listeners.
         for (let n = 0; n < this.combatCardSlots.length; n++) {
@@ -208,25 +213,44 @@ class Game {
         for (let l = 0; l < this.combatCardSlots.length; l++) {
             document.getElementById("gamePage__gameSpace__combat__cardOrder").appendChild(this.combatCardSlots[l]);
         }
-        this.initializeCombatCardSlots();
         //===================================================
-        //4) Place enemy cards.
-        //===================================================
-        //if all card slots filled, end turn. HOW DO I DETECT THIS, WTH?
+        //if all card slots filled, end turn. HOW DO I DETECT THIS, WTH? Check if thing onDrop worked.
         //Add a check at the end of each ondrop listener to check if queue is filled??
     }
-    endCombatTurn() {
-        console.log("ended turn")
-        //===================================================
-        //Freeze combat flags.
-        //draggable = false. Evaluate damage.
-        for (let i = 0; i < this.player.inventory.length; i++) {
-            this.player.inventory[i].domElement.setAttribute("draggable", "false");
+    //Handles drag/drop data.
+    //initializeCombatCardSlots must go after unlockPlayerCards <-- clones cardOrder nodes.
+    initializeCombatCardSlots() {
+        //Make player card slots light up.
+        //reset card slots.
+        for (let z = 0; z < 5; z++) {
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${z}`).style.border = "1px solid black";
         }
-        //===================================================
-        //evaluate cards.
-        for (let j = 0; j < this.cardQueue.length; j++) {
-            this.cardQueue[j].cardEvaluated(j);
+
+        for (let y = 0; y < this.playerCardPositions.length; y++) {
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${this.playerCardPositions[y]}`).style.border = "2px solid black";
+        }
+
+        //4) Initialize event listeners for card slots.
+        for (let m = 0; m < this.playerCardPositions.length; m++) {
+            //only drop on unfilled slots.
+            if (this.filledCardPositions.indexOf(this.playerCardPositions[m]) === -1) {
+                this.combatCardSlots[this.playerCardPositions[m]].addEventListener("dragover", (e) => {
+                    e.preventDefault();
+                })
+                this.combatCardSlots[this.playerCardPositions[m]].addEventListener("drop", (e) => {
+                    e.preventDefault();
+
+                    var data = e.dataTransfer.getData("text");
+                    this.player.inventory[data].cardPlayed(this.playerCardPositions[m], this);
+                    //Transfer inventory data instead. Use card.cardPlayed() to move things into new div on drop.
+                    //e.target.appendChild(document.getElementById(data));
+
+                    //Sweep check for if this was the last card in queue.
+                    if (this.cardQueue.indexOf(null) === -1) {
+                        this.endCombatTurn();
+                    }
+                })
+            }
         }
     }
 
@@ -539,6 +563,7 @@ class MapHandler {
                         //X AND Y ARE PATH CHECKS.
 
                         console.log("PathFound!") //<== this got infinite looped. Why?
+                        console.log(`x: ${x} y:${y}`)
                         //This is the actual test part. Scalability comes from here!
                         switch (type) {
                             case "Tower":
@@ -867,5 +892,7 @@ async function initializeGame() {
     game.player.addToInventory(new Card(-2, game.player));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
-    game.startCombat(true);
+
+    game.enemies.push(new Enemy(10, game, "!", -1));
+    game.startCombat(true, 0);
 }

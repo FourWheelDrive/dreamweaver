@@ -28,6 +28,14 @@ class Entity {
     //UPDATE Functions
     changeHealth(difference){
         this.health = this.health - difference;
+        switch(this.constructor.name){
+            case "Player":
+                document.getElementById("gamePage__gameSpace__combat__entityStats__playerStats__health").innerHTML = this.health;
+                break;
+            case "Enemy":
+                document.getElementById("gamePage__gameSpace__combat__entityStats__enemyStats__health").innerHTML = this.health;
+                break;
+        }
     }
     //This needs to check if item already exists in inventory, and then add 1 to that quantity.
     addToInventory(item){
@@ -76,6 +84,17 @@ class Player extends Entity {
         }
         this.game.updateInventoryDisplay();
     }
+    //if quantity decreases to 0.
+    removeFromInventory(card){
+        this.inventory.splice(this.inventory.indexOf(card), 1);
+        this.game.updateInventoryDisplay();
+
+        if(this.game.gameState == 2){
+            //initializeCombatCardSlots must go after unlockPlayerCards <-- clones cardOrder nodes.
+            this.game.unlockPlayerCards();
+            this.game.initializeCombatCardSlots();
+        }
+    }
     //Wishes.
     updateWishes(addedDiff) {
         this.wishes = this.wishes + addedDiff;
@@ -87,16 +106,26 @@ class Player extends Entity {
 }
 
 class Enemy extends Entity {
-    constructor(health, game, canvasSymbol, index, name, contactDialogue = [], defeatDialogue = []) {
+    constructor(health, game, canvasSymbol, index) {
         super(health, game, canvasSymbol);
         this.inventory = [];
-
-        this.name = name;
         this.index = index;
+
+        this.name;
         //for dialogues, pass in arrays! We'll cycle through the array in the output.
-        this.contactDialogue = contactDialogue;
-        this.defeatDialogue = defeatDialogue;
+        this.contactDialogue;
+        this.defeatDialogue;
     }
+    initializeEnemy(){
+        switch(this.index){
+            case -1:
+                this.name = "test enemy";
+                this.contactDialogue = ["Heheheha! I am amogus"];
+                this.defeatDialogue = ["o noes"];
+                break;
+        }
+    }
+
     //same as Player method.
     addToInventory(newCard) {
         let alreadyHave = false;

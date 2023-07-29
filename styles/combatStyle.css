@@ -22,7 +22,26 @@
 
 #gamePage__gameSpace__combat__entityStats {
     grid-area: stats;
-    display: grid;
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+}
+.entityStatsDiv{
+    display: flex;
+    flex-direction: column;
+}
+.entityStatsWrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.entityStats{
+    padding: 0;
+    margin: 0;
+}
+.entityEffects{
+    border: 1px dotted black;
 }
 
 #gamePage__gameSpace__combat__cardOrder {

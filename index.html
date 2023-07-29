@@ -119,15 +119,19 @@
                 Should also include entity health and effect.s-->
                 <canvas id="gamePage__gameSpace__combat__spriteDisplay"></canvas>
                 <div id="gamePage__gameSpace__combat__entityStats">
-                    <div id="gamePage__gameSpace__combat__entityStats__playerStats">
-                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__health"></p>
-                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeBuff"></p>
-                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeDebuff"></p>
+                    <div id="gamePage__gameSpace__combat__entityStats__playerStats" class="entityStatsDiv">
+                        <p id="gamePage__gameSpace__combat__entityStats__playerStats__health" class="entityStats">Health:</p>
+                        <div id="gamePage__gameSpace__combat__entityStats__playerStats__wrapper" class="entityStatsWrapper">
+                            <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeBuff" class="entityStats entityEffects">+</p>
+                            <p id="gamePage__gameSpace__combat__entityStats__playerStats__activeDebuff" class="entityStats entityEffects">-</p>
+                        </div>
                     </div>
-                    <div id="gamePage__gameSpace__combat__entityStats__enemyStats">
-                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__health"></p>
-                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeBuff"></p>
-                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeDebuff"></p>
+                    <div id="gamePage__gameSpace__combat__entityStats__enemyStats" class="entityStatsDiv">
+                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__health" class="entityStats">Health:</p>
+                        <div id="gamePage__gameSpace__combat__entityStats__enemyStats__wrapper" class="entityStatsWrapper">
+                            <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeBuff" class="entityStats entityEffects">+</p>
+                        <p id="gamePage__gameSpace__combat__entityStats__enemyStats__activeDebuff" class="entityStats entityEffects">-</p>
+                        </div>
                     </div>
                 </div>
                 <!--For displaying card turn order.-->

@@ -1,5 +1,5 @@
-class Card{
-    constructor(id, owner, quantity = 1){
+class Card {
+    constructor(id, owner, quantity = 1) {
         this.name;
         this.type; //P or A
         this.lore;
@@ -26,9 +26,9 @@ class Card{
     //Condensed symbols shown normally.
 
     //switch id to set this attributes.
-    initializeCard(id){
+    initializeCard(id) {
         var attributeArray = [];
-        switch(id){
+        switch (id) {
             /*
             [
                 name
@@ -46,8 +46,8 @@ class Card{
                     "A test card, created to test cards.",
                     "Deal 4 damage to the enemy.",
                     //Owner is owner.
-                    "4", 
-                    "opposition", 
+                    "4",
+                    "opposition",
                     "none"];
                 break;
             case -2:
@@ -62,14 +62,14 @@ class Card{
                     "none"];
                 break;
         }
-        this.name =         attributeArray[0];
-        this.type =         attributeArray[1];
-        this.lore =         attributeArray[2];
-        this.description =  attributeArray[3];
+        this.name = attributeArray[0];
+        this.type = attributeArray[1];
+        this.lore = attributeArray[2];
+        this.description = attributeArray[3];
 
-        this.magnitude =    attributeArray[4];
-        this.target =       attributeArray[5];
-        this.effect =       attributeArray[6];
+        this.magnitude = attributeArray[4];
+        this.target = attributeArray[5];
+        this.effect = attributeArray[6];
     }
 
     //this needs to deal damage to target and apply effects.
@@ -78,28 +78,36 @@ class Card{
 
     //might need 2 methods. 1 when drag-drop update, and 1 to evaluate card.
     //Drag-Drop Update
-    cardPlayed(position, game){
-        this.onCooldown = this.cooldown;
-        //add this card to game.cardQueue at the position it was played.
+    cardPlayed(position, game) {
+        this.onCooldown = this.cooldown; //put on cooldown.
 
-        //console.log(this.owner.game.gameState); //<-- find game in owner object.
-        //^^^^ passed in game instead for better readability.
-
-        //Add this card to the Queue.
-        game.cardQueue[position] = this;
         //Update display screen.
-        console.log(position)
         document.getElementById(`gamePage__gameSpace__combat__cardOrder__${position}__name`).innerHTML = this.name;
         document.getElementById(`gamePage__gameSpace__combat__cardOrder__${position}__magStat`).innerHTML = this.quantity;
+        //Add this card to the Queue.
+        game.cardQueue[position] = this;
+        game.filledCardPositions.push(position);
+
+        //remove charge.
+        if (this.owner.constructor.name == "Player") {
+            this.quantity = this.quantity - 1;
+
+            //remove from inventory if used up.
+            if (this.quantity == 0) {
+                this.owner.removeFromInventory(this);
+            }
+        }
+        //console.log(this.owner.game.gameState); //<-- find game in owner object.
+        //^^^^ passed in game instead for better readability.
     }
     //Evaluation Check
-    cardEvaluated(){
-        
+    cardEvaluated() {
+
     }
 
     //handles cooldowns each turn.
-    iterateCooldown(){
-        if(this.onCooldown > 0){
+    iterateCooldown() {
+        if (this.onCooldown > 0) {
             this.onCooldown = this.onCooldown - 1;
         }
     }
