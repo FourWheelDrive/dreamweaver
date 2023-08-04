@@ -135,10 +135,12 @@ class Game {
         //Find card positions
         this.generateCardSlots(inTowerRange);
         //Enemy places cards.
-        //this.enemies[currentEnemyIndex].placeCards(this.enemyCardPositions);
+        this.currentEnemy.placeCards(this.enemyCardPositions);
         //Unlock player cards. Player places cards.
         this.unlockPlayerCards();
         this.initializeCombatCardSlots();
+
+        console.log(this.cardQueue)
     }
     //Evaluates card queue. Evaluates win conditions.
     endCombatTurn() {
@@ -203,6 +205,8 @@ class Game {
                     for (let m = 0; m < this.playerCardPositions.length; m++) {
                     }
                 })
+            } else {
+                this.player.inventory[i].domElement.style.opacity = 0.5;
             }
         }
         //Clear and re-add drag-drop event listeners.
@@ -888,8 +892,9 @@ async function initializeGame() {
     pushMainOutput("Press Z for help!");
 
     //INVENTORY TESTING
-    game.player.addToInventory(new Card(-1, game.player));
-    game.player.addToInventory(new Card(-2, game.player));
+    game.player.addToInventory(new Card(-1, game.player, 3));
+    game.player.addToInventory(new Card(-2, game.player, 1));
+    game.player.addToInventory(new Card(-3, game.player, 1));
     //COMBAT TESTING, begin encounter here.
     await sleep(1000);
 

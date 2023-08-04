@@ -7,7 +7,7 @@ class Card {
         this.owner = owner; //Player or enemy. Enemy might need an identifyer now, since they're on board?
 
         this.magnitude;
-        this.target; //Opposition or self.
+        this.target; //opposition or self.
         this.effect; //buffs/debuffs.
 
         this.cooldown; //For combat. Turn cooldown.
@@ -46,7 +46,7 @@ class Card {
                     "A test card, created to test cards.",
                     "Deal 4 damage to the enemy.",
                     //Owner is owner.
-                    "4",
+                    4,
                     "opposition",
                     "none"];
                 break;
@@ -57,8 +57,19 @@ class Card {
                     "A test baguette, hon hon.",
                     "Deal 4 damage to thy self.",
                     //Owner is owner.
-                    "4",
+                    4,
                     "self",
+                    "none"];
+                break;
+            case -3:
+                attributeArray = [
+                    "Enemy test",
+                    "P",
+                    "Enemy test card",
+                    "Deal 4 damage to the enemy,",
+                    //Owner is owner.
+                    4,
+                    "opposition",
                     "none"];
                 break;
         }
@@ -80,6 +91,10 @@ class Card {
     //Drag-Drop Update
     cardPlayed(position, game) {
         this.onCooldown = this.cooldown; //put on cooldown.
+        //Enemy has no card tile.
+        if(this.owner.constructor.name == "Player"){
+            this.domElement.style.opacity = 0.5;
+        }
 
         //Update display screen.
         document.getElementById(`gamePage__gameSpace__combat__cardOrder__${position}__name`).innerHTML = this.name;
@@ -101,14 +116,23 @@ class Card {
         //^^^^ passed in game instead for better readability.
     }
     //Evaluation Check
-    cardEvaluated() {
-
+    //EFFECTS should also be handled here.
+    cardEvaluated(enemy) {
+        if(this.target == "opposition"){
+            enemy.changeHealth(this.magnitude);
+            //enemy.addEffect();
+        }
+        if(this.target == "self"){
+            this.owner.changeHealth(this.magnitude*-1);
+        }
     }
 
     //handles cooldowns each turn.
     iterateCooldown() {
         if (this.onCooldown > 0) {
             this.onCooldown = this.onCooldown - 1;
+        } else if (this.onCooldown == 0){
+            this.domElement.style.opacity = 1.0;
         }
     }
 }

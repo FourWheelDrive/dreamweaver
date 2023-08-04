@@ -115,6 +115,8 @@ class Enemy extends Entity {
         //for dialogues, pass in arrays! We'll cycle through the array in the output.
         this.contactDialogue;
         this.defeatDialogue;
+
+        this.initializeEnemy();
     }
     initializeEnemy(){
         switch(this.index){
@@ -122,6 +124,10 @@ class Enemy extends Entity {
                 this.name = "test enemy";
                 this.contactDialogue = ["Heheheha! I am amogus"];
                 this.defeatDialogue = ["o noes"];
+
+                this.addToInventory(new Card(-1, this, 900));
+                this.addToInventory(new Card(-2, this, 900));
+                this.addToInventory(new Card(-3, this, 900));
                 break;
         }
     }
@@ -155,7 +161,11 @@ class Enemy extends Entity {
                 break;
             }
             if(this.inventory[j].onCooldown == 0){
-                this.inventory[j].cardPlayed(index);
+                this.inventory[j].cardPlayed(enemyCardPositions[index], this.game);
+
+                //enemyCardPositions[index] represents cardPosition.
+
+
                 index = index + 1;
             }
         }
