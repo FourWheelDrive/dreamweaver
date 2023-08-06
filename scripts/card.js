@@ -92,7 +92,7 @@ class Card {
     cardPlayed(position, game) {
         this.onCooldown = this.cooldown; //put on cooldown.
         //Enemy has no card tile.
-        if(this.owner.constructor.name == "Player"){
+        if (this.owner.constructor.name == "Player") {
             this.domElement.style.opacity = 0.5;
         }
 
@@ -117,21 +117,36 @@ class Card {
     }
     //Evaluation Check
     //EFFECTS should also be handled here.
-    cardEvaluated(enemy) {
-        if(this.target == "opposition"){
-            enemy.changeHealth(this.magnitude);
-            //enemy.addEffect();
+    cardEvaluated(game) {
+        switch (this.owner.constructor.name) {
+            case "Player":
+                if (this.target == "opposition") {
+                    game.currentEnemy.changeHealth(this.magnitude);
+                    //enemy.addEffect();
+                }
+                if (this.target == "self") {
+                    this.owner.changeHealth(this.magnitude * -1);
+                }
+                break;
+            case "Enemy":
+                if (this.target == "opposition") {
+                    game.player.changeHealth(this.magnitude);
+                    //enemy.addEffect();
+                }
+                if (this.target == "self") {
+                    this.owner.changeHealth(this.magnitude * -1);
+                }
+                break;
         }
-        if(this.target == "self"){
-            this.owner.changeHealth(this.magnitude*-1);
-        }
+
+
     }
 
     //handles cooldowns each turn.
     iterateCooldown() {
         if (this.onCooldown > 0) {
             this.onCooldown = this.onCooldown - 1;
-        } else if (this.onCooldown == 0){
+        } else if (this.onCooldown == 0) {
             this.domElement.style.opacity = 1.0;
         }
     }

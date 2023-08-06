@@ -172,6 +172,8 @@ class Enemy extends Entity {
         //if ran out of cards, play filler card:
         if(index < enemyCards){
             //play filler card.
+            //CONSOLE.LOG
+            console.log("ran out of cards lmao")
         }
     }
 }

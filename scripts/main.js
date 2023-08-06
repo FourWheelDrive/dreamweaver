@@ -11,9 +11,11 @@ class Game {
         */
         this.player;
 
+        this.inTowerRange = true;
         this.currentRoom = 1;
         this.enemies = [];     //Array of enemy entities. Will be moved towards the player if within certain radius in turnHandler.
         this.currentEnemy;     //Index of current enemy.
+        this.gameTurn = 0;
 
         this.combatCardSlots = [
             document.getElementById("gamePage__gameSpace__combat__cardOrder__0"),
@@ -107,13 +109,25 @@ class Game {
     //Combat Functions:
 
     //Sets flags and changes gamestates for combat.
-    startCombat(inTowerRange, currentEnemyIndex) {
+    startCombat(currentEnemyIndex) {
         //1) change gameState flags
         this.gameState = 2;
         this.changeWindow(2);
         this.currentEnemy = this.enemies[currentEnemyIndex];
 
-        this.startCombatTurn(inTowerRange);
+        //check tower range.
+        /*let inRange = false;
+        for(let i = 0; i < this.towerArray.length; i++){
+
+        }
+        
+        //Problem ^^^^. towerArray is a mapHandler property. Can't pass into endCombatTurn() because of event listener. Death.
+        */
+        this.inTowerRange = true; //do this for now.
+
+        //set game things and begin turn.
+        this.gameTurn = 0;
+        this.startCombatTurn();
     }
     //Sets flags and ends combat.
     endCombat() {
@@ -121,19 +135,28 @@ class Game {
     }
 
     //Clears queue and sets up each card turn.
-    startCombatTurn(inTowerRange) {
+    async startCombatTurn() {
         //2) make sure keyHandlers handle flags
         //done.
         //clear cardq
         this.cardQueue = [null, null, null, null, null];
         this.filledCardPositions = [];
+        //show card slots.
+        for(let k = 0; k < this.cardQueue.length; k ++){
+            fadeElement("in", document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}`), 0.5);
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}__name`).innerHTML = "";
+            document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}__magStat`).innerHTML = "";
+        }
+
+        //CONSOLE.LOG
+        console.log(`Turn: ${this.gameTurn}`)
         //3) update displays.
         document.getElementById("gamePage__gameSpace__combat__entityStats__playerStats__health").innerHTML = `${this.player.health}`;
         document.getElementById("gamePage__gameSpace__combat__entityStats__enemyStats__health").innerHTML = `${this.currentEnemy.health}`
 
         //start turn.
         //Find card positions
-        this.generateCardSlots(inTowerRange);
+        this.generateCardSlots();
         //Enemy places cards.
         this.currentEnemy.placeCards(this.enemyCardPositions);
         //Unlock player cards. Player places cards.
@@ -143,8 +166,9 @@ class Game {
         console.log(this.cardQueue)
     }
     //Evaluates card queue. Evaluates win conditions.
-    endCombatTurn() {
+    async endCombatTurn() {
         console.log("ended turn")
+        this.gameTurn = this.gameTurn + 1;
         //===================================================
         //Freeze combat flags.
         //draggable = false. Evaluate damage.
@@ -154,11 +178,18 @@ class Game {
         //===================================================
         //evaluate cards.
         for (let j = 0; j < this.cardQueue.length; j++) {
-            this.cardQueue[j].cardEvaluated(j);
+            await fadeElement("out", document.getElementById(`gamePage__gameSpace__combat__cardOrder__${j}`), 1);
+            this.cardQueue[j].cardEvaluated(this);
+        }
+
+        //if no win condition met, go to next turn.
+        //NOTE: ALSO NEEDS TO INCREMENT EFFECTS AT END OF TURN.
+        if(this.currentEnemy.health > 0 && this.player.health > 0){
+            this.startCombatTurn()
         }
     }
 
-    generateCardSlots(inTowerRange) {
+    generateCardSlots() {
         //reset card slots.
         this.playerCardPositions = [];
         this.enemyCardPositions = [];
@@ -166,7 +197,7 @@ class Game {
         //3) Choose card slots.
         //if(player priority): /else
         let playerCardTotal;
-        if (inTowerRange) {
+        if (this.inTowerRange) {
             playerCardTotal = 3;
         } else { playerCardTotal = 2; }
         //4) Choose Player card slots, including modifiers.
@@ -899,5 +930,5 @@ async function initializeGame() {
     await sleep(1000);
 
     game.enemies.push(new Enemy(10, game, "!", -1));
-    game.startCombat(true, 0);
+    game.startCombat(0);
 }
