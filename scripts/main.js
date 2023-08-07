@@ -10,6 +10,7 @@ class Game {
         3 - shop                    ||| disable movement keys, attack keys
         */
         this.player;
+        this.mapHandler;
 
         this.inTowerRange = true;
         this.currentRoom = 1;
@@ -39,13 +40,13 @@ class Game {
     - display vision
     - check for special locations
     */
-    async turnHandler(map, e) {
-        map.hideCells();
+    async turnHandler(e) {
+        this.mapHandler.hideCells();
 
         //Show Tower vision.
-        for (let i = 0; i < map.towerArray.length; i++) {
-            if (map.towerArray[i].active) {
-                map.towerArray[i].showTowerVision();
+        for (let i = 0; i < this.mapHandler.towerArray.length; i++) {
+            if (this.mapHandler.towerArray[i].active) {
+                this.mapHandler.towerArray[i].showTowerVision();
             }
         }
 
@@ -71,7 +72,7 @@ class Game {
             //Keyboard input
             movementCode = e.code;
         }
-        this.playerMovementHandler(map.mapArray, map, movementCode);
+        this.playerMovementHandler(movementCode);
         //^ handles moving the player and showing the player!
     }
 
@@ -103,10 +104,10 @@ class Game {
             this.player.inventory[i].domElement = document.getElementById(`gamePage__gameSpace__combat__inventoryDisplay__${i}`);
         }
         //reset hover listener to show cards in full display.
-        setCardHoverListener(this.player);
+        setInventoryCardHoverListener(this.player);
     }
 
-    //Combat Functions:
+    //Combat Functions: =======================================================
 
     //Sets flags and changes gamestates for combat.
     startCombat(currentEnemyIndex) {
@@ -141,15 +142,13 @@ class Game {
         //clear cardq
         this.cardQueue = [null, null, null, null, null];
         this.filledCardPositions = [];
+
         //show card slots.
-        for(let k = 0; k < this.cardQueue.length; k ++){
+        for (let k = 0; k < this.cardQueue.length; k++) {
             fadeElement("in", document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}`), 0.5);
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}__name`).innerHTML = "";
             document.getElementById(`gamePage__gameSpace__combat__cardOrder__${k}__magStat`).innerHTML = "";
         }
-
-        //CONSOLE.LOG
-        console.log(`Turn: ${this.gameTurn}`)
         //3) update displays.
         document.getElementById("gamePage__gameSpace__combat__entityStats__playerStats__health").innerHTML = `${this.player.health}`;
         document.getElementById("gamePage__gameSpace__combat__entityStats__enemyStats__health").innerHTML = `${this.currentEnemy.health}`
@@ -163,11 +162,11 @@ class Game {
         this.unlockPlayerCards();
         this.initializeCombatCardSlots();
 
-        console.log(this.cardQueue)
+        //reset cardq listeners
+        setCombatSlotHoverListener(this);
     }
     //Evaluates card queue. Evaluates win conditions.
     async endCombatTurn() {
-        console.log("ended turn")
         this.gameTurn = this.gameTurn + 1;
         //===================================================
         //Freeze combat flags.
@@ -184,7 +183,7 @@ class Game {
 
         //if no win condition met, go to next turn.
         //NOTE: ALSO NEEDS TO INCREMENT EFFECTS AT END OF TURN.
-        if(this.currentEnemy.health > 0 && this.player.health > 0){
+        if (this.currentEnemy.health > 0 && this.player.health > 0) {
             this.startCombatTurn()
         }
     }
@@ -289,7 +288,7 @@ class Game {
         }
     }
 
-    //Key handlers:
+    //Key handlers: ==================================================
     async changeWindow(newWindowState) {
         this.windowState = newWindowState;
         switch (this.windowState) {
@@ -325,14 +324,14 @@ class Game {
         }
         document.getElementById("gamePage__header__windowDisplay").innerHTML = this.windowTitles[this.windowState];
     }
-    async playerMovementHandler(mapArray, mapHandler, key) {
+    async playerMovementHandler(key) {
         //very cool directions array! Append each element instead of having 4 switch statements.
         //[left] [right] [up] [down]
         let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]],
             newDirection;
 
         //Cells to update
-        let currentCell = mapArray[this.player.position[0]][this.player.position[1]],
+        let currentCell = this.mapHandler.mapArray[this.player.position[0]][this.player.position[1]],
             nextCellPos;
 
 
@@ -358,10 +357,10 @@ class Game {
         nextCellPos = [parseInt(currentCellPos[0]) + newDirection[0], parseInt(currentCellPos[1]) + newDirection[1]];
         let newCell, newCellEntity;
 
-        if ((nextCellPos[0] < mapArray.length && nextCellPos[1] < mapArray[0].length) && (nextCellPos[0] >= 0 && nextCellPos[1] >= 0)) { //check for out of bounds. //Not working.
+        if ((nextCellPos[0] < this.mapHandler.mapArray.length && nextCellPos[1] < this.mapHandler.mapArray[0].length) && (nextCellPos[0] >= 0 && nextCellPos[1] >= 0)) { //check for out of bounds. //Not working.
             newCell = document.getElementById(`[${nextCellPos[0]}][${nextCellPos[1]}]`);
             let tempPosition = newCell.id.replaceAll("[", "$").replaceAll("]", "$").split("$").filter(element => element.length >= 1);
-            newCellEntity = mapArray[tempPosition[0]][tempPosition[1]];
+            newCellEntity = this.mapHandler.mapArray[tempPosition[0]][tempPosition[1]];
         }
 
         //Move the player.
@@ -369,7 +368,7 @@ class Game {
             //if the new cell is a hidden boss room, exit.
             //if (newCellEntity instanceof BossEncounterCell && !newCellEntity.revealed) { return; }
             //Update previous cell.
-            mapHandler.clearPlayer(this.player);
+            this.mapHandler.clearPlayer(this.player);
             this.player.updatePosition(nextCellPos[0], nextCellPos[1]);
 
 
@@ -379,17 +378,17 @@ class Game {
             }*/
         }
         //Show the player.
-        mapHandler.showPlayer(this.player);
+        this.mapHandler.showPlayer(this.player);
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
-    async keyDownHandler(e, map = null) {
+    async keyDownHandler(e) {
         //Keyboard handlers from document listeners.
         if (e.type == "keydown") {
             //movement keys
             //state check
             if (this.gameState == 1 && this.windowState == 1) {
                 if (e.code == "KeyW" || e.code == "KeyD" || e.code == "KeyS" || e.code == "KeyA") {
-                    this.turnHandler(map, e);
+                    this.turnHandler(e);
                 }
             }
 
@@ -424,7 +423,7 @@ class Game {
                     e.target.id == "gamePage__gameSpace__map__mapMvmtA" ||
                     e.target.id == "gamePage__gameSpace__map__mapMvmtS" ||
                     e.target.id == "gamePage__gameSpace__map__mapMvmtD") {
-                    this.turnHandler(map, e);
+                    this.turnHandler(e);
                 }
             }
 
@@ -780,7 +779,7 @@ function setMapHoverListener(mapArray) {
 }
 //Show expanded inventory card in display.
 //UPDATE when EFFECTS (buffs/debuffs) are added. Also when ICONS are added.
-function setCardHoverListener(player) {
+function setInventoryCardHoverListener(player) {
     for (let i = 0; i < player.inventory.length; i++) {
         player.inventory[i].domElement.addEventListener("mouseover", function () {
             document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = player.inventory[i].name;
@@ -791,6 +790,23 @@ function setCardHoverListener(player) {
             //effect updaters. Uncomment when effects implemented.
             //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name").innerHTML = player.inventory[i].effect.name;
             //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description").innerHTML = player.inventory[i].effect.description;
+        })
+    }
+}
+//same as above, but for combat card slots.
+function setCombatSlotHoverListener(game) {
+    for (let i = 0; i < game.cardQueue.length; i++) {
+        document.getElementById(`gamePage__gameSpace__combat__cardOrder__${i}`).addEventListener("mouseover", function () {
+            if(game.cardQueue[i] != null){
+                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = game.cardQueue[i].name;
+                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${game.cardQueue[i].type}-${game.cardQueue[i].magnitude}`;
+                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore").innerHTML = game.cardQueue[i].lore;
+                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description").innerHTML = game.cardQueue[i].description;
+    
+                //effect updaters. Uncomment when effects implemented.
+                //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name").innerHTML = game.cardQueue[i].effect.name;
+                //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description").innerHTML = game.cardQueue[i].effect.description;
+            }
         })
     }
 }
@@ -878,37 +894,37 @@ function flushCSS(element) { //flushes css to no transition.
 
 async function initializeGame() {
     const game = new Game();
-    const map = new MapHandler(30, 30, 80, 10);
+    game.mapHandler = new MapHandler(30, 30, 80, 10);
 
     //init player
     game.player = new Player(10, game);
-    game.player.getInitialPosition(map.mapWidth, map.mapHeight);
+    game.player.getInitialPosition(game.mapHandler.mapWidth, game.mapHandler.mapHeight);
 
     //create map for new room.
-    map.mapArray = map.generateNewRoom(game);
+    game.mapHandler.mapArray = game.mapHandler.generateNewRoom(game);
     //Set up displays.
     document.getElementById("gamePage__header__windowDisplay").innerHTML = game.windowTitles[1];
 
     //Show map.
-    map.showCellsInVision(game.player.visionRange, game.player.mapX, game.player.mapY);
-    map.showPlayer(game.player);
+    game.mapHandler.showCellsInVision(game.player.visionRange, game.player.mapX, game.player.mapY);
+    game.mapHandler.showPlayer(game.player);
 
     //Input handlers.
     //KEYBOARD input, handled in Game.
     document.addEventListener("keydown", (e) => {
-        game.keyDownHandler(e, map);
+        game.keyDownHandler(e);
     })
     //MOUSE input, also handled in Game.
     var mapMouseButtons = document.getElementsByClassName("mapMvmtButton");
     for (var i = 0; i < mapMouseButtons.length; i++) {
         mapMouseButtons[i].addEventListener("click", (e) => {
-            game.keyDownHandler(e, map);
+            game.keyDownHandler(e);
         })
     }
     var windowNavButtons = document.getElementsByClassName("windowNavButtons");
     for (var j = 0; j < windowNavButtons.length; j++) {
         windowNavButtons[j].addEventListener("click", (e) => {
-            game.keyDownHandler(e, map);
+            game.keyDownHandler(e);
         })
     }
 
@@ -916,7 +932,7 @@ async function initializeGame() {
     //initAtkListener();
     //initMvmtListener(game);
     //Hover listener.
-    setMapHoverListener(map.mapArray);
+    setMapHoverListener(game.mapHandler.mapArray);
 
     //temporary tutorial panel.
     await sleep(1000);

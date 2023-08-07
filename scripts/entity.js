@@ -93,6 +93,7 @@ class Player extends Entity {
             //initializeCombatCardSlots must go after unlockPlayerCards <-- clones cardOrder nodes.
             this.game.unlockPlayerCards();
             this.game.initializeCombatCardSlots();
+            setCombatSlotHoverListener(this.game);
         }
     }
     //Wishes.
