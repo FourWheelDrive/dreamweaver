@@ -46,6 +46,11 @@ class Entity {
         this.mapY = mapY;
         this.position = [mapX, mapY];
     }
+    iterateInventoryCooldowns(){
+        for(let i = 0; i < this.inventory.length; i++){
+            this.inventory[i].iterateCooldown();
+        }
+    }
 }
 class Player extends Entity {
     constructor(health, game) {
@@ -67,7 +72,7 @@ class Player extends Entity {
 
         //set up header. Player uses Wishes as max health.
         document.getElementById("gamePage__footer__health").innerHTML = `Wishes: ${this.health}/${this.wishes}`;
-        //document.getElementById("gamePage__footer__wishes").innerHTML = `Wishes: ${this.wishes}`;
+        this.getInitialPosition(this.game.mapHandler.mapWidth, this.game.mapHandler.mapHeight);
     }
     //Inventory methods
     //Also needs to CHECK IF INVENTORY IS FULL! Check Discord for quantity stacking idea.
@@ -120,15 +125,17 @@ class Enemy extends Entity {
         this.initializeEnemy();
     }
     initializeEnemy(){
+        //Add filler card, regardless of enemy.
+        this.addToInventory(new Card(0, this, 1));
+
         switch(this.index){
             case -1:
                 this.name = "test enemy";
                 this.contactDialogue = ["Heheheha! I am amogus"];
                 this.defeatDialogue = ["o noes"];
-
-                this.addToInventory(new Card(-1, this, 900));
-                this.addToInventory(new Card(-2, this, 900));
-                this.addToInventory(new Card(-3, this, 900));
+                this.addToInventory(new Card(-1, this, 1));
+                this.addToInventory(new Card(-2, this, 1));
+                this.addToInventory(new Card(-3, this, 1));
                 break;
         }
     }
@@ -156,25 +163,24 @@ class Enemy extends Entity {
         //AMENDEMENT: Actually, go in inventory order. Makes the enemy more predictable, when you learn its moves.
         //needs to account for card order?
         let index = 0;
-        for(let j = 0; j < this.inventory.length; j++){
+        //j begins at 1 because inventory[0] is a filler "Patience" card.
+        for(let j = 1; j < this.inventory.length; j++){
             //if played the number of cards.
             if(index == enemyCards){
                 break;
             }
             if(this.inventory[j].onCooldown == 0){
                 this.inventory[j].cardPlayed(enemyCardPositions[index], this.game);
-
                 //enemyCardPositions[index] represents cardPosition.
-
-
                 index = index + 1;
             }
         }
         //if ran out of cards, play filler card:
         if(index < enemyCards){
-            //play filler card.
-            //CONSOLE.LOG
-            console.log("ran out of cards lmao")
+            //Play filler card.
+            for(let k = index; k < enemyCards; k++){
+                this.inventory[0].cardPlayed(enemyCardPositions[k], this.game);
+            }
         }
     }
 }

@@ -26,9 +26,9 @@ class Card {
     //Condensed symbols shown normally.
 
     //switch id to set this attributes.
-    initializeCard(id) {
+    initializeCard() {
         var attributeArray = [];
-        switch (id) {
+        switch (this.id) {
             /*
             [
                 name
@@ -39,6 +39,18 @@ class Card {
                 effect
             ]
             */
+            //REMINDER! Since cooldowns iterated at the end of a turn, cooldown = 1 is instant.
+            case 0:
+                attributeArray = [
+                    "Patience",
+                    "p",
+                    "A learned virtue. Or perhaps a curse?",
+                    "Skip your turn.",
+                    0,
+                    "opposition",
+                    "none",
+                    0];
+                break;
             case -1:
                 attributeArray = [
                     "Test Card",
@@ -48,7 +60,8 @@ class Card {
                     //Owner is owner.
                     4,
                     "opposition",
-                    "none"];
+                    "none",
+                    2];
                 break;
             case -2:
                 attributeArray = [
@@ -59,7 +72,8 @@ class Card {
                     //Owner is owner.
                     4,
                     "self",
-                    "none"];
+                    "none",
+                    2];
                 break;
             case -3:
                 attributeArray = [
@@ -70,7 +84,8 @@ class Card {
                     //Owner is owner.
                     4,
                     "opposition",
-                    "none"];
+                    "none",
+                    3];
                 break;
         }
         this.name = attributeArray[0];
@@ -81,6 +96,8 @@ class Card {
         this.magnitude = attributeArray[4];
         this.target = attributeArray[5];
         this.effect = attributeArray[6];
+
+        this.cooldown = attributeArray[7];
     }
 
     //this needs to deal damage to target and apply effects.
@@ -91,9 +108,17 @@ class Card {
     //Drag-Drop Update
     cardPlayed(position, game) {
         this.onCooldown = this.cooldown; //put on cooldown.
-        //Enemy has no card tile.
-        if (this.owner.constructor.name == "Player") {
+        //If not "Patience":
+        if (this.owner.constructor.name == "Player" && this.id != 0) {
+            //Grey out the card tile.
             this.domElement.style.opacity = 0.5;
+
+            //Remove charge.
+            this.quantity = this.quantity - 1;
+            //remove from inventory if used up.
+            if (this.quantity == 0 && this.id != 0) {
+                this.owner.removeFromInventory(this);
+            }
         }
 
         //Update display screen.
@@ -102,16 +127,6 @@ class Card {
         //Add this card to the Queue.
         game.cardQueue[position] = this;
         game.filledCardPositions.push(position);
-
-        //remove charge.
-        if (this.owner.constructor.name == "Player") {
-            this.quantity = this.quantity - 1;
-
-            //remove from inventory if used up.
-            if (this.quantity == 0) {
-                this.owner.removeFromInventory(this);
-            }
-        }
         //console.log(this.owner.game.gameState); //<-- find game in owner object.
         //^^^^ passed in game instead for better readability.
     }
@@ -138,15 +153,13 @@ class Card {
                 }
                 break;
         }
-
-
     }
 
     //handles cooldowns each turn.
     iterateCooldown() {
         if (this.onCooldown > 0) {
             this.onCooldown = this.onCooldown - 1;
-        } else if (this.onCooldown == 0) {
+        } else if (this.onCooldown == 0 && this.owner.constructor.name == "Player") {
             this.domElement.style.opacity = 1.0;
         }
     }

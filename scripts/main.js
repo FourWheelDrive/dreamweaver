@@ -184,6 +184,10 @@ class Game {
             this.cardQueue[j].cardEvaluated(this);
         }
 
+        //iterate all cooldowns.
+        this.player.iterateInventoryCooldowns();
+        this.currentEnemy.iterateInventoryCooldowns();
+
         //if no win condition met, go to next turn.
         //NOTE: ALSO NEEDS TO INCREMENT EFFECTS AT END OF TURN.
         if (this.currentEnemy.health > 0 && this.player.health > 0) {
@@ -911,8 +915,7 @@ async function initializeGame() {
     game.mapHandler = new MapHandler(30, 30, 80, 10);
 
     //init player
-    game.player = new Player(10, game);
-    game.player.getInitialPosition(game.mapHandler.mapWidth, game.mapHandler.mapHeight);
+    game.player = new Player(100, game);
 
     //create map for new room.
     game.mapHandler.mapArray = game.mapHandler.generateNewRoom(game);
@@ -956,6 +959,7 @@ async function initializeGame() {
     pushMainOutput("Press Z for help!");
 
     //INVENTORY TESTING
+    game.player.addToInventory(new Card(0, game.player, 1));
     game.player.addToInventory(new Card(-1, game.player, 3));
     game.player.addToInventory(new Card(-2, game.player, 1));
     game.player.addToInventory(new Card(-3, game.player, 1));
