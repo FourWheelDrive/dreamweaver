@@ -18,6 +18,8 @@
 #gamePage__gameSpace__combat__spriteDisplay {
     grid-area: sprite;
     display: grid;
+
+    margin: auto;
 }
 
 #gamePage__gameSpace__combat__entityStats {

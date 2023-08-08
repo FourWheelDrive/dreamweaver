@@ -117,14 +117,13 @@ class Game {
         this.currentEnemy = this.enemies[currentEnemyIndex];
 
         //check tower range.
-        /*let inRange = false;
-        for(let i = 0; i < this.towerArray.length; i++){
-
+        this.inTowerRange = false;
+        for(let i = 0; i < this.mapHandler.towerArray.length; i++){
+            let currentTower = this.mapHandler.towerArray[i];
+            if(calcPythagDistance([currentTower.mapX, currentTower.mapY], this.player.position) < currentTower.visionRange){
+                this.inTowerRange = true;
+            }
         }
-        
-        //Problem ^^^^. towerArray is a mapHandler property. Can't pass into endCombatTurn() because of event listener. Death.
-        */
-        this.inTowerRange = true; //do this for now.
 
         //set game things and begin turn.
         this.gameTurn = 0;
@@ -142,6 +141,11 @@ class Game {
         //clear cardq
         this.cardQueue = [null, null, null, null, null];
         this.filledCardPositions = [];
+
+        //Iterate turn.
+        this.gameTurn = this.gameTurn + 1;
+        //draw turn on canvas.
+        this.drawCombatCanvas();
 
         //show card slots.
         for (let k = 0; k < this.cardQueue.length; k++) {
@@ -167,7 +171,6 @@ class Game {
     }
     //Evaluates card queue. Evaluates win conditions.
     async endCombatTurn() {
-        this.gameTurn = this.gameTurn + 1;
         //===================================================
         //Freeze combat flags.
         //draggable = false. Evaluate damage.
@@ -186,6 +189,20 @@ class Game {
         if (this.currentEnemy.health > 0 && this.player.health > 0) {
             this.startCombatTurn()
         }
+    }
+
+    drawCombatCanvas(){
+        var canvas = document.getElementById("gamePage__gameSpace__combat__spriteDisplay");
+        var ctx = canvas.getContext("2d");
+
+        //clear canvas.
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        //Draw turn counter.
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+        ctx.font = "30px serif";
+        ctx.fillText(`[${this.gameTurn}]`, canvas.width/2, canvas.height/2);
     }
 
     generateCardSlots() {
@@ -469,10 +486,8 @@ class MapHandler {
     generateNewRoom(game) {
         //generate array of walls
         this.mapArray = this.createMapArray(game);
-        console.log("M1: Array complete.")
         //generate random paths procedurally
         this.mapArray = this.createMapPaths();
-        console.log("M2: Paths complete.")
 
         //Array defining how many rooms of each type exist.
         let roomTypeArray;
@@ -492,12 +507,10 @@ class MapHandler {
             this.mapArray = placeLocation(this.mapArray, this.mapWidth - 1, this.mapHeight - 1, centerCoord, "Minor");
             */
             this.mapArray = this.placeLocation("Tower")
-            console.log(`M3: Tower ${i} complete.`)
         }
         for (var j = 0; j < this.towerArray.length; j++) {
             this.towerArray[j].activateTower();
         }
-        console.log("M3: Towers complete.")
 
         //push complete mapArray to DOM
         this.pushMapToDOM(this.mapArray);
@@ -861,8 +874,9 @@ async function pushMainOutput(message) {
 //Resize the Canvas to un-blurry itself.
 //Credits to  https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da!
 function initializeCanvas() {
-    var canvas = document.getElementById("gamePage__gameSpace__encounter__canvas__gameCanvas");
+    var canvas = document.getElementById("gamePage__gameSpace__combat__spriteDisplay");
     var dpi = window.devicePixelRatio;
+
     //create a style object that returns width and height
     let style = {
         height() {
@@ -933,6 +947,9 @@ async function initializeGame() {
     //initMvmtListener(game);
     //Hover listener.
     setMapHoverListener(game.mapHandler.mapArray);
+    
+    //resize to unblurry canvas.
+    initializeCanvas();
 
     //temporary tutorial panel.
     await sleep(1000);
