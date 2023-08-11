@@ -983,7 +983,7 @@ async function initializeGame() {
     game.mapHandler = new MapHandler(15, 15, 50, 5);
 
     //init player
-    game.player = new Player(2, game);
+    game.player = new Player(20, game);
 
     //create map for new room.
     game.mapHandler.mapArray = game.mapHandler.generateNewRoom(game);
