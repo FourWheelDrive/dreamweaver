@@ -39,12 +39,7 @@ Search for general notes.
 Search for this for things to do.
 
 To-Do:
-- See class CELL for some ideas about cell.name!
-- Check which vars in class GAME actually matter. Also name them better.
-    - check if need var to track moves since last battle.
-- recomment NOTEs.
-- Remember to rename everything when the story is written! Not giving away the theme too early.
-- NOTE: masquerade may change other parameters depending on attack in the future. Cooldown, effectDur, channelling
+- Output dialogue choices in the dialogue bar instead.
 ==========================================
 Next session:
 - finish new cell types

@@ -1,0 +1,159 @@
+#gamePage__gameSpace__combat {
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: none;
+
+    grid-template-areas:
+        ".... sprite"
+        ".... stats"
+        "card board"
+        "card inventory";
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 3fr 1fr 3fr 4fr;
+
+    overflow: auto;
+}
+
+#gamePage__gameSpace__combat__spriteDisplay {
+    grid-area: sprite;
+    display: grid;
+
+    margin: auto;
+}
+
+#gamePage__gameSpace__combat__entityStats {
+    grid-area: stats;
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+}
+.entityStatsDiv{
+    display: flex;
+    flex-direction: column;
+}
+.entityStatsWrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+.entityStats{
+    padding: 0;
+    margin: 0;
+}
+.entityEffects{
+    border: 1px dotted black;
+}
+
+#gamePage__gameSpace__combat__cardOrder {
+    padding: 1%;
+    grid-area: board;
+    display: flex;
+
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+/*CARD CLASS STYLES. APPLIES TO SLOTS & INVENTORY CARDS!*/
+.combatCardSlot {
+    position: relative;
+    height: 100%;
+    width: 16%;
+
+    border: 1px solid black;
+    border-radius: 5px;
+
+    display: flex;
+    flex-direction: column;
+}
+.combatCardSlot:hover {
+    box-shadow: 5px 5px 2px lightgray;
+}
+.magStat{
+    position: absolute;
+    top: calc(86% - 0.5rem);
+    left: calc(50% - 1rem);
+
+    padding: 1%;
+    margin: none;
+    border: 1px solid black;
+    background-color: #fff8e0;
+
+    height: 1rem;
+    width: 2rem;
+}
+
+.inventoryCard {
+    border: 1px solid black;
+    border-radius: 5px;
+    height: 50%;
+    width: 16%;
+    margin: 1%;
+
+    display: flex;
+    flex-direction: column;
+}
+.inventoryCard:hover {
+    box-shadow: 5px 5px 2px lightgray;
+}
+
+#gamePage__gameSpace__combat__inventoryDisplay {
+    padding: 2%;
+    grid-area: inventory;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+#gamePage__gameSpace__combat__fullDisplays {
+    grid-area: card;
+    display: flex;
+    flex-direction: column;
+    padding: 10%;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullCardDisplay {
+    display: grid;
+    border: 1px solid black;
+    border-radius: 5px;
+    aspect-ratio: 3/4;
+    margin-bottom: 5%;
+
+    grid-template-areas:
+    "mag name"
+    "lore lore"
+    "desc desc";
+    grid-template-columns: 1fr 3fr;
+    grid-template-rows: 3em auto auto;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay {
+    display: grid;
+    border: 1px solid black;
+    border-radius: 5px;
+    aspect-ratio: 2/1;
+}
+
+.fullDisplayText{
+    padding: 1%;
+    margin: 0;
+
+    text-align: center;
+    line-height: 90%;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type{
+    grid-area: mag;
+    border-right: 1px solid black;
+    margin-top: 5%;
+    margin-bottom: 5%;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name{
+    grid-area: name;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore{
+    grid-area: lore;
+}
+#gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description{
+    grid-area: desc;
+}
