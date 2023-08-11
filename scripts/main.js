@@ -73,28 +73,49 @@ class Game {
             movementCode = e.code;
         }
 
-        //ACTUAL MOVE BIT. TURN HANDLER =============================================
-        if (this.playerMovementHandler(movementCode) == 1) { //if valid move:
-            //^ handles moving the player and showing the player!
+        
+        this.playerMovementHandler(movementCode);
+        //Move enemies.
+        for (let k = 0; k < this.enemies.length; k++) {
+            this.enemies[k].moveEnemy();
+            this.checkEntityOverlap();
+        }
+        //Uncomment the code below if i move enemies before the player.
+        /*
+        //re-show enemies because showCellsInVision() will delete them.
+        for (let m = 0; m < this.enemies.length; m++){
+            this.mapHandler.showEnemy(this.enemies[m]);
+        }
+        this.checkEntityOverlap();
+         */
 
-            //Move enemies.
+        //ACTUAL MOVE BIT. TURN HANDLER =============================================
+        /*if (this.playerMovementHandler(movementCode) == 1) { //if valid move:
+            //^ handles moving the player and showing the player!
+            this.checkEntityOverlap();
+
             for (let k = 0; k < this.enemies.length; k++) {
                 this.enemies[k].moveEnemy();
+                this.checkEntityOverlap();
             }
-            //check encounters.
-            for(let m = 0; m < this.enemies.length; m++){
-                //positions identical?
-                if(this.player.mapX == this.enemies[m].mapX &&
-                    this.player.mapY == this.enemies[m].mapY){
-                        this.currentEnemy = this.enemies[m];
-                        this.startCombat(m);
-                    }
-            }
+            
         } else { //if invalid move, still show. Map got cleared.
             this.mapHandler.showPlayer(this.player);
             for(let z = 0; z < this.enemies.length; z++){
                 this.mapHandler.showEnemy(this.enemies[z]);
             }
+        }*/
+    }
+    //for checking player-on-enemy encounters.
+    checkEntityOverlap(){
+        //check encounters.
+        for(let m = 0; m < this.enemies.length; m++){
+            //positions identical?
+            if(this.player.mapX == this.enemies[m].mapX &&
+                this.player.mapY == this.enemies[m].mapY){
+                    this.currentEnemy = this.enemies[m];
+                    this.startCombat(m);
+                }
         }
     }
 
@@ -436,7 +457,11 @@ class Game {
                 newCellEntity.visit();
             }*/
             return (1);
-        } else { return (0) }
+        } else { 
+            //Show the player.
+            this.mapHandler.showPlayer(this.player);
+            return (0) 
+        }
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
     async keyDownHandler(e) {
@@ -1028,9 +1053,9 @@ async function initializeGame() {
 
     //INVENTORY TESTING
     game.player.addToInventory(new Card(0, game.player, 1));
-    game.player.addToInventory(new Card(-1, game.player, 3));
-    game.player.addToInventory(new Card(-2, game.player, 1));
-    game.player.addToInventory(new Card(-3, game.player, 1));
+    game.player.addToInventory(new Card(-1, game.player, 5));
+    game.player.addToInventory(new Card(-2, game.player, 5));
+    game.player.addToInventory(new Card(-3, game.player, 5));
     //COMBAT TESTING, begin encounter here.
     /*await sleep(1000);
     game.enemies.push(new Enemy(10, game, "!", -1));

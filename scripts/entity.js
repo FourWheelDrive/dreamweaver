@@ -81,7 +81,7 @@ class Player extends Entity {
         this.healthMulti = [10, 9, 8, 7, 6, 5];*/
 
         this.wishes = health;
-        this.visionRange = 2;
+        this.visionRange = 3;
 
         //set up header. Player uses Wishes as max health.
         document.getElementById("gamePage__footer__health").innerHTML = `Wishes: ${this.health}/${this.wishes}`;

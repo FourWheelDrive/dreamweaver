@@ -143,7 +143,7 @@ class TowerCell extends Cell {
     constructor(positionX, positionY, map) {
         super(positionX, positionY, map);
         this.active = false;
-        this.visionRange = 4;
+        this.visionRange = 5;
     }
     activateTower(){
         this.active = true;
