@@ -18,6 +18,8 @@ class Card {
         this.id = id; //ID for quick identification in code.
         this.domElement; //DOM Element for quick processing.
 
+        this.entityHost = []; //does this cell have any entities on it?
+
         //call an initialize function to make the card without making super duper long constructor.
         this.initializeCard(id);
     }

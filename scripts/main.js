@@ -15,7 +15,7 @@ class Game {
         this.inTowerRange = true;
         this.currentRoom = 1;
         this.enemies = [];     //Array of enemy entities. Will be moved towards the player if within certain radius in turnHandler.
-        this.currentEnemy;     //Index of current enemy.
+        this.currentEnemy = null;     //current enemy.
         this.gameTurn = 0;
 
         this.combatCardSlots = [
@@ -72,10 +72,35 @@ class Game {
             //Keyboard input
             movementCode = e.code;
         }
-        this.playerMovementHandler(movementCode);
-        //^ handles moving the player and showing the player!
+
+        //ACTUAL MOVE BIT. TURN HANDLER =============================================
+        if (this.playerMovementHandler(movementCode) == 1) { //if valid move:
+            //^ handles moving the player and showing the player!
+
+            //Move enemies.
+            for (let k = 0; k < this.enemies.length; k++) {
+                this.enemies[k].moveEnemy();
+            }
+            //check encounters.
+            for(let m = 0; m < this.enemies.length; m++){
+                //positions identical?
+                if(this.player.mapX == this.enemies[m].mapX &&
+                    this.player.mapY == this.enemies[m].mapY){
+                        this.currentEnemy = this.enemies[m];
+                        this.startCombat(m);
+                    }
+            }
+        } else { //if invalid move, still show. Map got cleared.
+            this.mapHandler.showPlayer(this.player);
+            for(let z = 0; z < this.enemies.length; z++){
+                this.mapHandler.showEnemy(this.enemies[z]);
+            }
+        }
     }
 
+    addEnemy(id) {
+        this.enemies.push(new Enemy(this, id));
+    }
     //Inventory initializations and updates.
     //when card icons happen, this needs to be updated.
     updateInventoryDisplay() {
@@ -118,9 +143,9 @@ class Game {
 
         //check tower range.
         this.inTowerRange = false;
-        for(let i = 0; i < this.mapHandler.towerArray.length; i++){
+        for (let i = 0; i < this.mapHandler.towerArray.length; i++) {
             let currentTower = this.mapHandler.towerArray[i];
-            if(calcPythagDistance([currentTower.mapX, currentTower.mapY], this.player.position) < currentTower.visionRange){
+            if (calcPythagDistance([currentTower.mapX, currentTower.mapY], this.player.position) < currentTower.visionRange) {
                 this.inTowerRange = true;
             }
         }
@@ -131,7 +156,8 @@ class Game {
     }
     //Sets flags and ends combat.
     endCombat() {
-
+        this.currentEnemy = null;
+        console.log("done")
     }
 
     //Clears queue and sets up each card turn.
@@ -188,6 +214,16 @@ class Game {
         this.player.iterateInventoryCooldowns();
         this.currentEnemy.iterateInventoryCooldowns();
 
+        //CHECK WIN CONDITIONS
+        if(this.player.health <= 0){
+            this.endCombat(0);
+            return;
+        }
+        if(this.currentEnemy.health <= 0){
+            this.endCombat(1);
+            return;
+        }
+
         //if no win condition met, go to next turn.
         //NOTE: ALSO NEEDS TO INCREMENT EFFECTS AT END OF TURN.
         if (this.currentEnemy.health > 0 && this.player.health > 0) {
@@ -195,7 +231,7 @@ class Game {
         }
     }
 
-    drawCombatCanvas(){
+    drawCombatCanvas() {
         var canvas = document.getElementById("gamePage__gameSpace__combat__spriteDisplay");
         var ctx = canvas.getContext("2d");
 
@@ -206,7 +242,7 @@ class Game {
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
         ctx.font = "30px serif";
-        ctx.fillText(`[${this.gameTurn}]`, canvas.width/2, canvas.height/2);
+        ctx.fillText(`[${this.gameTurn}]`, canvas.width / 2, canvas.height / 2);
     }
 
     generateCardSlots() {
@@ -345,7 +381,7 @@ class Game {
         }
         document.getElementById("gamePage__header__windowDisplay").innerHTML = this.windowTitles[this.windowState];
     }
-    async playerMovementHandler(key) {
+    playerMovementHandler(key) {
         //very cool directions array! Append each element instead of having 4 switch statements.
         //[left] [right] [up] [down]
         let directions = [[-1, 0], [1, 0], [0, -1], [0, 1]],
@@ -392,14 +428,15 @@ class Game {
             this.mapHandler.clearPlayer(this.player);
             this.player.updatePosition(nextCellPos[0], nextCellPos[1]);
 
+            //Show the player.
+            this.mapHandler.showPlayer(this.player);
 
             //Proc encounters!!!
             /*if (newCellEntity) {
                 newCellEntity.visit();
             }*/
-        }
-        //Show the player.
-        this.mapHandler.showPlayer(this.player);
+            return (1);
+        } else { return (0) }
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
     async keyDownHandler(e) {
@@ -600,6 +637,8 @@ class MapHandler {
             randomCoord[0] = randInt(this.mapWidth - 1);
             randomCoord[1] = randInt(this.mapHeight - 1);
 
+            console.log(`[${randomCoord[0]}][${randomCoord[1]}]`);
+
             //Validate if above position is accessible.
             //check if one of the neighbouring tiles instanceof PathCell.
             //iterate through adjacent cells.
@@ -624,7 +663,7 @@ class MapHandler {
                                     //Check distance between towers. Needs to be > 10.
                                     let towerCheck = true;
                                     for (let k = 0; k < this.towerArray.length; k++) {
-                                        if (calcPythagDistance(randomCoord, [this.towerArray[k].mapX, this.towerArray[k].mapY]) < 10) {
+                                        if (calcPythagDistance(randomCoord, [this.towerArray[k].mapX, this.towerArray[k].mapY]) < this.mapWidth / 5) {
                                             console.log("TowerCheckFailed!")
                                             towerCheck = false;
                                         }
@@ -733,6 +772,35 @@ class MapHandler {
             previousCell.domElement.style.opacity = "0.5";
         }
     }
+
+    showEnemy(enemy) {
+        let posX = enemy.mapX;
+        let posY = enemy.mapY;
+        if (this.mapArray[posX][posY].hidden == false) {
+            this.mapArray[posX][posY].domElement.innerHTML = enemy.canvasSymbol;
+            this.mapArray[posX][posY].domElement.style.fontWeight = "900";
+            this.mapArray[posX][posY].domElement.style.opacity = "1";
+        }
+    }
+    clearEnemy(enemy) {
+        let posX = enemy.mapX;
+        let posY = enemy.mapY;
+
+        var previousCell = this.mapArray[posX][posY];
+
+        if (previousCell.hidden) {
+            previousCell.domElement.innerHTML = "."
+            previousCell.domElement.style.fontWeight = "400";
+            previousCell.domElement.style.opacity = "1";
+        } else {
+            previousCell.domElement.innerHTML = previousCell.symbol;
+            //NOTE: this may change as more room types are added.
+            if (previousCell instanceof PathCell) {
+                previousCell.domElement.style.fontWeight = "400";
+                previousCell.domElement.style.opacity = "0.5";
+            }
+        }
+    }
 }
 class InputHandler {
     constructor() {
@@ -814,12 +882,12 @@ function setInventoryCardHoverListener(player) {
 function setCombatSlotHoverListener(game) {
     for (let i = 0; i < game.cardQueue.length; i++) {
         document.getElementById(`gamePage__gameSpace__combat__cardOrder__${i}`).addEventListener("mouseover", function () {
-            if(game.cardQueue[i] != null){
+            if (game.cardQueue[i] != null) {
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = game.cardQueue[i].name;
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${game.cardQueue[i].type}-${game.cardQueue[i].magnitude}`;
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore").innerHTML = game.cardQueue[i].lore;
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description").innerHTML = game.cardQueue[i].description;
-    
+
                 //effect updaters. Uncomment when effects implemented.
                 //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__name").innerHTML = game.cardQueue[i].effect.name;
                 //document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullEffectDisplay__description").innerHTML = game.cardQueue[i].effect.description;
@@ -912,10 +980,10 @@ function flushCSS(element) { //flushes css to no transition.
 
 async function initializeGame() {
     const game = new Game();
-    game.mapHandler = new MapHandler(30, 30, 80, 10);
+    game.mapHandler = new MapHandler(15, 15, 50, 5);
 
     //init player
-    game.player = new Player(100, game);
+    game.player = new Player(2, game);
 
     //create map for new room.
     game.mapHandler.mapArray = game.mapHandler.generateNewRoom(game);
@@ -950,7 +1018,7 @@ async function initializeGame() {
     //initMvmtListener(game);
     //Hover listener.
     setMapHoverListener(game.mapHandler.mapArray);
-    
+
     //resize to unblurry canvas.
     initializeCanvas();
 
@@ -964,8 +1032,10 @@ async function initializeGame() {
     game.player.addToInventory(new Card(-2, game.player, 1));
     game.player.addToInventory(new Card(-3, game.player, 1));
     //COMBAT TESTING, begin encounter here.
-    await sleep(1000);
-
+    /*await sleep(1000);
     game.enemies.push(new Enemy(10, game, "!", -1));
-    game.startCombat(0);
+    game.startCombat(0);*/
+    game.addEnemy(-1);
+    game.addEnemy(-1);
+    game.addEnemy(-1);
 }

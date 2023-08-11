@@ -7,6 +7,8 @@ class Cell {
         this.initialNode = initialNode;         //initial dialogue node. This is the TAG.
         //The above could be an ARRAY. This could indicate a recurring encounter.
 
+        this.hidden = true;
+
         this.mapX = positionX;
         this.mapY = positionY;
 
@@ -106,9 +108,11 @@ class Cell {
     //Show/hide DOM element
     showCell(){
         this.domElement.innerHTML = this.symbol;
+        this.hidden = false;
     }
     hideCell(){
         this.domElement.innerHTML = ".";
+        this.hidden = true;
     }
 }
 class WallCell extends Cell {
