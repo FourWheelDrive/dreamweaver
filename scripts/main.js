@@ -78,8 +78,8 @@ class Game {
         //Move enemies.
         for (let k = 0; k < this.enemies.length; k++) {
             this.enemies[k].moveEnemy();
-            this.checkEntityOverlap();
         }
+        this.checkEntityOverlap();
         //Uncomment the code below if i move enemies before the player.
         /*
         //re-show enemies because showCellsInVision() will delete them.
@@ -115,6 +115,7 @@ class Game {
                 this.player.mapY == this.enemies[m].mapY){
                     this.currentEnemy = this.enemies[m];
                     this.startCombat(m);
+                    return;
                 }
         }
     }
@@ -161,7 +162,6 @@ class Game {
         this.gameState = 2;
         this.changeWindow(2);
         this.currentEnemy = this.enemies[currentEnemyIndex];
-
         //check tower range.
         this.inTowerRange = false;
         for (let i = 0; i < this.mapHandler.towerArray.length; i++) {
