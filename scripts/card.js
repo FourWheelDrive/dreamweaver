@@ -45,7 +45,7 @@ class Card {
             case 0:
                 attributeArray = [
                     "Patience",
-                    "p",
+                    "P",
                     "A learned virtue. Or perhaps a curse?",
                     "Skip your turn.",
                     0,
