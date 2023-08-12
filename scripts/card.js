@@ -55,7 +55,7 @@ class Card {
                 break;
             case -1:
                 attributeArray = [
-                    "Test Card",
+                    "Attack",
                     "P",
                     "A test card, created to test cards.",
                     "Deal 4 damage to the enemy.",
@@ -67,10 +67,10 @@ class Card {
                 break;
             case -2:
                 attributeArray = [
-                    "Test Baguette",
+                    "Heal",
                     "A",
-                    "A test baguette, hon hon.",
-                    "Deal 4 damage to thy self.",
+                    "A reverse test card, created to reverse card tests.",
+                    "Deal -4 damage to thy self.",
                     //Owner is owner.
                     4,
                     "self",
@@ -79,7 +79,7 @@ class Card {
                 break;
             case -3:
                 attributeArray = [
-                    "Enemy test",
+                    "Attack 2",
                     "P",
                     "Enemy test card",
                     "Deal 4 damage to the enemy,",
