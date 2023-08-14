@@ -202,8 +202,16 @@ class Enemy extends Entity {
         }
         //Move to the smallest distance.
         var finalNewPos = [position[0] + directions[lowestDistIndex][0], position[1] + directions[lowestDistIndex][1]];
-        this.updatePosition(finalNewPos[0], finalNewPos[1]);
+        //Check if enemy already exists there.
+        if(mapHandler.mapArray[finalNewPos[0]][finalNewPos[1]].entityHost == false){
 
+            //Update flag on current cell.
+            mapHandler.mapArray[this.mapX][this.mapY].entityHost = false;
+
+            //Move & Update new cell.
+            this.updatePosition(finalNewPos[0], finalNewPos[1]);
+            mapHandler.mapArray[this.mapX][this.mapY].entityHost = true;
+        }
         mapHandler.showEnemy(this);
     }
 

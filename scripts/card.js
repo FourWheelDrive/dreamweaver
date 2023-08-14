@@ -18,8 +18,6 @@ class Card {
         this.id = id; //ID for quick identification in code.
         this.domElement; //DOM Element for quick processing.
 
-        this.entityHost = []; //does this cell have any entities on it?
-
         //call an initialize function to make the card without making super duper long constructor.
         this.initializeCard(id);
     }
@@ -112,15 +110,20 @@ class Card {
         this.onCooldown = this.cooldown; //put on cooldown.
         //If not "Patience":
         if (this.owner.constructor.name == "Player" && this.id != 0) {
-            //Grey out the card tile.
-            this.domElement.style.opacity = 0.5;
-
             //Remove charge.
             this.quantity = this.quantity - 1;
             //remove from inventory if used up.
             if (this.quantity == 0 && this.id != 0) {
                 this.owner.removeFromInventory(this);
             }
+
+
+            //Grey out the card tile.
+            this.domElement.style.opacity = 0.5;
+            //& Update the quantity in the display.
+            let index = this.owner.inventory.findIndex((element) => element === this);
+            document.getElementById(`gamePage__gameSpace__combat__inventoryDisplay__${index}__name`).innerHTML = `${this.name} \n
+            ${this.quantity}*${this.type}${this.magnitude}`;
         }
 
         //Update display screen.

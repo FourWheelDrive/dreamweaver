@@ -15,6 +15,8 @@ class Cell {
         this.cellID = `[${positionX}][${positionY}]`;   //HTML DOM ID
         this.domElement;
         this.mapHandler = map;
+
+        this.entityHost = false;    //does this cell have entities (enemy) on it?
     }
     //Adds .domElement to this cell.
     addDomElement(){

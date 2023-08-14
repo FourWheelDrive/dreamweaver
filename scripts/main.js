@@ -74,21 +74,18 @@ class Game {
         }
 
         
-        this.playerMovementHandler(movementCode);
-        //Move enemies.
+        //Move enemies before player.
         for (let k = 0; k < this.enemies.length; k++) {
             this.enemies[k].moveEnemy();
         }
         this.checkEntityOverlap();
+        this.playerMovementHandler(movementCode);
+
         //Uncomment the code below if i move enemies before the player.
-        /*
         //re-show enemies because showCellsInVision() will delete them.
         for (let m = 0; m < this.enemies.length; m++){
             this.mapHandler.showEnemy(this.enemies[m]);
         }
-        this.checkEntityOverlap();
-         */
-
         //ACTUAL MOVE BIT. TURN HANDLER =============================================
         /*if (this.playerMovementHandler(movementCode) == 1) { //if valid move:
             //^ handles moving the player and showing the player!
@@ -107,16 +104,16 @@ class Game {
         }*/
     }
     //for checking player-on-enemy encounters.
-    checkEntityOverlap(){
+    checkEntityOverlap() {
         //check encounters.
-        for(let m = 0; m < this.enemies.length; m++){
+        for (let m = 0; m < this.enemies.length; m++) {
             //positions identical?
-            if(this.player.mapX == this.enemies[m].mapX &&
-                this.player.mapY == this.enemies[m].mapY){
-                    this.currentEnemy = this.enemies[m];
-                    this.startCombat(m);
-                    return;
-                }
+            if (this.player.mapX == this.enemies[m].mapX &&
+                this.player.mapY == this.enemies[m].mapY) {
+                this.currentEnemy = this.enemies[m];
+                this.startCombat(m);
+                return;
+            }
         }
     }
 
@@ -137,7 +134,10 @@ class Game {
             let newIcon; //when i sort out card icons.
             let newName = document.createElement("p");
 
-            newName.innerText = `${this.player.inventory[i].name}`;
+            let invObj = this.player.inventory[i];
+
+            newName.innerText = `${invObj.name} \n
+            ${invObj.quantity}*${invObj.type}${invObj.magnitude}`;
 
             newCard.setAttribute("id", `gamePage__gameSpace__combat__inventoryDisplay__${i}`);
             newCard.setAttribute("class", "inventoryCard");
@@ -236,11 +236,11 @@ class Game {
         this.currentEnemy.iterateInventoryCooldowns();
 
         //CHECK WIN CONDITIONS
-        if(this.player.health <= 0){
+        if (this.player.health <= 0) {
             this.endCombat(0);
             return;
         }
-        if(this.currentEnemy.health <= 0){
+        if (this.currentEnemy.health <= 0) {
             this.endCombat(1);
             return;
         }
@@ -457,10 +457,10 @@ class Game {
                 newCellEntity.visit();
             }*/
             return (1);
-        } else { 
+        } else {
             //Show the player.
             this.mapHandler.showPlayer(this.player);
-            return (0) 
+            return (0)
         }
     }
     //THIS FUNCTION WILL LATER BE CHECKING FOR GAMESTATE.
@@ -893,7 +893,7 @@ function setInventoryCardHoverListener(player) {
     for (let i = 0; i < player.inventory.length; i++) {
         player.inventory[i].domElement.addEventListener("mouseover", function () {
             document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = player.inventory[i].name;
-            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${player.inventory[i].type}-${player.inventory[i].magnitude}`;
+            document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${player.inventory[i].type}${player.inventory[i].magnitude}`;
             document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore").innerHTML = player.inventory[i].lore;
             document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description").innerHTML = player.inventory[i].description;
 
@@ -909,7 +909,7 @@ function setCombatSlotHoverListener(game) {
         document.getElementById(`gamePage__gameSpace__combat__cardOrder__${i}`).addEventListener("mouseover", function () {
             if (game.cardQueue[i] != null) {
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__name").innerHTML = game.cardQueue[i].name;
-                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${game.cardQueue[i].type}-${game.cardQueue[i].magnitude}`;
+                document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__magnitude-type").innerHTML = `${game.cardQueue[i].type}${game.cardQueue[i].magnitude}`;
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__lore").innerHTML = game.cardQueue[i].lore;
                 document.getElementById("gamePage__gameSpace__combat__fullDisplays__fullCardDisplay__description").innerHTML = game.cardQueue[i].description;
 
@@ -1052,7 +1052,7 @@ async function initializeGame() {
     pushMainOutput("Press Z for help!");
 
     //INVENTORY TESTING
-    game.player.addToInventory(new Card(0, game.player, 1));
+    game.player.addToInventory(new Card(0, game.player, "∞"));
     game.player.addToInventory(new Card(-1, game.player, 5));
     game.player.addToInventory(new Card(-2, game.player, 5));
     game.player.addToInventory(new Card(-3, game.player, 5));
