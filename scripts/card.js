@@ -61,7 +61,7 @@ class Card {
                     4,
                     "opposition",
                     "none",
-                    2];
+                    1];
                 break;
             case -2:
                 attributeArray = [
@@ -73,7 +73,7 @@ class Card {
                     4,
                     "self",
                     "none",
-                    2];
+                    5];
                 break;
             case -3:
                 attributeArray = [
@@ -85,7 +85,7 @@ class Card {
                     4,
                     "opposition",
                     "none",
-                    3];
+                    2];
                 break;
         }
         this.name = attributeArray[0];
