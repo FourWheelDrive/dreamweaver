@@ -164,7 +164,9 @@ class Card {
     iterateCooldown() {
         if (this.onCooldown > 0) {
             this.onCooldown = this.onCooldown - 1;
-        } else if (this.onCooldown == 0 && this.owner.constructor.name == "Player") {
+        }
+        
+        if (this.onCooldown == 0 && this.owner.constructor.name == "Player") {
             this.domElement.style.opacity = 1.0;
         }
     }

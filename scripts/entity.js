@@ -152,7 +152,6 @@ class Enemy extends Entity {
                 this.contactDialogue = ["Heheheha! I am amogus"];
                 this.defeatDialogue = ["o noes"];
                 this.addToInventory(new Card(-1, this, 1));
-                this.addToInventory(new Card(-2, this, 1));
                 this.addToInventory(new Card(-3, this, 1));
                 break;
         }
